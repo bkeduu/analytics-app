@@ -6,5 +6,9 @@
         <file>images/page_3.png</file>
         <file>images/page_4.png</file>
         <file>images/page_5.png</file>
+        <file>images/solar-power.png</file>
+        <file>images/wind-turbine.png</file>
+        <file>images/battery.png</file>
+        <file>images/diesel.png</file>
     </qresource>
 </RCC>

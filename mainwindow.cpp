@@ -7,15 +7,20 @@
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent), ui(new Ui::MainWindow), tabWidget(nullptr), tabDialog(nullptr), layout(nullptr) {
+	: QMainWindow{parent}, ui{new Ui::MainWindow}, tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr} {
 
 	ui->setupUi(this);
 
-	setWindowTitle(tr("Analytics system"));
-	setWindowIcon(QIcon(":/images/window_icon.png"));
+	QFont appFont{this->font()};
+	appFont.setPixelSize(18);
+	appFont.setHintingPreference(QFont::PreferFullHinting);
+	this->setFont(appFont);
 
-	layout = new QGridLayout(this);
-	tabWidget = new QTabWidget(this);
+	setWindowTitle(tr("Analytics system"));
+	setWindowIcon(QIcon{":/images/window_icon.png"});
+
+	layout = new QGridLayout{this};
+	tabWidget = new QTabWidget{this};
 
 	tabs[Tab::Status] = StatusTab::getWidget(tr("Status"), tabWidget);
 	tabs[Tab::Forecast] = ConsumersTab::getWidget(tr("Consumers"), tabWidget);
@@ -26,18 +31,18 @@ MainWindow::MainWindow(QWidget *parent)
 	foreach (Tab tab, tabs.keys()) {
 		tabWidget->addTab(tabs[tab], tabs[tab]->getName());
 		tabWidget->setTabIcon(tabWidget->indexOf(tabs[tab]),
-							  QIcon(QString(":/images/page_") + QString::number((int)tab) + ".png"));
+							  QIcon{QString{":/images/page_"} + QString::number((int)tab) + ".png"});
 	}
 
-	tabWidget->tabBar()->setMinimumHeight(100);
-	tabWidget->setMinimumHeight(100);
-	tabWidget->tabBar()->setDocumentMode(true);
-	tabWidget->tabBar()->setExpanding(true);
+	// tabWidget->tabBar()->setMinimumHeight(100);
+	// tabWidget->setMinimumHeight(100);
+	// tabWidget->tabBar()->setDocumentMode(true);
+	// tabWidget->tabBar()->setExpanding(true);
 	tabWidget->tabBar()->setIconSize(QSize(30, 30));
 
-	layout->addWidget(tabWidget);
+	layout->addWidget(tabWidget, 0, 0);
 	tabWidget->setCurrentWidget(tabs[Tab::Status]);
-	tabWidget->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
+	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 
 	this->setLayout(layout);
 }

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <QString>
-#include <QWidget>
 #include <QMutex>
+#include <QLabel>
+#include <QFrame>
+#include <QLayout>
 
-class ITab : public QWidget {
+class ITab : public QFrame {
 	Q_OBJECT
 public:
 	ITab(QWidget* parent, const QString& name);
