@@ -16,7 +16,8 @@ SOURCES += \
 	tabs/generationtab.cpp \
 	tabs/itab.cpp \
 	tabs/settingstab.cpp \
-	tabs/statustab.cpp
+	tabs/statustab.cpp \
+	customwidgets.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -25,7 +26,8 @@ HEADERS += \
 	tabs/generationtab.h \
 	tabs/itab.h \
 	tabs/settingstab.h \
-	tabs/statustab.h
+	tabs/statustab.h \
+	customwidgets.h
 
 FORMS += \
     mainwindow.ui

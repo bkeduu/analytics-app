@@ -6,7 +6,10 @@
 #include <QTabWidget>
 #include <QTabBar>
 #include <QMap>
+#include <QFile>
+#include <QJsonDocument>
 #include <QResizeEvent>
+#include <QVBoxLayout>
 #include <QLayout>
 
 enum class Tab {
@@ -33,7 +36,7 @@ private:
     Ui::MainWindow *ui;
 	QTabWidget* tabWidget;
 	QDialog* tabDialog;
-	QGridLayout* layout;
+	QHBoxLayout* layout;
 
 	QMap<Tab, ITab*> tabs;
 };

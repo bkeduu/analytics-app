@@ -8,7 +8,6 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow{parent}, ui{new Ui::MainWindow}, tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr} {
-
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -19,14 +18,26 @@ MainWindow::MainWindow(QWidget *parent)
 	setWindowTitle(tr("Analytics system"));
 	setWindowIcon(QIcon{":/images/window_icon.png"});
 
-	layout = new QGridLayout{this};
+	QString consumers_JSON;
+	QFile consumers_JSON_file{"C:\\Users\\leakt\\Documents\\analytics-app\\configs\\consumers.json"};
+	consumers_JSON_file.open(QIODevice::ReadOnly | QIODevice::Text);
+	consumers_JSON = consumers_JSON_file.readAll();
+
+	QJsonDocument consumers = QJsonDocument::fromJson(consumers_JSON.toUtf8());
+
+	layout = new QHBoxLayout{this};
 	tabWidget = new QTabWidget{this};
 
 	tabs[Tab::Status] = StatusTab::getWidget(tr("Status"), tabWidget);
-	tabs[Tab::Forecast] = ConsumersTab::getWidget(tr("Consumers"), tabWidget);
+
+	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), tabWidget);
+	consumersTab->setJSONDocument(consumers);
+
+	tabs[Tab::Consumers] = consumersTab;
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), tabWidget);
-	tabs[Tab::Consumers] = ForecastTab::getWidget(tr("Forecast"), tabWidget);
+	tabs[Tab::Forecast] = ForecastTab::getWidget(tr("Forecast"), tabWidget);
 	tabs[Tab::Settings] = SettingsTab::getWidget(tr("Settings"), tabWidget);
+
 
 	foreach (Tab tab, tabs.keys()) {
 		tabWidget->addTab(tabs[tab], tabs[tab]->getName());
@@ -34,13 +45,9 @@ MainWindow::MainWindow(QWidget *parent)
 							  QIcon{QString{":/images/page_"} + QString::number((int)tab) + ".png"});
 	}
 
-	// tabWidget->tabBar()->setMinimumHeight(100);
-	// tabWidget->setMinimumHeight(100);
-	// tabWidget->tabBar()->setDocumentMode(true);
-	// tabWidget->tabBar()->setExpanding(true);
 	tabWidget->tabBar()->setIconSize(QSize(30, 30));
 
-	layout->addWidget(tabWidget, 0, 0);
+	layout->addWidget(tabWidget);
 	tabWidget->setCurrentWidget(tabs[Tab::Status]);
 	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 

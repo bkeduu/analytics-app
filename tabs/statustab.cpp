@@ -30,7 +30,7 @@ StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tab
 	layout->addWidget(battery, 1 , 1);
 }
 
-QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSizePolicy& sp) {
+QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSizePolicy& sp) const {
 	QLabel* result = new QLabel{parent};
 	result->setText(text);
 	result->setSizePolicy(sp);
@@ -42,7 +42,7 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSize
 	return result;
 }
 
-QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const QSizePolicy& sp, const QSize& sz) {
+QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const QSizePolicy& sp, const QSize& sz) const {
 	QLabel* result = new QLabel{parent};
 	QPixmap image{imagePath};
 	image = image.scaled(sz);
@@ -56,6 +56,30 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const 
 	return result;
 }
 
+QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize) const {
+	QProgressBar* result = new QProgressBar{parent};
+
+	static QFile stylesheet_file = QFile{":/stylesheets/progressbar.css"};
+	stylesheet_file.open(QFile::ReadOnly, QFile::Text);
+
+	static QString stylesheet = QString::fromStdString(stylesheet_file.readAll().toStdString());
+
+	result->setValue(40);
+	result->setTextVisible(true);
+	result->setMaximumSize(minSize);
+	result->setStyleSheet("QProgressBar::chunk { \
+							  background-color: rgb(0, 179, 0); \
+						  } \
+						  QProgressBar { \
+							  border: 1px solid #acacac; \
+							  border-radius: 0px; \
+							  text-align: center; \
+							  background: #dfdfdf; \
+						 }");
+
+	return result;
+}
+
 QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 	QFrame* widget;
@@ -64,8 +88,6 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widget = new QFrame{parent};
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
-		layout->setContentsMargins(0, 0, 0, 0);
-		layout->setSizeConstraint(QLayout::SetDefaultConstraint);
 
 		widget->setLayout(layout);
 		widget->setFrameShape(QFrame::Box);
@@ -76,14 +98,12 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		generationFrameLabel->setFrameShape(QFrame::Box);
 		generationFrameLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 		generationFrameLabel->setMaximumSize(QSize{100, 40});
-		layout->addWidget(generationFrameLabel, 0, Qt::AlignCenter);
+		layout->addWidget(generationFrameLabel, Qt::AlignCenter);
 
 		QFrame* solarInfoWidget = new QFrame{widget};
 		QHBoxLayout* solarInfoLayout = new QHBoxLayout{solarInfoWidget};
-		solarInfoLayout->setContentsMargins(0, 0, 0, 0);
-		solarInfoLayout->setSpacing(10);
 		solarInfoWidget->setLayout(solarInfoLayout);
-		layout->addWidget(solarInfoWidget, 0, Qt::AlignCenter);
+		layout->addWidget(solarInfoWidget, Qt::AlignCenter);
 
 		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/images/solar-power.png",
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
@@ -93,13 +113,12 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		solarInfoLayout->addWidget(createLabel(solarInfoWidget, QString("W: %1").arg(0),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/images/solar-power.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+		solarInfoLayout->addWidget(createProgressBar(solarInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		QFrame* windInfoWidget = new QFrame{widget};
 		QHBoxLayout* windInfoLayout = new QHBoxLayout{windInfoWidget};
 		solarInfoWidget->setLayout(windInfoLayout);
-		layout->addWidget(windInfoWidget, 0, Qt::AlignCenter);
+		layout->addWidget(windInfoWidget, Qt::AlignCenter);
 
 		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/images/wind-turbine.png",
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
@@ -109,24 +128,22 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		windInfoLayout->addWidget(createLabel(windInfoWidget, QString("W: %1").arg(0),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/images/wind-turbine.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+		windInfoLayout->addWidget(createProgressBar(windInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		QFrame* dieselInfoWidget = new QFrame{widget};
 		QHBoxLayout* dieselInfoLayout = new QHBoxLayout{dieselInfoWidget};
 		dieselInfoWidget->setLayout(dieselInfoLayout);
-		layout->addWidget(dieselInfoWidget, 0, Qt::AlignCenter);
+		layout->addWidget(dieselInfoWidget, Qt::AlignCenter);
 
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/images/diesel.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), Qt::AlignCenter);
+									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), Qt::AlignCenter);
+									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), Qt::AlignCenter);
+									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), Qt::AlignCenter);
-		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/images/diesel.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), Qt::AlignCenter);
+									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
+		dieselInfoLayout->addWidget(createProgressBar(dieselInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -143,7 +160,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		consumersFrameLabel->setFrameShape(QFrame::Box);
 		consumersFrameLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 		consumersFrameLabel->setMaximumSize(QSize{120, 40});
-		layout->addWidget(consumersFrameLabel, 0, Qt::AlignCenter);
+		layout->addWidget(consumersFrameLabel, Qt::AlignCenter);
 
 		QFrame* firstInfoWidget = new QFrame{widget};
 		QHBoxLayout* firstInfoLayout = new QHBoxLayout{firstInfoWidget};
@@ -158,8 +175,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		firstInfoLayout->addWidget(createLabel(firstInfoWidget, QString("W: %1").arg(0),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		firstInfoLayout->addWidget(createLabel(firstInfoWidget, ":/images/solar-power.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+		firstInfoLayout->addWidget(createProgressBar(firstInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		QFrame* secondInfoWidget = new QFrame{widget};
 		QHBoxLayout* secondInfoLayout = new QHBoxLayout{secondInfoWidget};
@@ -174,8 +190,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		secondInfoLayout->addWidget(createLabel(secondInfoWidget, QString("W: %1").arg(0),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		secondInfoLayout->addWidget(createLabel(secondInfoWidget, ":/images/solar-power.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+		secondInfoLayout->addWidget(createProgressBar(secondInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		QFrame* thirdInfoWidget = new QFrame{widget};
 		QHBoxLayout* thirdInfoLayout = new QHBoxLayout{thirdInfoWidget};
@@ -190,8 +205,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, QString("W: %1").arg(0),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, ":/images/solar-power.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+		thirdInfoLayout->addWidget(createProgressBar(thirdInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -204,63 +218,85 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		QLabel* modeLabel = new QLabel{widget};
 		modeLabel->setText(tr("Work Mode"));
-		modeLabel->setAlignment(Qt::AlignCenter);
 		modeLabel->setFrameShape(QFrame::Box);
 		modeLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 		modeLabel->setMaximumSize(QSize{150, 40});
-		layout->addWidget(modeLabel, 0, Qt::AlignCenter);
+		layout->addWidget(modeLabel);
 
 		QFrame* manualModeWidget = new QFrame{widget};
 		QHBoxLayout* manualModeWidgetLayout = new QHBoxLayout{manualModeWidget};
 		manualModeWidget->setLayout(manualModeWidgetLayout);
-		layout->addWidget(manualModeWidget, 20, Qt::AlignCenter);
+		manualModeWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+		layout->addWidget(manualModeWidget, 20, Qt::AlignLeft);
 
 		QRadioButton* manualModeButton = new QRadioButton{manualModeWidget};
 		manualModeButton->setMinimumSize(20, 20);
-		manualModeWidgetLayout->addWidget(manualModeButton, 20, Qt::AlignCenter);
+		manualModeWidgetLayout->addWidget(manualModeButton, 20, Qt::AlignLeft);
 
 		QFrame* manualModeDescriptionWidget = new QFrame{manualModeWidget};
 		QVBoxLayout* manualModeDescriptionLayout = new QVBoxLayout{manualModeDescriptionWidget};
 		manualModeDescriptionWidget->setLayout(manualModeDescriptionLayout);
-		manualModeWidgetLayout->addWidget(manualModeDescriptionWidget, 20, Qt::AlignCenter);
+		manualModeDescriptionWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+		manualModeWidgetLayout->addWidget(manualModeDescriptionWidget, 20, Qt::AlignLeft);
 
 		QLabel* manualModeWidgetName = new QLabel{manualModeDescriptionWidget};
 		manualModeWidgetName->setText(tr("Manual mode"));
-		manualModeDescriptionLayout->addWidget(manualModeWidgetName);
+		manualModeDescriptionLayout->addWidget(manualModeWidgetName, Qt::AlignLeft);
+		manualModeWidgetName->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 
 		QFrame* manualModeDescriptionDelimeter = new QFrame{manualModeDescriptionWidget};
 		manualModeDescriptionDelimeter->setFrameShape(QFrame::HLine);
-		manualModeDescriptionLayout->addWidget(manualModeDescriptionDelimeter);
+		manualModeDescriptionLayout->addWidget(manualModeDescriptionDelimeter, Qt::AlignLeft);
 
 		QLabel* manualModeWidgetDescription = new QLabel{manualModeDescriptionWidget};
 		manualModeWidgetDescription->setText(tr("Manual mode description"));
-		manualModeDescriptionLayout->addWidget(manualModeWidgetDescription);
+		manualModeDescriptionLayout->addWidget(manualModeWidgetDescription, Qt::AlignLeft);
+		manualModeWidgetDescription->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 
 		QFrame* autoModeWidget = new QFrame{widget};
 		QHBoxLayout* autoModeWidgetLayout = new QHBoxLayout{autoModeWidget};
 		autoModeWidget->setLayout(autoModeWidgetLayout);
-		layout->addWidget(autoModeWidget, 20, Qt::AlignCenter);
+		layout->addWidget(autoModeWidget, 20, Qt::AlignLeft);
 
 		QRadioButton* autoModeButton = new QRadioButton{autoModeWidget};
 		autoModeButton->setMinimumSize(20, 20);
-		autoModeWidgetLayout->addWidget(autoModeButton, 20, Qt::AlignCenter);
+		autoModeWidgetLayout->addWidget(autoModeButton, 20);
 
 		QFrame* autoModeDescriptionWidget = new QFrame{autoModeWidget};
 		QVBoxLayout* autoModeDescriptionLayout = new QVBoxLayout{autoModeDescriptionWidget};
 		autoModeDescriptionWidget->setLayout(autoModeDescriptionLayout);
-		autoModeWidgetLayout->addWidget(autoModeDescriptionWidget, 20, Qt::AlignCenter);
+		autoModeWidgetLayout->addWidget(autoModeDescriptionWidget, 20, Qt::AlignLeft);
 
 		QLabel* autoModeWidgetName = new QLabel{autoModeDescriptionWidget};
 		autoModeWidgetName->setText(tr("Automatic mode"));
-		autoModeDescriptionLayout->addWidget(autoModeWidgetName);
+		autoModeDescriptionLayout->addWidget(autoModeWidgetName, Qt::AlignLeft);
 
 		QFrame* autoModeDescriptionDelimeter = new QFrame{autoModeDescriptionWidget};
 		autoModeDescriptionDelimeter->setFrameShape(QFrame::HLine);
-		autoModeDescriptionLayout->addWidget(autoModeDescriptionDelimeter);
+		autoModeDescriptionLayout->addWidget(autoModeDescriptionDelimeter, Qt::AlignLeft);
 
 		QLabel* autoModeWidgetDescription = new QLabel{autoModeDescriptionWidget};
 		autoModeWidgetDescription->setText(tr("Automatic mode description"));
-		autoModeDescriptionLayout->addWidget(autoModeWidgetDescription);
+		autoModeDescriptionLayout->addWidget(autoModeWidgetDescription, Qt::AlignLeft);
+
+		// clicked signal prevents infinite recursion against toggled signal
+		connect(manualModeButton, &QRadioButton::clicked, manualModeButton, [=](bool state) {
+			if (state) {
+				autoModeButton->setChecked(!state);
+			}
+			else {
+				manualModeButton->setChecked(!state);
+			}
+		});
+
+		connect(autoModeButton, &QRadioButton::clicked, autoModeButton, [=](bool state) {
+			if (state) {
+				manualModeButton->setChecked(!state);
+			}
+			else {
+				autoModeButton->setChecked(!state);
+			}
+		});
 
 		break;
 	}
@@ -276,9 +312,21 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QHBoxLayout* batteryStatusLayout = new QHBoxLayout{batteryStatusWidget};
 
 		QProgressBar* batteryChargeIndicator = new QProgressBar{widget};
-		batteryChargeIndicator->setOrientation(Qt::Vertical);
+
 		batteryChargeIndicator->setValue(40);
 		batteryChargeIndicator->setMinimumSize(60, 100);
+
+		batteryChargeIndicator->setStyleSheet("QProgressBar::chunk { \
+												  background-color: rgb(0, 179, 0); \
+											  } \
+											  QProgressBar { \
+												  border: 1px solid #acacac; \
+												  border-radius: 0px; \
+												  text-align: center; \
+												  background: #dfdfdf; \
+											}");
+
+		batteryChargeIndicator->setOrientation(Qt::Vertical);
 		batteryStatusLayout->addWidget(batteryChargeIndicator);
 
 		QFrame* batteryStatusInformation = new QFrame{widget};

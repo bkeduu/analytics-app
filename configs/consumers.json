@@ -1,0 +1,37 @@
+{
+	"consumers": {
+			"group_1" : [
+				"refrigerator1-1",
+				"televisor1-1",
+				"teapot1-1",
+				"refrigerator1-2",
+				"televisor1-2",
+				"teapot1-2",
+				"refrigerator1-3",
+				"televisor1-3",
+				"teapot1-3"
+			],
+      "group_2" : [
+				"refrigerator2-1",
+				"televisor2-1",
+				"teapot2-1",
+				"refrigerator2-2",
+				"televisor2-2",
+				"teapot2-2",
+				"refrigerator2-3",
+				"televisor2-3",
+				"teapot2-3"
+			],
+      "group_3": [
+        "refrigerator3-1",
+        "televisor3-1",
+        "teapot3-1",
+        "refrigerator3-2",
+        "televisor3-2",
+        "teapot3-2",
+        "refrigerator3-3",
+        "televisor3-3",
+        "teapot3-3"
+      ]
+    }
+}

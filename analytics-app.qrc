@@ -10,5 +10,6 @@
         <file>images/wind-turbine.png</file>
         <file>images/battery.png</file>
         <file>images/diesel.png</file>
+        <file>stylesheets/progressbar.css</file>
     </qresource>
 </RCC>
