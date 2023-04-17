@@ -5,6 +5,8 @@
 #include <QFrame>
 #include <QLayout>
 
+class MainWindow;
+
 class ITab : public QFrame {
 	Q_OBJECT
 public:
@@ -15,5 +17,8 @@ public:
 
 private:
 	const QString tabName;
+
+protected:
+	MainWindow* mParent;
 };
 

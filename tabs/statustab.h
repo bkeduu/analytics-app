@@ -11,6 +11,41 @@
 
 #include "itab.h"
 
+enum GeneratorsStatus {
+	SolarVoltage,
+	SolarCurrent,
+	SolarPower,
+	SolarProgress,
+	WindVoltage,
+	WindCurrent,
+	WindPower,
+	WindProgress,
+	DieselVoltage,
+	DieselCurrent,
+	DieselPower,
+	DieselProgress
+};
+
+enum ConsumersStatus {
+	FirstVoltage,
+	FirstCurrent,
+	FirstPower,
+	FirstProgress,
+	SecondVoltage,
+	SecondCurrent,
+	SecondPower,
+	SecondProgress,
+	ThirdVoltage,
+	ThirdCurrent,
+	ThirdPower,
+	ThirdProgress
+};
+
+enum BatteryStatus {
+	BatteryVoltage,
+	BatteryProgress
+};
+
 class StatusTab : public ITab {
 	Q_OBJECT
 public:
@@ -33,6 +68,10 @@ private:
 	static QMutex lock;
 
 	QFrame* createWidget(TabWidget widgetType, QWidget* parent);
+
+	QHash<GeneratorsStatus, QWidget*> generatorsLabels;
+	QHash<ConsumersStatus, QWidget*> consumersLabels;
+	QHash<BatteryStatus, QWidget*> batteryLabels;
 
 	virtual ~StatusTab() {};
 };

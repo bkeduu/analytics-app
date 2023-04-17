@@ -1,6 +1,5 @@
 QProgressBar::chunk {
     background-color: rgb(0, 179, 0);
-    width: 1px;
 }
 
 QProgressBar {

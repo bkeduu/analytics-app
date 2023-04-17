@@ -59,23 +59,15 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const 
 QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize) const {
 	QProgressBar* result = new QProgressBar{parent};
 
-	static QFile stylesheet_file = QFile{":/stylesheets/progressbar.css"};
-	stylesheet_file.open(QFile::ReadOnly, QFile::Text);
-
-	static QString stylesheet = QString::fromStdString(stylesheet_file.readAll().toStdString());
+	static QFile stylesheet_file = QFile{":/static/stylesheets/progressbar.css"};
+	if (!stylesheet_file.isOpen())
+		stylesheet_file.open(QFile::ReadOnly | QFile::Text);
+	static QString stylesheet = stylesheet_file.readAll();
 
 	result->setValue(40);
 	result->setTextVisible(true);
-	result->setMaximumSize(minSize);
-	result->setStyleSheet("QProgressBar::chunk { \
-							  background-color: rgb(0, 179, 0); \
-						  } \
-						  QProgressBar { \
-							  border: 1px solid #acacac; \
-							  border-radius: 0px; \
-							  text-align: center; \
-							  background: #dfdfdf; \
-						 }");
+	result->setMinimumSize(minSize);
+	result->setStyleSheet(stylesheet);
 
 	return result;
 }
@@ -105,45 +97,83 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		solarInfoWidget->setLayout(solarInfoLayout);
 		layout->addWidget(solarInfoWidget, Qt::AlignCenter);
 
-		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/images/solar-power.png",
+		QWidget* statusLabel = nullptr;
+
+		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/static/images/solar-power.png",
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
-		solarInfoLayout->addWidget(createLabel(solarInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		solarInfoLayout->addWidget(createLabel(solarInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		solarInfoLayout->addWidget(createLabel(solarInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		solarInfoLayout->addWidget(createProgressBar(solarInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(solarInfoWidget, QString("V: %1").arg(0),
+								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[SolarVoltage] = statusLabel;
+		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(solarInfoWidget, QString("A: %1").arg(0),
+								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[SolarCurrent] = statusLabel;
+		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(solarInfoWidget, QString("W: %1").arg(0),
+								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[SolarPower] = statusLabel;
+		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(solarInfoWidget, QSize{70, 30});
+		generatorsLabels[SolarProgress] = statusLabel;
+		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		QFrame* windInfoWidget = new QFrame{widget};
 		QHBoxLayout* windInfoLayout = new QHBoxLayout{windInfoWidget};
 		solarInfoWidget->setLayout(windInfoLayout);
 		layout->addWidget(windInfoWidget, Qt::AlignCenter);
 
-		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/images/wind-turbine.png",
+		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/static/images/wind-turbine.png",
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
-		windInfoLayout->addWidget(createLabel(windInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		windInfoLayout->addWidget(createLabel(windInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		windInfoLayout->addWidget(createLabel(windInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		windInfoLayout->addWidget(createProgressBar(windInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(windInfoWidget, QString("V: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[WindVoltage] = statusLabel;
+		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(windInfoWidget, QString("A: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[WindCurrent] = statusLabel;
+		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(windInfoWidget, QString("W: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[WindPower] = statusLabel;
+		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(windInfoWidget, QSize{70, 30});
+		generatorsLabels[WindProgress] = statusLabel;
+		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		QFrame* dieselInfoWidget = new QFrame{widget};
 		QHBoxLayout* dieselInfoLayout = new QHBoxLayout{dieselInfoWidget};
 		dieselInfoWidget->setLayout(dieselInfoLayout);
 		layout->addWidget(dieselInfoWidget, Qt::AlignCenter);
 
-		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/images/diesel.png",
+		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/static/images/diesel.png",
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
-		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		dieselInfoLayout->addWidget(createProgressBar(dieselInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(dieselInfoWidget, QString("V: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[DieselVoltage] = statusLabel;
+		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(dieselInfoWidget, QString("A: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[DieselCurrent] = statusLabel;
+		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(dieselInfoWidget, QString("W: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		generatorsLabels[DieselPower] = statusLabel;
+		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(dieselInfoWidget, QSize{70, 30});
+		generatorsLabels[DieselProgress] = statusLabel;
+		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -167,15 +197,29 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		firstInfoWidget->setLayout(firstInfoLayout);
 		layout->addWidget(firstInfoWidget);
 
+		QWidget* statusLabel = nullptr;
+
 		firstInfoLayout->addWidget(createLabel(firstInfoWidget, tr("1st group"),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		firstInfoLayout->addWidget(createLabel(firstInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		firstInfoLayout->addWidget(createLabel(firstInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		firstInfoLayout->addWidget(createLabel(firstInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		firstInfoLayout->addWidget(createProgressBar(firstInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(firstInfoWidget, QString("V: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[FirstVoltage] = statusLabel;
+		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(firstInfoWidget, QString("A: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[FirstCurrent] = statusLabel;
+		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(firstInfoWidget, QString("W: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[FirstPower] = statusLabel;
+		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(firstInfoWidget, QSize{70, 30});
+		consumersLabels[FirstProgress] = statusLabel;
+		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		QFrame* secondInfoWidget = new QFrame{widget};
 		QHBoxLayout* secondInfoLayout = new QHBoxLayout{secondInfoWidget};
@@ -184,28 +228,52 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		secondInfoLayout->addWidget(createLabel(secondInfoWidget, tr("2nd group"),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		secondInfoLayout->addWidget(createLabel(secondInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		secondInfoLayout->addWidget(createLabel(secondInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		secondInfoLayout->addWidget(createLabel(secondInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		secondInfoLayout->addWidget(createProgressBar(secondInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(secondInfoWidget, QString("V: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[SecondVoltage] = statusLabel;
+		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(secondInfoWidget, QString("A: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[SecondCurrent] = statusLabel;
+		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(secondInfoWidget, QString("W: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[SecondPower] = statusLabel;
+		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(secondInfoWidget, QSize{70, 30});
+		consumersLabels[SecondProgress] = statusLabel;
+		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		QFrame* thirdInfoWidget = new QFrame{widget};
 		QHBoxLayout* thirdInfoLayout = new QHBoxLayout{thirdInfoWidget};
 		thirdInfoWidget->setLayout(thirdInfoLayout);
 		layout->addWidget(thirdInfoWidget);
 
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("3rd group"),
+		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("2nd group"),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, QString("V: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, QString("A: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, QString("W: %1").arg(0),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
-		thirdInfoLayout->addWidget(createProgressBar(thirdInfoWidget, QSize{70, 30}), 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(thirdInfoWidget, QString("V: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[ThirdVoltage] = statusLabel;
+		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(thirdInfoWidget, QString("A: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[ThirdCurrent] = statusLabel;
+		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createLabel(thirdInfoWidget, QString("W: %1").arg(0),
+								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		consumersLabels[ThirdPower] = statusLabel;
+		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+
+		statusLabel = createProgressBar(thirdInfoWidget, QSize{70, 30});
+		consumersLabels[ThirdProgress] = statusLabel;
+		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -281,21 +349,17 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		// clicked signal prevents infinite recursion against toggled signal
 		connect(manualModeButton, &QRadioButton::clicked, manualModeButton, [=](bool state) {
-			if (state) {
+			if (state)
 				autoModeButton->setChecked(!state);
-			}
-			else {
+			else
 				manualModeButton->setChecked(!state);
-			}
 		});
 
 		connect(autoModeButton, &QRadioButton::clicked, autoModeButton, [=](bool state) {
-			if (state) {
+			if (state)
 				manualModeButton->setChecked(!state);
-			}
-			else {
+			else
 				autoModeButton->setChecked(!state);
-			}
 		});
 
 		break;
@@ -311,21 +375,8 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(batteryStatusWidget);
 		QHBoxLayout* batteryStatusLayout = new QHBoxLayout{batteryStatusWidget};
 
-		QProgressBar* batteryChargeIndicator = new QProgressBar{widget};
-
+		QProgressBar* batteryChargeIndicator = createProgressBar(batteryStatusWidget, QSize{60, 100});
 		batteryChargeIndicator->setValue(40);
-		batteryChargeIndicator->setMinimumSize(60, 100);
-
-		batteryChargeIndicator->setStyleSheet("QProgressBar::chunk { \
-												  background-color: rgb(0, 179, 0); \
-											  } \
-											  QProgressBar { \
-												  border: 1px solid #acacac; \
-												  border-radius: 0px; \
-												  text-align: center; \
-												  background: #dfdfdf; \
-											}");
-
 		batteryChargeIndicator->setOrientation(Qt::Vertical);
 		batteryStatusLayout->addWidget(batteryChargeIndicator);
 

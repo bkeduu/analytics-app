@@ -1,15 +1,19 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/window_icon.png</file>
-        <file>images/page_1.png</file>
-        <file>images/page_2.png</file>
-        <file>images/page_3.png</file>
-        <file>images/page_4.png</file>
-        <file>images/page_5.png</file>
-        <file>images/solar-power.png</file>
-        <file>images/wind-turbine.png</file>
-        <file>images/battery.png</file>
-        <file>images/diesel.png</file>
-        <file>stylesheets/progressbar.css</file>
+        <file>static/images/battery.png</file>
+        <file>static/images/diesel.png</file>
+        <file>static/images/electricity (1).png</file>
+        <file>static/images/energy (1).png</file>
+        <file>static/images/page_1.png</file>
+        <file>static/images/page_2.png</file>
+        <file>static/images/page_3.png</file>
+        <file>static/images/page_4.png</file>
+        <file>static/images/page_5.png</file>
+        <file>static/images/solar-power.png</file>
+        <file>static/images/window_icon.png</file>
+        <file>static/images/wind-turbine.png</file>
+        <file>static/requests/authorization.json</file>
+        <file>static/requests/relay.json</file>
+        <file>static/stylesheets/progressbar.css</file>
     </qresource>
 </RCC>

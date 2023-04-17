@@ -1,5 +1,5 @@
 #include "consumerstab.h"
-#include "customwidgets.h"
+#include "mainwindow.h"
 
 ConsumersTab* ConsumersTab::instance = nullptr;
 QMutex ConsumersTab::lock{};
@@ -11,71 +11,66 @@ ConsumersTab* ConsumersTab::getWidget(const QString& tabName, QWidget* parent) {
 	return instance;
 }
 
-ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
-	group_widgets.reserve(3);
-}
+ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
+	layout{nullptr}, consumersGroups{3} { }
 
 void ConsumersTab::setJSONDocument(const QJsonDocument& document) {
-	config = document;
-
-	QJsonObject object = config.object();
+	QJsonObject object = document.object();
 	QJsonObject groups = object.value("consumers").toObject();
 
-	QJsonArray group = groups["group_1"].toArray();
-	for (auto it = group.begin(); it != group.end(); ++it)
-		consumers_group1[(*it).toString()] = nullptr;
+	for (int i = 0; i < 3; ++i) {
+		QJsonArray group = groups[QString{"group_%1"}.arg(i)].toArray();
+		for (auto it = group.begin(); it != group.end(); ++it) {
 
-	group = groups["group_2"].toArray();
-	for (auto it = group.begin(); it != group.end(); ++it)
-		consumers_group2[(*it).toString()] = nullptr;
+			QJsonObject consumer = (*it).toObject();
 
-	group = groups["group_3"].toArray();
-	for (auto it = group.begin(); it != group.end(); ++it)
-		consumers_group3[(*it).toString()] = nullptr;
+			Consumer c {
+				consumer.value("id").toInt(),
+				consumer.value("name").toString(),
+				consumer.value("is_on").toBool(),
+				nullptr
+			};
+
+			consumersGroups[i][c.id] = c;
+		}
+	}
 
 	buildInterface();
 }
 
 void ConsumersTab::buildInterface() {
 	layout = new QHBoxLayout{this};
-	layout->setSpacing(100);
+	layout->setSpacing(30);
 
-	group_widgets.push_back(new QWidget{this});
-	group_widgets.push_back(new QWidget{this});
-	group_widgets.push_back(new QWidget{this});
+	groupWidgets.push_back(new QFrame{this});
+	groupWidgets.push_back(new QFrame{this});
+	groupWidgets.push_back(new QFrame{this});
 
-	layout->addWidget(group_widgets[0]);
-	layout->addWidget(group_widgets[1]);
-	layout->addWidget(group_widgets[2]);
+	for (int i = 0; i < groupWidgets.size(); ++i) {
+		layout->addWidget(groupWidgets[i]);
+		groupWidgets[i]->setFrameShape(QFrame::Box);
 
-	QVBoxLayout* verticalLayout = new QVBoxLayout{group_widgets[0]};
-	verticalLayout->setAlignment(Qt::AlignLeft);
-	group_widgets[0]->setLayout(verticalLayout);
+		QVBoxLayout* verticalLayout = new QVBoxLayout{groupWidgets[i]};
+		verticalLayout->setAlignment(Qt::AlignLeft);
+		groupWidgets[i]->setLayout(verticalLayout);
 
-	foreach (QString consumer, consumers_group1.keys()) {
-		QWidget* consumerWidget = new CustomSlider{group_widgets[0], consumer};
-		verticalLayout->addWidget(consumerWidget);
-		consumers_group1[consumer] = consumerWidget;
+		CustomCheckbox* groupCheckbox = new CustomCheckbox{groupWidgets[i], tr("Group %1").arg(i)};
+		verticalLayout->addWidget(groupCheckbox);
+		groupRelays.push_back(groupCheckbox);
+
+		foreach (int consumerId, consumersGroups[i].keys()) {
+			QWidget* consumerWidget = new CustomCheckbox{groupWidgets[i], consumersGroups[i][consumerId].name};
+			verticalLayout->addWidget(consumerWidget);
+			consumersGroups[i][consumerId].widget = consumerWidget;
+		}
 	}
 
-	verticalLayout = new QVBoxLayout{group_widgets[1]};
-	verticalLayout->setAlignment(Qt::AlignLeft);
-	group_widgets[0]->setLayout(verticalLayout);
+	for (int i = 0; i < groupRelays.size(); ++i) {
 
-	foreach (QString consumer, consumers_group2.keys()) {
-		QWidget* consumerWidget = new CustomSlider{group_widgets[1], consumer};
-		verticalLayout->addWidget(consumerWidget);
-		consumers_group2[consumer] = consumerWidget;
-	}
+		connect(groupRelays[i], &CustomCheckbox::checkboxClicked, groupRelays[i], [=](bool newState) {
+			mParent->onRelayClicked(i, newState);
+		});
 
-	verticalLayout = new QVBoxLayout{group_widgets[2]};
-	verticalLayout->setAlignment(Qt::AlignLeft);
-	group_widgets[0]->setLayout(verticalLayout);
-
-	foreach (QString consumer, consumers_group3.keys()) {
-		QWidget* consumerWidget = new CustomSlider{group_widgets[2], consumer};
-		verticalLayout->addWidget(consumerWidget);
-		consumers_group3[consumer] = consumerWidget;
 	}
 
 }

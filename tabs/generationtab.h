@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itab.h"
+#include "etc/customwidgets.h"
 
 #include <QWidget>
 #include <QGridLayout>

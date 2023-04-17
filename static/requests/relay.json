@@ -1,0 +1,6 @@
+###RELAY_STATUS###
+{
+  "RELAY_NUMBER": "%1",
+  "STATUS": "%2"
+}
+###END_OF_DATA###

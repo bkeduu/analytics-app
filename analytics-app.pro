@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,17 +17,20 @@ SOURCES += \
 	tabs/itab.cpp \
 	tabs/settingstab.cpp \
 	tabs/statustab.cpp \
-	customwidgets.cpp
+	networking/connection.cpp \
+	etc/customwidgets.cpp
 
 HEADERS += \
 	mainwindow.h \
+	etc/customwidgets.h \
 	tabs/consumerstab.h \
 	tabs/forecasttab.h \
 	tabs/generationtab.h \
 	tabs/itab.h \
 	tabs/settingstab.h \
 	tabs/statustab.h \
-	customwidgets.h
+	networking/connection.h
+
 
 FORMS += \
     mainwindow.ui

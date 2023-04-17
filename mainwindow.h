@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itab.h"
+#include "networking/connection.h"
 
 #include <QMainWindow>
 #include <QTabWidget>
@@ -32,11 +33,21 @@ public:
 	virtual void resizeEvent(QResizeEvent* event);
     ~MainWindow();
 
+	void authorize();
+	void onRelayClicked(int group, bool newState);
+
 private:
+	void parseConfig(QFile& conf);
+
     Ui::MainWindow *ui;
 	QTabWidget* tabWidget;
 	QDialog* tabDialog;
 	QHBoxLayout* layout;
+
+	QString login;
+	QString password;
+
+	Networker* connector;
 
 	QMap<Tab, ITab*> tabs;
 };

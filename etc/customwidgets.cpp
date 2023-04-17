@@ -1,6 +1,6 @@
 #include "customwidgets.h"
 
-CustomSlider::CustomSlider(QWidget *parent, const QString& text) : QWidget{parent} {
+CustomCheckbox::CustomCheckbox(QWidget *parent, const QString& text) : QWidget{parent} {
 
 	QHBoxLayout* layout = new QHBoxLayout{this};
 	layout->setAlignment(Qt::AlignLeft);
@@ -15,4 +15,8 @@ CustomSlider::CustomSlider(QWidget *parent, const QString& text) : QWidget{paren
 
 	layout->setSpacing(5);
 	layout->setContentsMargins(0, 0, 0, 0);
+
+	connect(cb, &QCheckBox::clicked, cb, [=](bool newState){
+		emit checkboxClicked(newState);
+	});
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itab.h"
+#include "etc/customwidgets.h"
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -13,6 +14,16 @@
 #include <QSlider>
 #include <QVector>
 #include <QString>
+
+class MainWindow;
+
+struct Consumer {
+	int id;
+	QString name;
+	bool is_on;
+
+	QWidget* widget;
+};
 
 class ConsumersTab : public ITab {
 	Q_OBJECT
@@ -27,16 +38,13 @@ private:
 
 	QHBoxLayout* layout;
 
-	QJsonDocument config;
-
 	static ConsumersTab* instance;
 	static QMutex lock;
 
-	QMap<QString, QWidget*> consumers_group1;
-	QMap<QString, QWidget*> consumers_group2;
-	QMap<QString, QWidget*> consumers_group3;
+	QVector<QMap<int, Consumer>> consumersGroups;
 
-	QVector<QWidget*> group_widgets;
+	QVector<CustomCheckbox*> groupRelays;
+	QVector<QFrame*> groupWidgets;
 
 	virtual ~ConsumersTab() {};
 };
