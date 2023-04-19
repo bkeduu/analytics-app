@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QString>
 #include <QRadioButton>
+#include <QJsonObject>
 #include <QProgressBar>
 
 #include "itab.h"
@@ -43,13 +44,18 @@ enum ConsumersStatus {
 
 enum BatteryStatus {
 	BatteryVoltage,
+	BatteryInfo,
 	BatteryProgress
 };
 
 class StatusTab : public ITab {
 	Q_OBJECT
+
 public:
 	static StatusTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+
+public slots:
+	void onDataReceived(const QJsonArray& values);
 
 private:
 	enum class TabWidget { Generation, Consumers, WorkMode, BatteryStatus };

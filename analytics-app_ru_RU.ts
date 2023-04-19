@@ -27,38 +27,54 @@
     <message>
         <location filename="mainwindow.ui" line="26"/>
         <location filename="mainwindow.cpp" line="18"/>
+        <location filename="mainwindow.cpp" line="133"/>
+        <location filename="mainwindow.h" line="40"/>
         <source>Analytics system</source>
         <translation>Система предиктивной аналитики</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="40"/>
+        <location filename="mainwindow.cpp" line="55"/>
         <source>Status</source>
         <translation>Показатели</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="42"/>
+        <location filename="mainwindow.cpp" line="57"/>
         <source>Consumers</source>
         <translation>Потребление</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="46"/>
+        <location filename="mainwindow.cpp" line="61"/>
         <source>Generation</source>
         <translation>Генерация</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="47"/>
+        <location filename="mainwindow.cpp" line="62"/>
         <source>Forecast</source>
         <translation>Прогноз</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="48"/>
+        <location filename="mainwindow.cpp" line="63"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="87"/>
-        <source>Authorizing...</source>
+        <location filename="mainwindow.cpp" line="102"/>
+        <source>Authorization...</source>
         <translation>Авторизация...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="118"/>
+        <source>Wait for ESP connection...</source>
+        <translation>Ожидание подключения ESP...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="122"/>
+        <source>Unsuccessfull authorization!!!</source>
+        <translation>Ошибка авторизации!!!</translation>
+    </message>
+    <message>
+        <source>Authorizing...</source>
+        <translation type="vanished">Авторизация...</translation>
     </message>
 </context>
 <context>

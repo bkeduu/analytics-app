@@ -2,6 +2,22 @@
 #include <QTcpSocket>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QTimer>
+
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+enum MessageType {
+	Error = 0,
+	Authorization,
+	AuthorizationReply,
+	ESPStatus,
+	RelaySwitch,
+	ConsumersData,
+	SensorsData,
+	Shutdown
+};
 
 class Networker : public QObject {
 Q_OBJECT
@@ -20,17 +36,21 @@ public:
 	~Networker();
 
 signals:
-	void connected();
-	void authorized();
-	void consumersArrived();
-	void dataArrived();
+	void authorized(QJsonArray);
+	void consumersReceived(QJsonArray);
+	void ESPStatusReceived(QJsonArray);
+	void dataReceived(const QJsonArray&);
 	void disconnected();
 
 private slots:
 	void readFromSocket();
+	void onConnectionTimeout();
 
 private:
 	QTcpSocket* socket;
+
+	QTimer* connectionTimeout;
+
 	QHostAddress mAddr;
 	int mPort;
 };

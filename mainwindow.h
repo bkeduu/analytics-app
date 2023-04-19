@@ -36,6 +36,17 @@ public:
 	void authorize();
 	void onRelayClicked(int group, bool newState);
 
+	void setChangingTitle(QString newTitle) {
+		if (currentWindowTitle == tr("Analytics system"))
+			windowTitle = newTitle;
+		else
+			currentWindowTitle = newTitle;
+	}
+
+public slots:
+	void onAuthorized(QJsonArray);
+	void onESPStatusChanged(QJsonArray);
+
 private:
 	void parseConfig(QFile& conf);
 
@@ -46,6 +57,13 @@ private:
 
 	QString login;
 	QString password;
+
+	bool mAuthorized;
+	bool mESPConnected;
+
+	QTimer* windowTitleChangingTimer;
+	QString windowTitle;
+	QString currentWindowTitle;
 
 	Networker* connector;
 

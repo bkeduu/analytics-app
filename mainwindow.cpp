@@ -6,8 +6,8 @@
 #include "settingstab.h"
 #include "./ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow{parent}, ui{new Ui::MainWindow}, tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr} {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
+	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mAuthorized{false}, mESPConnected{false} {
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
 	appFont.setHintingPreference(QFont::PreferFullHinting);
 	this->setFont(appFont);
 
-	setWindowTitle(tr("Analytics system"));
+	currentWindowTitle = windowTitle = tr("Analytics system");
+	setWindowTitle(currentWindowTitle);
 	setWindowIcon(QIcon{":/static/images/window_icon.png"});
 
 	connector = new Networker{this};
@@ -24,25 +25,34 @@ MainWindow::MainWindow(QWidget *parent)
 	config.open(QIODevice::ReadOnly | QIODevice::Text);
 	parseConfig(config);
 
+	windowTitleChangingTimer = new QTimer{this};
+	windowTitleChangingTimer->setInterval(1000);
+	windowTitleChangingTimer->start();
+
+	connect(windowTitleChangingTimer, &QTimer::timeout, windowTitleChangingTimer, [=]() {
+		std::swap(currentWindowTitle, windowTitle);
+		setWindowTitle(currentWindowTitle);
+		windowTitleChangingTimer->start();
+	});
+
 	connector->connectToHost();
 	authorize();
 
-	QString consumers_JSON;
-	QFile consumers_JSON_file{"C:\\Users\\leakt\\Documents\\analytics-app\\config_examples\\consumers.json"};
-	consumers_JSON_file.open(QIODevice::ReadOnly | QIODevice::Text);
-	consumers_JSON = consumers_JSON_file.readAll();
-
-	QJsonDocument consumers = QJsonDocument::fromJson(consumers_JSON.toUtf8());
+	connect(connector, SIGNAL(authorized(QJsonArray)), this, SLOT(onAuthorized(QJsonArray)));
+	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(QJsonObject)));
+	connect(connector, SIGNAL(ESPStatusChanged(QJsonArray)), this, SLOT(onESPStatusChanged(QJsonArray)));
 
 	layout = new QHBoxLayout{this};
 	tabWidget = new QTabWidget{this};
 
-	tabs[Tab::Status] = StatusTab::getWidget(tr("Status"), tabWidget);
+	StatusTab* statusTab = StatusTab::getWidget(tr("Status"), this);
+	connect(connector, SIGNAL(dataReceived(const QJsonArray&)), statusTab, SLOT(onDataReceived(const QJsonArray&)));
+	tabs[Tab::Status] = statusTab;
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-	consumersTab->setJSONDocument(consumers);
-
+	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
 	tabs[Tab::Consumers] = consumersTab;
+
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
 	tabs[Tab::Forecast] = ForecastTab::getWidget(tr("Forecast"), this);
 	tabs[Tab::Settings] = SettingsTab::getWidget(tr("Settings"), this);
@@ -83,8 +93,8 @@ void MainWindow::parseConfig(QFile& conf) {
 }
 
 void MainWindow::authorize() {
-	QString wt = windowTitle();
-	setWindowTitle(tr("Authorizing..."));
+
+	setChangingTitle(tr("Authorization..."));
 
 	static QFile file{":/static/requests/authorization.json"};
 	if (!file.isOpen())
@@ -92,8 +102,36 @@ void MainWindow::authorize() {
 	static QString request = file.readAll();
 
 	connector->sendToHost(request.arg(login, password));
+}
 
-	setWindowTitle(wt);
+void MainWindow::onAuthorized(QJsonArray dataObject) {
+
+	int status = dataObject[1].toInt();
+	if (status == 0) {
+		// success authorization
+		mAuthorized = true;
+		setChangingTitle(tr("Wait for ESP connection..."));
+	}
+	else {
+		// error
+		setChangingTitle(tr("Unsuccessfull authorization!!!"));
+	}
+}
+
+void MainWindow::onESPStatusChanged(QJsonArray dataObject) {
+
+	int status = dataObject[1].toInt();
+
+	if (status) {
+		// esp connected
+		mESPConnected = true;
+		setChangingTitle(tr("Analytics system"));
+	}
+	else {
+		// esp disconnected
+		setChangingTitle(tr("ESP disconnected!!!"));
+		mESPConnected = false;
+	}
 }
 
 void MainWindow::onRelayClicked(int group, bool newState) {

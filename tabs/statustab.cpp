@@ -1,5 +1,8 @@
 #include "statustab.h"
 
+#include <QJsonObject>
+#include <QJsonArray>
+
 StatusTab* StatusTab::instance = nullptr;
 QMutex StatusTab::lock{};
 
@@ -70,6 +73,64 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 	result->setStyleSheet(stylesheet);
 
 	return result;
+}
+
+void StatusTab::onDataReceived(const QJsonArray& values) {
+
+	QJsonArray generatorsArray = values[0].toArray();
+	QJsonArray solarArray = generatorsArray[0].toArray();
+	dynamic_cast<QLabel*>(generatorsLabels[SolarVoltage])->setText(solarArray[0].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[SolarCurrent])->setText(solarArray[1].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[SolarPower])->setText(solarArray[2].toString());
+	dynamic_cast<QProgressBar*>(generatorsLabels[SolarProgress])->setValue(solarArray[4].toInt());
+
+	QJsonArray windArray = generatorsArray[1].toArray();
+	dynamic_cast<QLabel*>(generatorsLabels[WindVoltage])->setText(windArray[0].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[WindCurrent])->setText(windArray[1].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[WindPower])->setText(windArray[2].toString());
+	dynamic_cast<QProgressBar*>(generatorsLabels[WindProgress])->setValue(windArray[4].toInt());
+
+	QJsonArray dieselArray = generatorsArray[2].toArray();
+	dynamic_cast<QLabel*>(generatorsLabels[DieselVoltage])->setText(dieselArray[0].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[DieselCurrent])->setText(dieselArray[1].toString());
+	dynamic_cast<QLabel*>(generatorsLabels[DieselPower])->setText(dieselArray[2].toString());
+	dynamic_cast<QProgressBar*>(generatorsLabels[DieselProgress])->setValue(dieselArray[4].toInt());
+
+	QJsonArray batteryArray = values[1].toArray();
+	dynamic_cast<QLabel*>(batteryLabels[BatteryVoltage])->setText(batteryArray[0].toString());
+	int status = batteryArray[3].toInt();
+
+	switch (status) {
+	case 0:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Charging..."));
+		break;
+	case 1:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Discharging..."));
+		break;
+	case 2:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Unknown state"));
+		break;
+	}
+	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[4].toInt());
+
+	QJsonArray consumersArray = values[2].toArray();
+	QJsonArray firstArray = consumersArray[0].toArray();
+	dynamic_cast<QLabel*>(consumersLabels[FirstVoltage])->setText(firstArray[0].toString());
+	dynamic_cast<QLabel*>(consumersLabels[FirstCurrent])->setText(firstArray[1].toString());
+	dynamic_cast<QLabel*>(consumersLabels[FirstPower])->setText(firstArray[2].toString());
+	dynamic_cast<QProgressBar*>(consumersLabels[FirstProgress])->setValue(firstArray[4].toInt());
+
+	QJsonArray secondArray = consumersArray[1].toArray();
+	dynamic_cast<QLabel*>(consumersLabels[SecondVoltage])->setText(secondArray[0].toString());
+	dynamic_cast<QLabel*>(consumersLabels[SecondCurrent])->setText(secondArray[1].toString());
+	dynamic_cast<QLabel*>(consumersLabels[SecondPower])->setText(secondArray[2].toString());
+	dynamic_cast<QProgressBar*>(consumersLabels[SecondProgress])->setValue(secondArray[4].toInt());
+
+	QJsonArray thirdArray = consumersArray[2].toArray();
+	dynamic_cast<QLabel*>(consumersLabels[ThirdVoltage])->setText(thirdArray[0].toString());
+	dynamic_cast<QLabel*>(consumersLabels[ThirdCurrent])->setText(thirdArray[1].toString());
+	dynamic_cast<QLabel*>(consumersLabels[ThirdPower])->setText(thirdArray[2].toString());
+	dynamic_cast<QProgressBar*>(consumersLabels[ThirdProgress])->setValue(thirdArray[4].toInt());
 }
 
 QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
@@ -378,6 +439,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QProgressBar* batteryChargeIndicator = createProgressBar(batteryStatusWidget, QSize{60, 100});
 		batteryChargeIndicator->setValue(40);
 		batteryChargeIndicator->setOrientation(Qt::Vertical);
+		batteryLabels[BatteryProgress] = batteryChargeIndicator;
 		batteryStatusLayout->addWidget(batteryChargeIndicator);
 
 		QFrame* batteryStatusInformation = new QFrame{widget};
@@ -386,7 +448,8 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		batteryStatusInformation->setLayout(batteryStatusInformationLayout);
 
 		QLabel* batteryCurrentCapacity = new QLabel{batteryStatusInformation};
-		batteryCurrentCapacity->setText(QString{tr("%1 W*h")}.arg(0));
+		batteryCurrentCapacity->setText(QString{tr("%1 V")}.arg(0));
+		batteryLabels[BatteryVoltage] = batteryCurrentCapacity;
 		batteryStatusInformationLayout->addWidget(batteryCurrentCapacity);
 
 		QFrame* batteryInformationDelimeter = new QFrame{batteryStatusInformation};
@@ -395,6 +458,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		QLabel* batteryCurrentStatus = new QLabel{batteryStatusInformation};
 		batteryCurrentStatus->setText(QString{tr("Charging...")});
+		batteryLabels[BatteryInfo] = batteryCurrentStatus;
 		batteryStatusInformationLayout->addWidget(batteryCurrentStatus);
 
 		break;
