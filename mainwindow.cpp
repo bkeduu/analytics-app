@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	connector->connectToHost();
 
-	connect(connector, SIGNAL(authorized(const QJsonObject&)), this, SLOT(onAuthorized(const QJsonObject&)));
+	connect(connector, SIGNAL(authorized(QJsonObject)), this, SLOT(onAuthorized(QJsonObject)));
 	// connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
 	// connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
 
@@ -40,11 +40,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	tabWidget = new QTabWidget{this};
 
 	StatusTab* statusTab = StatusTab::getWidget(tr("Status"), this);
-	connect(connector, SIGNAL(dataReceived(const QJsonObject&)), statusTab, SLOT(onDataReceived(const QJsonObject&)));
+	connect(connector, SIGNAL(dataReceived(QJsonObject)), statusTab, SLOT(onDataReceived(QJsonObject)));
 	tabs[Tab::Status] = statusTab;
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-	connect(connector, SIGNAL(consumersReceived(const QJsonObject&)), consumersTab, SLOT(setJSONDocument(const QJsonObject&)));
+	connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
 	tabs[Tab::Consumers] = consumersTab;
 
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);

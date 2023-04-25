@@ -111,7 +111,7 @@ void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 		break;
 	}
 
-	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[4].toInt());
+	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[1].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
 	dynamic_cast<QLabel*>(consumersLabels[FirstVoltage])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
