@@ -47,10 +47,9 @@ public slots:
 	void onAuthorized(const QJsonObject&);
 	void onESPStatusChanged(const QJsonObject&);
 	//void onConsumersReceived(const QJsonObject&);
+	void onDisconnect();
 
 private:
-	void parseConfig(QFile& conf);
-
     Ui::MainWindow *ui;
 	QTabWidget* tabWidget;
 	QDialog* tabDialog;

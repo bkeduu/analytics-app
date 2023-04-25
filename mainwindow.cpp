@@ -30,9 +30,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 		windowTitleChangingTimer->start();
 	});
 
-	connector->connectToHost();
-
 	connect(connector, SIGNAL(authorized(QJsonObject)), this, SLOT(onAuthorized(QJsonObject)));
+	connect(connector, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
 	// connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
 	// connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
 
@@ -97,21 +96,6 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 	event->accept();
 }
 
-void MainWindow::parseConfig(QFile& conf) {
-
-	QString configContent;
-	configContent = conf.readAll();
-
-	QJsonDocument configJSON = QJsonDocument::fromJson(configContent.toUtf8());
-	QJsonObject configObject = configJSON.object();
-
-	connector->setHostAddress(QHostAddress{configObject.value("server_ip").toString()});
-	connector->setHostPort(configObject.value("server_port").toInt());
-
-	login = configObject.value("login").toString();
-	password = configObject.value("password").toString();
-}
-
 void MainWindow::authorize() {
 
 	setChangingTitle(tr("Authorization..."));
@@ -130,7 +114,8 @@ void MainWindow::onAuthorized(const QJsonObject& dataObject) {
 	if (status == 0) {
 		// success authorization
 		mAuthorized = true;
-		setChangingTitle(tr("Wait for ESP connection..."));
+		mESPConnected = true;
+		setChangingTitle(tr("Analytics system"));
 	}
 	else {
 		// error
@@ -161,6 +146,12 @@ void MainWindow::onRelayClicked(int group, bool newState) {
 	static QString request = file.readAll();
 
 	connector->sendToHost(request.arg(group).arg(newState));
+}
+
+void MainWindow::onDisconnect() {
+
+
+
 }
 
 MainWindow::~MainWindow() {

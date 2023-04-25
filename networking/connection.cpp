@@ -4,7 +4,11 @@
 
 Networker::Networker(QObject* parent, QHostAddress address, int port) : QObject{parent}, mAddr{address}, mPort{port} {
 	socket = new QTcpSocket{this};
+
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSocket()));
+	connect(socket, &QTcpSocket::disconnected, socket, [=]() {
+		emit disconnected();
+	});
 
 	connectionTimeout = new QTimer{this};
 
