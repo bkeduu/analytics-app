@@ -20,11 +20,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	setWindowIcon(QIcon{":/static/images/window_icon.png"});
 
 	connector = new Networker{this};
-
-	QFile config{"C:\\Users\\leakt\\Documents\\build-analytics-app-Desktop_Qt_6_4_2_MinGW_64_bit-Debug\\debug\\config.json"};
-	config.open(QIODevice::ReadOnly | QIODevice::Text);
-	parseConfig(config);
-
 	windowTitleChangingTimer = new QTimer{this};
 	windowTitleChangingTimer->setInterval(1000);
 	windowTitleChangingTimer->start();
