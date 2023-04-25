@@ -38,19 +38,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	connector->connectToHost();
 	authorize();
 
-	connect(connector, SIGNAL(authorized(QJsonArray)), this, SLOT(onAuthorized(QJsonArray)));
-	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(QJsonObject)));
-	connect(connector, SIGNAL(ESPStatusChanged(QJsonArray)), this, SLOT(onESPStatusChanged(QJsonArray)));
+	connect(connector, SIGNAL(authorized(const QJsonObject&)), this, SLOT(onAuthorized(const QJsonObject&)));
+	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
+	connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
 
 	layout = new QHBoxLayout{this};
 	tabWidget = new QTabWidget{this};
 
 	StatusTab* statusTab = StatusTab::getWidget(tr("Status"), this);
-	connect(connector, SIGNAL(dataReceived(const QJsonArray&)), statusTab, SLOT(onDataReceived(const QJsonArray&)));
+	connect(connector, SIGNAL(dataReceived(const QJsonObject&)), statusTab, SLOT(onDataReceived(const QJsonObject&)));
 	tabs[Tab::Status] = statusTab;
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
+	connect(connector, SIGNAL(consumersReceived(const QJsonObject&)), consumersTab, SLOT(setJSONDocument(const QJsonObject&)));
 	tabs[Tab::Consumers] = consumersTab;
 
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
@@ -104,9 +104,9 @@ void MainWindow::authorize() {
 	connector->sendToHost(request.arg(login, password));
 }
 
-void MainWindow::onAuthorized(QJsonArray dataObject) {
+void MainWindow::onAuthorized(const QJsonObject& dataObject) {
 
-	int status = dataObject[1].toInt();
+	int status = dataObject.value("status").toInt();
 	if (status == 0) {
 		// success authorization
 		mAuthorized = true;
@@ -118,9 +118,9 @@ void MainWindow::onAuthorized(QJsonArray dataObject) {
 	}
 }
 
-void MainWindow::onESPStatusChanged(QJsonArray dataObject) {
+void MainWindow::onESPStatusChanged(const QJsonObject& dataObject) {
 
-	int status = dataObject[1].toInt();
+	int status = dataObject.value("status").toInt();
 
 	if (status) {
 		// esp connected

@@ -14,11 +14,10 @@ ConsumersTab* ConsumersTab::getWidget(const QString& tabName, QWidget* parent) {
 ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
 	layout{nullptr}, consumersGroups{3} { }
 
-void ConsumersTab::setJSONDocument(QJsonObject object) {
-	QJsonObject groups = object.value("consumers").toObject();
+void ConsumersTab::setJSONDocument(const QJsonObject& object) {
 
 	for (int i = 0; i < 3; ++i) {
-		QJsonArray group = groups[QString{"group_%1"}.arg(i)].toArray();
+		QJsonArray group = object.value(QString{"G%1"}.arg(i)).toArray();
 		for (auto it = group.begin(); it != group.end(); ++it) {
 
 			QJsonObject consumer = (*it).toObject();
@@ -26,7 +25,7 @@ void ConsumersTab::setJSONDocument(QJsonObject object) {
 			Consumer c {
 				consumer.value("id").toInt(),
 				consumer.value("name").toString(),
-				consumer.value("is_on").toBool(),
+				bool(consumer.value("status").toInt()),
 				nullptr
 			};
 

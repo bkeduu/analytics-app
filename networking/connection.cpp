@@ -41,7 +41,7 @@ void Networker::readFromSocket() {
 
 	MessageType messageType = MessageType(inputObject.value("type").toInt(-1));
 
-	QJsonArray dataObject = inputObject.value("data").toArray();
+	QJsonObject dataObject = inputObject.value("data").toObject();
 
 	switch (messageType) {
 	case AuthorizationReply:

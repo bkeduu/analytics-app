@@ -36,10 +36,10 @@ public:
 	~Networker();
 
 signals:
-	void authorized(QJsonArray);
-	void consumersReceived(QJsonArray);
-	void ESPStatusReceived(QJsonArray);
-	void dataReceived(const QJsonArray&);
+	void authorized(const QJsonObject&);
+	void consumersReceived(const QJsonObject&);
+	void ESPStatusReceived(const QJsonObject&);
+	void dataReceived(const QJsonObject&);
 	void disconnected();
 
 private slots:

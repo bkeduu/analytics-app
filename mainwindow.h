@@ -44,8 +44,9 @@ public:
 	}
 
 public slots:
-	void onAuthorized(QJsonArray);
-	void onESPStatusChanged(QJsonArray);
+	void onAuthorized(const QJsonObject&);
+	void onESPStatusChanged(const QJsonObject&);
+	//void onConsumersReceived(const QJsonObject&);
 
 private:
 	void parseConfig(QFile& conf);

@@ -55,7 +55,7 @@ public:
 	static StatusTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
 
 public slots:
-	void onDataReceived(const QJsonArray& values);
+	void onDataReceived(const QJsonObject& values);
 
 private:
 	enum class TabWidget { Generation, Consumers, WorkMode, BatteryStatus };
