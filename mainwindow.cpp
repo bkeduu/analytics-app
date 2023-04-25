@@ -32,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	connect(connector, SIGNAL(authorized(QJsonObject)), this, SLOT(onAuthorized(QJsonObject)));
 	connect(connector, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
-	// connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
 	// connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
 
 	layout = new QHBoxLayout{this};

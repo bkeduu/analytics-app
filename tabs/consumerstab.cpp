@@ -22,14 +22,12 @@ void ConsumersTab::setJSONDocument(const QJsonObject& object) {
 
 			QJsonObject consumer = (*it).toObject();
 
-			Consumer c {
+			consumersGroups[i][consumer.value("id").toInt()] = {
 				consumer.value("id").toInt(),
 				consumer.value("name").toString(),
 				bool(consumer.value("status").toInt()),
 				nullptr
 			};
-
-			consumersGroups[i][c.id] = c;
 		}
 	}
 
@@ -63,12 +61,9 @@ void ConsumersTab::buildInterface() {
 		}
 	}
 
-	for (int i = 0; i < groupRelays.size(); ++i) {
-
+	for (int i = 0; i < groupRelays.size(); ++i)
 		connect(groupRelays[i], &CustomCheckbox::checkboxClicked, groupRelays[i], [=](bool newState) {
 			mParent->onRelayClicked(i, newState);
 		});
-
-	}
 
 }

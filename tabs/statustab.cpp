@@ -313,7 +313,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		thirdInfoWidget->setLayout(thirdInfoLayout);
 		layout->addWidget(thirdInfoWidget);
 
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("2nd group"),
+		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("3rd group"),
 									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
 
 		statusLabel = createLabel(thirdInfoWidget, QString("V: %1").arg(0),
