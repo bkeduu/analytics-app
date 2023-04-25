@@ -56,6 +56,8 @@ private:
 	QDialog* tabDialog;
 	QHBoxLayout* layout;
 
+	QString serverAddress;
+	QString serverPort;
 	QString login;
 	QString password;
 

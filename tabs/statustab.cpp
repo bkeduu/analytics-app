@@ -78,25 +78,25 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray solarArray = dataObject.value("solar").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[SolarVoltage])->setText(tr("V: %1").arg(solarArray[0].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[SolarCurrent])->setText(tr("A: %1").arg(solarArray[1].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[SolarPower])->setText(tr("W: %1").arg(solarArray[2].toInt()));
+	dynamic_cast<QLabel*>(generatorsLabels[SolarVoltage])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[SolarCurrent])->setText(tr("A: %1").arg(solarArray[1].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[SolarPower])->setText(tr("W: %1").arg(solarArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(generatorsLabels[SolarProgress])->setValue(solarArray[3].toInt());
 
 	QJsonArray windArray = dataObject.value("wind").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[WindVoltage])->setText(tr("V: %1").arg(windArray[0].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[WindCurrent])->setText(tr("A: %1").arg(windArray[1].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[WindPower])->setText(tr("W: %1").arg(windArray[2].toInt()));
+	dynamic_cast<QLabel*>(generatorsLabels[WindVoltage])->setText(tr("V: %1").arg(windArray[0].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[WindCurrent])->setText(tr("A: %1").arg(windArray[1].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[WindPower])->setText(tr("W: %1").arg(windArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(generatorsLabels[WindProgress])->setValue(windArray[3].toInt());
 
 	QJsonArray dieselArray = dataObject.value("gen").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[DieselVoltage])->setText(tr("V: %1").arg(dieselArray[0].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[DieselCurrent])->setText(tr("A: %1").arg(dieselArray[1].toInt()));
-	dynamic_cast<QLabel*>(generatorsLabels[DieselPower])->setText(tr("W: %1").arg(dieselArray[2].toInt()));
+	dynamic_cast<QLabel*>(generatorsLabels[DieselVoltage])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[DieselCurrent])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
+	dynamic_cast<QLabel*>(generatorsLabels[DieselPower])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(generatorsLabels[DieselProgress])->setValue(dieselArray[3].toInt());
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
-	dynamic_cast<QLabel*>(batteryLabels[BatteryVoltage])->setText(QString{"%1"}.arg(batteryArray[0].toInt()));
+	dynamic_cast<QLabel*>(batteryLabels[BatteryVoltage])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
 	int status = batteryArray[4].toInt();
 
 	switch (BatteryInformation(status)) {
@@ -114,21 +114,21 @@ void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[4].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[FirstVoltage])->setText(tr("V: %1").arg(firstArray[0].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[FirstCurrent])->setText(tr("A: %1").arg(firstArray[1].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[FirstPower])->setText(tr("W: %1").arg(firstArray[2].toInt()));
+	dynamic_cast<QLabel*>(consumersLabels[FirstVoltage])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[FirstCurrent])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[FirstPower])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(consumersLabels[FirstProgress])->setValue(firstArray[3].toInt());
 
 	QJsonArray secondArray = dataObject.value("2").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[SecondVoltage])->setText(tr("V: %1").arg(secondArray[0].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[SecondCurrent])->setText(tr("A: %1").arg(secondArray[1].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[SecondPower])->setText(tr("W: %1").arg(secondArray[2].toInt()));
+	dynamic_cast<QLabel*>(consumersLabels[SecondVoltage])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[SecondCurrent])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[SecondPower])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(consumersLabels[SecondProgress])->setValue(secondArray[3].toInt());
 
 	QJsonArray thirdArray = dataObject.value("3").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[ThirdVoltage])->setText(tr("V: %1").arg(thirdArray[0].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[ThirdCurrent])->setText(tr("A: %1").arg(thirdArray[1].toInt()));
-	dynamic_cast<QLabel*>(consumersLabels[ThirdPower])->setText(tr("W: %1").arg(thirdArray[2].toInt()));
+	dynamic_cast<QLabel*>(consumersLabels[ThirdVoltage])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[ThirdCurrent])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
+	dynamic_cast<QLabel*>(consumersLabels[ThirdPower])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(consumersLabels[ThirdProgress])->setValue(thirdArray[3].toInt());
 }
 

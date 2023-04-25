@@ -36,11 +36,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	});
 
 	connector->connectToHost();
-	authorize();
 
 	connect(connector, SIGNAL(authorized(const QJsonObject&)), this, SLOT(onAuthorized(const QJsonObject&)));
-	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
-	connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
+	// connect(connector, SIGNAL(consumersReceived(QJsonObject)), this, SLOT(onConsumersReceived(const QJsonObject&)));
+	// connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
 
 	layout = new QHBoxLayout{this};
 	tabWidget = new QTabWidget{this};
@@ -55,7 +54,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
 	tabs[Tab::Forecast] = ForecastTab::getWidget(tr("Forecast"), this);
-	tabs[Tab::Settings] = SettingsTab::getWidget(tr("Settings"), this);
+
+	SettingsTab* settingsTab = SettingsTab::getWidget(tr("Settings"), this);
+
+	connect(settingsTab, &SettingsTab::serverAddressUpdated, this, [=](const QString& newAddress) {
+		serverAddress = newAddress;
+		connector->setHostAddress(QHostAddress{serverAddress});
+	});
+
+	connect(settingsTab, &SettingsTab::serverPortUpdated, this, [=](const QString& newPort) {
+		serverPort = newPort;
+		connector->setHostPort(serverPort.toInt());
+	});
+
+	connect(settingsTab, &SettingsTab::loginUpdated, this, [=](const QString& newLogin) {
+		login = newLogin;
+	});
+
+	connect(settingsTab, &SettingsTab::passwordUpdated, this, [=](const QString& newPassword) {
+		password = newPassword;
+	});
+
+	connect(settingsTab, &SettingsTab::authorizationClicked, this, [=]() {
+		connector->connectToHost();
+		authorize();
+	});
+
+	tabs[Tab::Settings] = settingsTab;
 
 	foreach (Tab tab, tabs.keys()) {
 		tabWidget->addTab(tabs[tab], tabs[tab]->getName());

@@ -29,6 +29,8 @@ class ConsumersTab : public ITab {
 	Q_OBJECT
 public:
 	static ConsumersTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+
+public slots:
 	void setJSONDocument(const QJsonObject& document);
 
 private:
