@@ -67,7 +67,7 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 		stylesheet_file.open(QFile::ReadOnly | QFile::Text);
 	static QString stylesheet = stylesheet_file.readAll();
 
-	result->setValue(40);
+	result->setValue(0);
 	result->setTextVisible(true);
 	result->setMinimumSize(minSize);
 	result->setStyleSheet(stylesheet);
@@ -97,19 +97,20 @@ void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
 	dynamic_cast<QLabel*>(batteryLabels[BatteryVoltage])->setText(QString{"%1"}.arg(batteryArray[0].toInt()));
-	QString status = batteryArray[4].toString();
+	int status = batteryArray[4].toInt();
 
-//	switch (status) {
-//	case 0:
-//		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Charging..."));
-//		break;
-//	case 1:
-//		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Discharging..."));
-//		break;
-//	case 2:
-//		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Unknown state"));
-//		break;
-//	}
+	switch (BatteryInformation(status)) {
+	case Charging:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Charging..."));
+		break;
+	case Discharging:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Discharging..."));
+		break;
+	default:
+		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Unknown..."));
+		break;
+	}
+
 	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[4].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
@@ -435,7 +436,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QHBoxLayout* batteryStatusLayout = new QHBoxLayout{batteryStatusWidget};
 
 		QProgressBar* batteryChargeIndicator = createProgressBar(batteryStatusWidget, QSize{60, 100});
-		batteryChargeIndicator->setValue(40);
+		batteryChargeIndicator->setValue(0);
 		batteryChargeIndicator->setOrientation(Qt::Vertical);
 		batteryLabels[BatteryProgress] = batteryChargeIndicator;
 		batteryStatusLayout->addWidget(batteryChargeIndicator);

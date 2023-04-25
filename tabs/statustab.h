@@ -48,6 +48,12 @@ enum BatteryStatus {
 	BatteryProgress
 };
 
+enum BatteryInformation {
+	Charging,
+	Discharging,
+	NoData
+};
+
 class StatusTab : public ITab {
 	Q_OBJECT
 
