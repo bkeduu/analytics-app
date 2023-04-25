@@ -15,5 +15,6 @@
         <file>static/requests/authorization.json</file>
         <file>static/requests/relay.json</file>
         <file>static/stylesheets/progressbar.css</file>
+        <file>static/requests/shutdown.json</file>
     </qresource>
 </RCC>

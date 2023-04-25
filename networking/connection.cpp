@@ -1,6 +1,7 @@
 #include "networking/connection.h"
 
 #include <QJsonArray>
+#include <QFile>
 
 Networker::Networker(QObject* parent, QHostAddress address, int port) : QObject{parent}, mAddr{address}, mPort{port} {
 	socket = new QTcpSocket{this};
@@ -77,6 +78,9 @@ void Networker::onConnectionTimeout() {
 }
 
 Networker::~Networker() {
+	QFile file{":/static/requests/shutdown.json"};
+	file.open(QIODevice::ReadOnly | QIODevice::Text);
+	sendToHost(QString::fromStdString(file.readAll().toStdString()));
 	socket->close();
 }
 
