@@ -5,6 +5,7 @@
 
 #include <QMainWindow>
 #include <QTabWidget>
+#include <QSettings>
 #include <QTabBar>
 #include <QMap>
 #include <QFile>
@@ -43,6 +44,9 @@ public:
 			currentWindowTitle = newTitle;
 	}
 
+	void load();
+	void save();
+
 public slots:
 	void onAuthorized(const QJsonObject&);
 	void onESPStatusChanged(const QJsonObject&);
@@ -70,4 +74,6 @@ private:
 	Networker* connector;
 
 	QMap<Tab, ITab*> tabs;
+
+	QSettings settings;
 };

@@ -5,13 +5,16 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QCheckBox>
+#include <QLineEdit>
 #include <QString>
 
 class SettingsTab : public ITab {
 	Q_OBJECT
 public:
 	static SettingsTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+
+	void load(QSettings& settings) final;
+	void save(QSettings& settings) final;
 
 signals:
 	void serverAddressUpdated(const QString& newAddress);
@@ -24,6 +27,11 @@ signals:
 private:
 	SettingsTab(const QString& tabName, QWidget* parent = nullptr);
 	QGridLayout* layout;
+
+	QLineEdit* serverAddress;
+	QLineEdit* serverPort;
+	QLineEdit* login;
+	QLineEdit* password;
 
 	static SettingsTab* instance;
 	static QMutex lock;

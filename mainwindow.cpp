@@ -7,7 +7,8 @@
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
-	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mAuthorized{false}, mESPConnected{false} {
+	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mAuthorized{false}, mESPConnected{false},
+	settings{"analytics.conf", QSettings::IniFormat} {
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -88,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 
 	this->setLayout(layout);
+	this->load();
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
@@ -147,6 +149,18 @@ void MainWindow::onRelayClicked(int group, bool newState) {
 	connector->sendToHost(request.arg(group).arg(newState));
 }
 
+void MainWindow::load() {
+	settings.beginGroup("SETTINGS");
+	tabs[Tab::Settings]->load(settings);
+	settings.endGroup();
+}
+
+void MainWindow::save() {
+	settings.beginGroup("SETTINGS");
+	tabs[Tab::Settings]->save(settings);
+	settings.endGroup();
+}
+
 void MainWindow::onDisconnect() {
 
 
@@ -154,5 +168,8 @@ void MainWindow::onDisconnect() {
 }
 
 MainWindow::~MainWindow() {
+
+	this->save();
+
 	delete ui;
 }

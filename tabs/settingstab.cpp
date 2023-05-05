@@ -15,19 +15,19 @@ SettingsTab* SettingsTab::getWidget(const QString& tabName, QWidget* parent) {
 SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
 	layout = new QGridLayout{this};
 
-	QLineEdit* serverAddress = new QLineEdit{this};
+	serverAddress = new QLineEdit{this};
 	serverAddress->setPlaceholderText(tr("Server\'s IP"));
 	serverAddress->setMaximumWidth(200);
 
-	QLineEdit* serverPort = new QLineEdit{this};
+	serverPort = new QLineEdit{this};
 	serverPort->setPlaceholderText(tr("Server\'s port"));
 	serverPort->setMaximumWidth(200);
 
-	QLineEdit* login = new QLineEdit{this};
+	login = new QLineEdit{this};
 	login->setPlaceholderText(tr("Login"));
 	login->setMaximumWidth(200);
 
-	QLineEdit* password = new QLineEdit{this};
+	password = new QLineEdit{this};
 	password->setPlaceholderText(tr("Password"));
 	password->setMaximumWidth(200);
 	password->setEchoMode(QLineEdit::Password);
@@ -61,4 +61,16 @@ SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent,
 	connect(button, &QPushButton::clicked, button, [=]() {
 		emit authorizationClicked();
 	});
+}
+
+void SettingsTab::load(QSettings& settings) {
+	serverAddress->setText(settings.value("serverAddress", "").toString());
+	serverPort->setText(settings.value("serverPort").toString());
+	login->setText(settings.value("login").toString());
+}
+
+void SettingsTab::save(QSettings& settings) {
+	settings.setValue("serverAddress", serverAddress->text());
+	settings.setValue("serverPort", serverPort->text());
+	settings.setValue("login", login->text());
 }

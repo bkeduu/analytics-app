@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QFrame>
 #include <QLayout>
+#include <QSettings>
 
 class MainWindow;
 
@@ -12,6 +13,9 @@ class ITab : public QFrame {
 public:
 	ITab(QWidget* parent, const QString& name);
 	QString getName() const;
+
+	virtual void load(QSettings& settings) { }
+	virtual void save(QSettings& settings) { }
 
 	virtual ~ITab() = default;
 
