@@ -16,5 +16,6 @@
         <file>static/requests/relay.json</file>
         <file>static/stylesheets/progressbar.css</file>
         <file>static/requests/shutdown.json</file>
+        <file>static/requests/consumers.json</file>
     </qresource>
 </RCC>

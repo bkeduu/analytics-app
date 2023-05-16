@@ -1,0 +1,56 @@
+{
+  "type": 5,
+  "data": {
+    "G1": [
+      {
+        "id": 1,
+        "name": "consumer1",
+        "status": 1
+      },
+      {
+        "id": 2,
+        "name": "consumer2",
+        "status":  1
+      },
+      {
+        "id": 3,
+        "name": "consumer3",
+        "status": 1
+      }
+    ],
+    "G2": [
+      {
+        "id": 4,
+        "name": "consumer4",
+        "status": 1
+      },
+      {
+        "id": 5,
+        "name": "consumer5",
+        "status": 1
+      },
+      {
+        "id": 6,
+        "name": "consumer6",
+        "status": 1
+      }
+    ],
+    "G3": [
+      {
+        "id": 7,
+        "name": "consumer7",
+        "status": 1
+      },
+      {
+        "id": 8,
+        "name": "consumer8",
+        "status": 1
+      },
+      {
+        "id": 9,
+        "name": "consumer9",
+        "status": 1
+      }
+    ]
+  }
+}

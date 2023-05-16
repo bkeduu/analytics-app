@@ -44,6 +44,8 @@ public:
 			currentWindowTitle = newTitle;
 	}
 
+	bool authorized() const { return mAuthorized; };
+
 	void load();
 	void save();
 

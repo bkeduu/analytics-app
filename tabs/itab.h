@@ -14,6 +14,8 @@ public:
 	ITab(QWidget* parent, const QString& name);
 	QString getName() const;
 
+	virtual void onAuthorize() { }
+
 	virtual void load(QSettings& settings) { }
 	virtual void save(QSettings& settings) { }
 

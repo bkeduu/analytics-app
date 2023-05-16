@@ -43,7 +43,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	tabs[Tab::Status] = statusTab;
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-	connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
+
+	QFile f{":/static/requests/consumers.json"};
+	f.open(QIODevice::ReadOnly | QIODevice::Text);
+	QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
+	QJsonObject obj = doc.object().value("data").toObject();
+	consumersTab->setJSONDocument(obj);
+
+	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
 	tabs[Tab::Consumers] = consumersTab;
 
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
@@ -117,6 +124,10 @@ void MainWindow::onAuthorized(const QJsonObject& dataObject) {
 		mAuthorized = true;
 		mESPConnected = true;
 		setChangingTitle(tr("Analytics system"));
+
+		foreach (ITab* tab, tabs) {
+			tab->onAuthorize();
+		}
 	}
 	else {
 		// error
