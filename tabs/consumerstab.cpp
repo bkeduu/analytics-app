@@ -12,10 +12,11 @@ ConsumersTab* ConsumersTab::getWidget(const QString& tabName, QWidget* parent) {
 }
 
 ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
-	layout{nullptr}, consumersGroups{3} { }
+	layout{nullptr}, consumersGroups{3} {
+	removeTabContents();
+}
 
 void ConsumersTab::setJSONDocument(const QJsonObject& object) {
-
 	for (int i = 0; i < 3; ++i) {
 		QJsonArray group = object.value(QString{"G%1"}.arg(i)).toArray();
 		for (auto it = group.begin(); it != group.end(); ++it) {
@@ -31,11 +32,18 @@ void ConsumersTab::setJSONDocument(const QJsonObject& object) {
 		}
 	}
 
-	buildInterface();
+	createTabContents();
 }
 
-void ConsumersTab::buildInterface() {
+void ConsumersTab::onAuthorized() {
+	removeTabContents(tr("Waiting for consumers data from server"));
+}
+
+void ConsumersTab::createTabContents() {
+	clearTab();
+	delete this->layout;
 	layout = new QHBoxLayout{this};
+	this->setLayout(layout);
 	layout->setSpacing(30);
 
 	groupWidgets.push_back(new QFrame{this});
@@ -50,7 +58,7 @@ void ConsumersTab::buildInterface() {
 		verticalLayout->setAlignment(Qt::AlignLeft);
 		groupWidgets[i]->setLayout(verticalLayout);
 
-		CustomCheckbox* groupCheckbox = new CustomCheckbox{groupWidgets[i], tr("Group %1").arg(i)};
+		CustomCheckbox* groupCheckbox = new CustomCheckbox{groupWidgets[i], tr("Group %1").arg(i + 1)};
 		verticalLayout->addWidget(groupCheckbox);
 		groupRelays.push_back(groupCheckbox);
 
@@ -65,5 +73,19 @@ void ConsumersTab::buildInterface() {
 		connect(groupRelays[i], &CustomCheckbox::checkboxClicked, groupRelays[i], [=](bool newState) {
 			mParent->onRelayClicked(i, newState);
 		});
+}
 
+void ConsumersTab::removeTabContents(const QString& text) {
+	clearTab();
+	delete this->layout;
+	layout = new QGridLayout{this};
+	this->setLayout(layout);
+	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+	QLabel* textLabel = new QLabel{this};
+	textLabel->setText(text);
+	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	textLabel->setAlignment(Qt::AlignCenter);
+
+	layout->addWidget(textLabel);
 }

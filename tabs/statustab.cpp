@@ -15,8 +15,21 @@ StatusTab* StatusTab::getWidget(const QString& tabName, QWidget* parent) {
 
 StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
 	generators{nullptr}, consumers{nullptr}, layout{nullptr} {
-	layout = new QGridLayout{this};
-	layout->setContentsMargins(9, 9, 9, 9);
+
+	removeTabContents();
+}
+
+void StatusTab::onAuthorized() {
+	createTabContents();
+}
+
+void StatusTab::createTabContents() {
+	clearTab();
+	delete this->layout;
+	QGridLayout* gridLayout = new QGridLayout{this};
+	gridLayout->setContentsMargins(9, 9, 9, 9);
+	this->layout = gridLayout;
+	this->setLayout(gridLayout);
 
 	generators = createWidget(TabWidget::Generation, this);
 	generators->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
@@ -27,10 +40,27 @@ StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tab
 	battery = createWidget(TabWidget::BatteryStatus, this);
 	battery->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 
-	layout->addWidget(generators, 0, 0);
-	layout->addWidget(modes, 0, 1);
-	layout->addWidget(consumers, 1, 0);
-	layout->addWidget(battery, 1 , 1);
+	gridLayout->addWidget(generators, 0, 0);
+	gridLayout->addWidget(modes, 0, 1);
+	gridLayout->addWidget(consumers, 1, 0);
+	gridLayout->addWidget(battery, 1, 1);
+
+	layout = gridLayout;
+}
+
+void StatusTab::removeTabContents(const QString& text) {
+	clearTab();
+	delete this->layout;
+	layout = new QGridLayout{this};
+	this->setLayout(layout);
+	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+	QLabel* textLabel = new QLabel{this};
+	textLabel->setText(text);
+	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	textLabel->setAlignment(Qt::AlignCenter);
+
+	layout->addWidget(textLabel);
 }
 
 QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSizePolicy& sp) const {

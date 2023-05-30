@@ -13,9 +13,15 @@ class ForecastTab : public ITab {
 public:
 	static ForecastTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
 
+	virtual void createTabContents() final override;
+	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
+
+public slots:
+	virtual void onAuthorized() final override;
+
 private:
 	ForecastTab(const QString& tabName, QWidget* parent = nullptr);
-	QGridLayout* layout;
+	QLayout* layout;
 
 	static ForecastTab* instance;
 	static QMutex lock;

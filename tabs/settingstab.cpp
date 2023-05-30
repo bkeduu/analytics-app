@@ -7,13 +7,24 @@ QMutex SettingsTab::lock{};
 
 SettingsTab* SettingsTab::getWidget(const QString& tabName, QWidget* parent) {
 	QMutexLocker locker{&SettingsTab::lock};
-		if (!instance)
-			instance = new SettingsTab{tabName, parent};
-		return instance;
+	if (!instance)
+		instance = new SettingsTab{tabName, parent};
+	return instance;
 }
 
 SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
-	layout = new QGridLayout{this};
+	createTabContents();
+}
+
+void SettingsTab::onAuthorized() {
+
+}
+
+void SettingsTab::createTabContents() {
+	clearTab();
+	QGridLayout* gridLayout = new QGridLayout{this};
+	layout = gridLayout;
+	this->setLayout(layout);
 
 	serverAddress = new QLineEdit{this};
 	serverAddress->setPlaceholderText(tr("Server\'s IP"));
@@ -36,11 +47,11 @@ SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent,
 	button->setText(tr("Authorize"));
 	button->setMaximumWidth(200);
 
-	layout->addWidget(serverAddress, 0, 0);
-	layout->addWidget(serverPort, 1, 0);
-	layout->addWidget(login, 2, 0);
-	layout->addWidget(password, 3, 0);
-	layout->addWidget(button, 0, 1);
+	gridLayout->addWidget(serverAddress, 0, 0);
+	gridLayout->addWidget(serverPort, 1, 0);
+	gridLayout->addWidget(login, 2, 0);
+	gridLayout->addWidget(password, 3, 0);
+	gridLayout->addWidget(button, 0, 1);
 
 	connect(serverAddress, &QLineEdit::textChanged, serverAddress, [=](const QString& newAddress) {
 		emit serverAddressUpdated(newAddress);
@@ -63,14 +74,20 @@ SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent,
 	});
 }
 
+void SettingsTab::removeTabContents(const QString& text) {
+
+}
+
 void SettingsTab::load(QSettings& settings) {
 	serverAddress->setText(settings.value("serverAddress", "").toString());
 	serverPort->setText(settings.value("serverPort").toString());
 	login->setText(settings.value("login").toString());
+	password->setText(settings.value("password").toString());
 }
 
 void SettingsTab::save(QSettings& settings) {
 	settings.setValue("serverAddress", serverAddress->text());
 	settings.setValue("serverPort", serverPort->text());
 	settings.setValue("login", login->text());
+	settings.setValue("password", password->text());
 }

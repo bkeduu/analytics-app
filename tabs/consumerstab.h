@@ -32,13 +32,15 @@ public:
 
 public slots:
 	void setJSONDocument(const QJsonObject& document);
+	virtual void onAuthorized() final override;
 
 private:
 	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);
 
-	void buildInterface();
+	virtual void createTabContents() final override;
+	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
-	QHBoxLayout* layout;
+	QLayout* layout;
 
 	static ConsumersTab* instance;
 	static QMutex lock;

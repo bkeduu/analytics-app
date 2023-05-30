@@ -62,6 +62,7 @@ public:
 
 public slots:
 	void onDataReceived(const QJsonObject& values);
+	virtual void onAuthorized() final override;
 
 private:
 	enum class TabWidget { Generation, Consumers, WorkMode, BatteryStatus };
@@ -72,9 +73,12 @@ private:
 	QLabel* createLabel(QWidget* parent, const QString& imagePath, const QSizePolicy& sp, const QSize& sz) const;
 	QProgressBar* createProgressBar(QWidget* parent, const QSize& minSize) const;
 
+	virtual void createTabContents() final override;
+	virtual void removeTabContents(const QString& = tr("You need to authorize before starting")) final override;
+
 	QFrame* generators,* consumers,* modes,* battery;
 
-	QGridLayout* layout;
+	QLayout* layout;
 
 	static StatusTab* instance;
 	static QMutex lock;

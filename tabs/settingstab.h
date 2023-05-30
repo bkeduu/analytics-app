@@ -13,6 +13,9 @@ class SettingsTab : public ITab {
 public:
 	static SettingsTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
 
+	virtual void createTabContents() final override;
+	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting"));
+
 	void load(QSettings& settings) final;
 	void save(QSettings& settings) final;
 
@@ -24,9 +27,12 @@ signals:
 
 	void authorizationClicked();
 
+public slots:
+	virtual void onAuthorized() final override;
+
 private:
 	SettingsTab(const QString& tabName, QWidget* parent = nullptr);
-	QGridLayout* layout;
+	QLayout* layout;
 
 	QLineEdit* serverAddress;
 	QLineEdit* serverPort;

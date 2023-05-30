@@ -8,7 +8,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
 	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mAuthorized{false}, mESPConnected{false},
-	settings{"analytics.conf", QSettings::IniFormat} {
+	settings{"ICS4", "Analytics app"} {
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -44,13 +44,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
 
-	QFile f{":/static/requests/consumers.json"};
-	f.open(QIODevice::ReadOnly | QIODevice::Text);
-	QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
-	QJsonObject obj = doc.object().value("data").toObject();
-	consumersTab->setJSONDocument(obj);
+//	QFile f{":/static/requests/consumers.json"};
+//	f.open(QIODevice::ReadOnly | QIODevice::Text);
+//	QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
+//	QJsonObject obj = doc.object().value("data").toObject();
+//	consumersTab->setJSONDocument(obj);
 
-	//connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
+	connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
 	tabs[Tab::Consumers] = consumersTab;
 
 	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 		tabWidget->addTab(tabs[tab], tabs[tab]->getName());
 		tabWidget->setTabIcon(tabWidget->indexOf(tabs[tab]),
 							  QIcon{QString{":/static/images/page_"} + QString::number((int)tab) + ".png"});
+		connect(connector, SIGNAL(authorized(QJsonObject)), tabs[tab], SLOT(onAuthorized()));
 	}
 
 	tabWidget->tabBar()->setIconSize(QSize(30, 30));
@@ -161,12 +162,16 @@ void MainWindow::onRelayClicked(int group, bool newState) {
 }
 
 void MainWindow::load() {
+	this->restoreGeometry(settings.value("windowGeometry").toByteArray());
+
 	settings.beginGroup("SETTINGS");
 	tabs[Tab::Settings]->load(settings);
 	settings.endGroup();
 }
 
 void MainWindow::save() {
+	settings.setValue("windowGeometry", this->saveGeometry());
+
 	settings.beginGroup("SETTINGS");
 	tabs[Tab::Settings]->save(settings);
 	settings.endGroup();
