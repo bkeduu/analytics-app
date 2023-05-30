@@ -29,7 +29,7 @@ void GenerationTab::createTabContents() {
 	layout->addWidget(cb);
 
 	connect(cb, &CustomCheckbox::checkboxClicked, cb, [=](bool newState) {
-		mParent->onRelayClicked(4, newState);
+		mParent->onRelayClicked(3, newState);
 	});
 }
 
