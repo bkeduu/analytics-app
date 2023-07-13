@@ -33,6 +33,7 @@ public:
 public slots:
 	void setJSONDocument(const QJsonObject& document);
 	virtual void onAuthorized() final override;
+	virtual void onTabOpened() final override;
 
 private:
 	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);

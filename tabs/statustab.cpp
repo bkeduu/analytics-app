@@ -2,6 +2,8 @@
 
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QGroupBox>
+#include <QResizeEvent>
 
 StatusTab* StatusTab::instance = nullptr;
 QMutex StatusTab::lock{};
@@ -15,7 +17,6 @@ StatusTab* StatusTab::getWidget(const QString& tabName, QWidget* parent) {
 
 StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
 	generators{nullptr}, consumers{nullptr}, layout{nullptr} {
-
 	removeTabContents();
 }
 
@@ -23,11 +24,16 @@ void StatusTab::onAuthorized() {
 	createTabContents();
 }
 
+void StatusTab::onTabOpened() {
+
+}
+
 void StatusTab::createTabContents() {
 	clearTab();
 	delete this->layout;
 	QGridLayout* gridLayout = new QGridLayout{this};
-	gridLayout->setContentsMargins(9, 9, 9, 9);
+	gridLayout->setContentsMargins(15, 15, 15, 15);
+	gridLayout->setSpacing(20);
 	this->layout = gridLayout;
 	this->setLayout(gridLayout);
 
@@ -45,7 +51,8 @@ void StatusTab::createTabContents() {
 	gridLayout->addWidget(consumers, 1, 0);
 	gridLayout->addWidget(battery, 1, 1);
 
-	layout = gridLayout;
+	gridLayout->setColumnStretch(0, 2);
+	gridLayout->setColumnStretch(1, 1);
 }
 
 void StatusTab::removeTabContents(const QString& text) {
@@ -56,6 +63,7 @@ void StatusTab::removeTabContents(const QString& text) {
 	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
+	textLabel->setProperty("class", "tab-standalone-text");
 	textLabel->setText(text);
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);
@@ -63,10 +71,10 @@ void StatusTab::removeTabContents(const QString& text) {
 	layout->addWidget(textLabel);
 }
 
-QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSizePolicy& sp) const {
+QLabel* StatusTab::createLabel(QWidget* parent, const QString& text) const {
 	QLabel* result = new QLabel{parent};
 	result->setText(text);
-	result->setSizePolicy(sp);
+	result->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 	result->setMargin(0);
 	result->setIndent(0);
 	result->setContentsMargins(0, 0, 0, 0);
@@ -75,12 +83,12 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& text, const QSize
 	return result;
 }
 
-QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const QSizePolicy& sp, const QSize& sz) const {
+QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const QSize& sz) const {
 	QLabel* result = new QLabel{parent};
 	QPixmap image{imagePath};
 	image = image.scaled(sz);
 	result->setPixmap(image);
-	result->setSizePolicy(sp);
+	result->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
 	result->setMargin(0);
 	result->setIndent(0);
 	result->setContentsMargins(0, 0, 0, 0);
@@ -92,15 +100,17 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const 
 QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize) const {
 	QProgressBar* result = new QProgressBar{parent};
 
-	static QFile stylesheet_file = QFile{":/static/stylesheets/progressbar.css"};
-	if (!stylesheet_file.isOpen())
-		stylesheet_file.open(QFile::ReadOnly | QFile::Text);
-	static QString stylesheet = stylesheet_file.readAll();
+	static QString progressBarStylesheet = "";
+	if (!progressBarStylesheet.length()) {
+		QFile stylesheet{":/static/stylesheets/progressbar.css"};
+		stylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
+		progressBarStylesheet = stylesheet.readAll();
+	}
 
 	result->setValue(0);
 	result->setTextVisible(true);
 	result->setMinimumSize(minSize);
-	result->setStyleSheet(stylesheet);
+	result->setStyleSheet(progressBarStylesheet);
 
 	return result;
 }
@@ -162,48 +172,46 @@ void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 	dynamic_cast<QProgressBar*>(consumersLabels[ThirdProgress])->setValue(thirdArray[3].toInt());
 }
 
-QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
+QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
+	QGroupBox* widget;
 
-	QFrame* widget;
+	static QString groupBoxStylesheet{""};
+
+	if (!groupBoxStylesheet.length()) {
+		QFile stylesheet{":/static/stylesheets/qgroupbox.css"};
+		stylesheet.open(QIODevice::ReadOnly);
+		groupBoxStylesheet = stylesheet.readAll();
+		stylesheet.close();
+	}
+
 	switch (widgetType) {
 	case TabWidget::Generation: {
-		widget = new QFrame{parent};
+		widget = new QGroupBox{parent};
+		QWidget* statusLabel = nullptr;
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
-
 		widget->setLayout(layout);
-		widget->setFrameShape(QFrame::Box);
+		widget->setTitle(tr("Generators"));
 
-		QLabel* generationFrameLabel = new QLabel{widget};
-		generationFrameLabel->setText(tr("Generators"));
-		generationFrameLabel->setAlignment(Qt::AlignCenter);
-		generationFrameLabel->setFrameShape(QFrame::Box);
-		generationFrameLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
-		generationFrameLabel->setMaximumSize(QSize{100, 40});
-		layout->addWidget(generationFrameLabel, Qt::AlignCenter);
+		widget->setStyleSheet(groupBoxStylesheet);
 
 		QFrame* solarInfoWidget = new QFrame{widget};
 		QHBoxLayout* solarInfoLayout = new QHBoxLayout{solarInfoWidget};
 		solarInfoWidget->setLayout(solarInfoLayout);
 		layout->addWidget(solarInfoWidget, Qt::AlignCenter);
 
-		QWidget* statusLabel = nullptr;
-
 		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/static/images/solar-power.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+											   QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString("V: %1").arg(0),
-								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(solarInfoWidget, QString{"V: -"});
 		generatorsLabels[SolarVoltage] = statusLabel;
 		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString("A: %1").arg(0),
-								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(solarInfoWidget, QString{"A: -"});
 		generatorsLabels[SolarCurrent] = statusLabel;
 		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString("W: %1").arg(0),
-								QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(solarInfoWidget, QString{"W: -"});
 		generatorsLabels[SolarPower] = statusLabel;
 		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -213,24 +221,21 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		QFrame* windInfoWidget = new QFrame{widget};
 		QHBoxLayout* windInfoLayout = new QHBoxLayout{windInfoWidget};
-		solarInfoWidget->setLayout(windInfoLayout);
+		windInfoWidget->setLayout(windInfoLayout);
 		layout->addWidget(windInfoWidget, Qt::AlignCenter);
 
 		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/static/images/wind-turbine.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+											  QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString("V: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(windInfoWidget, QString{"V: -"});
 		generatorsLabels[WindVoltage] = statusLabel;
 		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString("A: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(windInfoWidget, QString{"A: -"});
 		generatorsLabels[WindCurrent] = statusLabel;
 		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString("W: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(windInfoWidget, QString{"W: -"});
 		generatorsLabels[WindPower] = statusLabel;
 		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -244,20 +249,17 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(dieselInfoWidget, Qt::AlignCenter);
 
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/static/images/diesel.png",
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}, QSize{30, 30}), 10, Qt::AlignCenter);
+												QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString("V: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(dieselInfoWidget, QString{"V: -"});
 		generatorsLabels[DieselVoltage] = statusLabel;
 		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString("A: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(dieselInfoWidget, QString{"A: -"});
 		generatorsLabels[DieselCurrent] = statusLabel;
 		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString("W: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(dieselInfoWidget, QString{"W: -"});
 		generatorsLabels[DieselPower] = statusLabel;
 		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -268,19 +270,13 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	case TabWidget::Consumers: {
-		widget = new QFrame{parent};
-		widget->setFrameShape(QFrame::Box);
+		widget = new QGroupBox{parent};
+		widget->setTitle(tr("Consumers"));
+		widget->setStyleSheet(groupBoxStylesheet);
+
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
-
-		QLabel* consumersFrameLabel = new QLabel{widget};
-		consumersFrameLabel->setText(tr("Consumers"));
-		consumersFrameLabel->setAlignment(Qt::AlignCenter);
-		consumersFrameLabel->setFrameShape(QFrame::Box);
-		consumersFrameLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
-		consumersFrameLabel->setMaximumSize(QSize{120, 40});
-		layout->addWidget(consumersFrameLabel, Qt::AlignCenter);
 
 		QFrame* firstInfoWidget = new QFrame{widget};
 		QHBoxLayout* firstInfoLayout = new QHBoxLayout{firstInfoWidget};
@@ -289,21 +285,17 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		QWidget* statusLabel = nullptr;
 
-		firstInfoLayout->addWidget(createLabel(firstInfoWidget, tr("1st group"),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
+		firstInfoLayout->addWidget(createLabel(firstInfoWidget, tr("1st group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString("V: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(firstInfoWidget, QString{"V: -"});
 		consumersLabels[FirstVoltage] = statusLabel;
 		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString("A: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(firstInfoWidget, QString{"A: -"});
 		consumersLabels[FirstCurrent] = statusLabel;
 		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString("W: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(firstInfoWidget, QString{"W: -"});
 		consumersLabels[FirstPower] = statusLabel;
 		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -316,21 +308,17 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		secondInfoWidget->setLayout(secondInfoLayout);
 		layout->addWidget(secondInfoWidget, Qt::AlignCenter);
 
-		secondInfoLayout->addWidget(createLabel(secondInfoWidget, tr("2nd group"),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
+		secondInfoLayout->addWidget(createLabel(secondInfoWidget, tr("2nd group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString("V: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(secondInfoWidget, QString{"V: -"});
 		consumersLabels[SecondVoltage] = statusLabel;
 		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString("A: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(secondInfoWidget, QString{"A: -"});
 		consumersLabels[SecondCurrent] = statusLabel;
 		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString("W: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(secondInfoWidget, QString{"W: -"});
 		consumersLabels[SecondPower] = statusLabel;
 		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -343,21 +331,17 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		thirdInfoWidget->setLayout(thirdInfoLayout);
 		layout->addWidget(thirdInfoWidget);
 
-		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("3rd group"),
-									  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum}), 10, Qt::AlignCenter);
+		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("3rd group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString("V: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(thirdInfoWidget, QString{"V: -"});
 		consumersLabels[ThirdVoltage] = statusLabel;
 		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString("A: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(thirdInfoWidget, QString{"A: -"});
 		consumersLabels[ThirdCurrent] = statusLabel;
 		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString("W: %1").arg(0),
-								  QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
+		statusLabel = createLabel(thirdInfoWidget, QString{"W: -"});
 		consumersLabels[ThirdPower] = statusLabel;
 		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
 
@@ -368,18 +352,12 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	case TabWidget::WorkMode: {
-		widget = new QFrame{parent};
-		widget->setFrameShape(QFrame::Box);
+		widget = new QGroupBox{parent};
+		widget->setTitle(tr("Work Mode"));
+		widget->setStyleSheet(groupBoxStylesheet);
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
-
-		QLabel* modeLabel = new QLabel{widget};
-		modeLabel->setText(tr("Work Mode"));
-		modeLabel->setFrameShape(QFrame::Box);
-		modeLabel->setSizePolicy(QSizePolicy{QSizePolicy::Minimum, QSizePolicy::Minimum});
-		modeLabel->setMaximumSize(QSize{150, 40});
-		layout->addWidget(modeLabel);
 
 		QFrame* manualModeWidget = new QFrame{widget};
 		QHBoxLayout* manualModeWidgetLayout = new QHBoxLayout{manualModeWidget};
@@ -455,8 +433,9 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	case TabWidget::BatteryStatus: {
-		widget = new QFrame{parent};
-		widget->setFrameShape(QFrame::Box);
+		widget = new QGroupBox{parent};
+		widget->setTitle(tr("Battery"));
+		widget->setStyleSheet(groupBoxStylesheet);
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
@@ -464,6 +443,7 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QFrame* batteryStatusWidget = new QFrame{this};
 		layout->addWidget(batteryStatusWidget);
 		QHBoxLayout* batteryStatusLayout = new QHBoxLayout{batteryStatusWidget};
+		batteryStatusWidget->setLayout(batteryStatusLayout);
 
 		QProgressBar* batteryChargeIndicator = createProgressBar(batteryStatusWidget, QSize{60, 100});
 		batteryChargeIndicator->setValue(0);
@@ -493,7 +473,6 @@ QFrame* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	default:
-		widget = nullptr;
 		break;
 	}
 

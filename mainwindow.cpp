@@ -14,7 +14,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	QFont appFont{this->font()};
 	appFont.setPixelSize(18);
 	appFont.setHintingPreference(QFont::PreferFullHinting);
-	this->setFont(appFont);
+	qApp->setFont(appFont);
+
+	QFile globalStylesheet{":/static/stylesheets/global.css"};
+	globalStylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
+	qApp->setStyleSheet(globalStylesheet.readAll());
+	globalStylesheet.close();
 
 	currentWindowTitle = windowTitle = tr("Analytics system");
 	setWindowTitle(currentWindowTitle);
@@ -37,18 +42,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	layout = new QHBoxLayout{this};
 	tabWidget = new QTabWidget{this};
+	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+	tabWidget->tabBar()->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+	tabWidget->tabBar()->setDocumentMode(true);
+	tabWidget->tabBar()->setExpanding(true);
 
 	StatusTab* statusTab = StatusTab::getWidget(tr("Status"), this);
 	connect(connector, SIGNAL(dataReceived(QJsonObject)), statusTab, SLOT(onDataReceived(QJsonObject)));
 	tabs[Tab::Status] = statusTab;
 
 	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-
-//	QFile f{":/static/requests/consumers.json"};
-//	f.open(QIODevice::ReadOnly | QIODevice::Text);
-//	QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
-//	QJsonObject obj = doc.object().value("data").toObject();
-//	consumersTab->setJSONDocument(obj);
 
 	connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
 	tabs[Tab::Consumers] = consumersTab;
@@ -85,9 +88,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 
 	foreach (Tab tab, tabs.keys()) {
 		tabWidget->addTab(tabs[tab], tabs[tab]->getName());
-		tabWidget->setTabIcon(tabWidget->indexOf(tabs[tab]),
+
+		int tabIndex = tabWidget->indexOf(tabs[tab]);
+		tabWidget->setTabIcon(tabIndex,
 							  QIcon{QString{":/static/images/page_"} + QString::number((int)tab) + ".png"});
 		connect(connector, SIGNAL(authorized(QJsonObject)), tabs[tab], SLOT(onAuthorized()));
+		connect(tabWidget, &QTabWidget::currentChanged, this, [tabIndex, this, tab](int clickedTabIndex) {
+			if (tabIndex == clickedTabIndex)
+				this->tabs[tab]->onTabOpened();
+		});
 	}
 
 	tabWidget->tabBar()->setIconSize(QSize(30, 30));
@@ -127,7 +136,7 @@ void MainWindow::onAuthorized(const QJsonObject& dataObject) {
 		setChangingTitle(tr("Analytics system"));
 
 		foreach (ITab* tab, tabs) {
-			tab->onAuthorize();
+			tab->onAuthorized();
 		}
 	}
 	else {

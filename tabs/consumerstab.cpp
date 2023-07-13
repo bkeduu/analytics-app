@@ -39,6 +39,10 @@ void ConsumersTab::onAuthorized() {
 	removeTabContents(tr("Waiting for consumers data from server"));
 }
 
+void ConsumersTab::onTabOpened() {
+
+}
+
 void ConsumersTab::createTabContents() {
 	clearTab();
 	delete this->layout;
@@ -83,6 +87,7 @@ void ConsumersTab::removeTabContents(const QString& text) {
 	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
+	textLabel->setProperty("class", "tab-standalone-text");
 	textLabel->setText(text);
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);

@@ -14,18 +14,17 @@ public:
 	ITab(QWidget* parent, const QString& name);
 	QString getName() const;
 
-	virtual void onAuthorize() { }
-
 	virtual void createTabContents() = 0;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) = 0;
 
-    virtual void load(QSettings&) { };
-    virtual void save(QSettings&) { };
+	virtual void load(QSettings&) { };
+	virtual void save(QSettings&) { };
 
 	virtual ~ITab() = default;
 
 public slots:
 	virtual void onAuthorized() = 0;
+	virtual void onTabOpened() = 0;
 
 private:
 	const QString tabName;

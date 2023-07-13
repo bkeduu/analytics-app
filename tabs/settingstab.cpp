@@ -1,4 +1,5 @@
 #include "settingstab.h"
+#include "mainwindow.h"
 
 #include <QLineEdit>
 
@@ -17,7 +18,24 @@ SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent,
 }
 
 void SettingsTab::onAuthorized() {
+	clearTab();
+	delete this->layout;
+	layout = new QGridLayout{this};
+	this->setLayout(layout);
+	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
+	QLabel* textLabel = new QLabel{this};
+	textLabel->setProperty("class", "tab-standalone-text");
+	textLabel->setText(tr("You are successfully authorized"));
+	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	textLabel->setAlignment(Qt::AlignCenter);
+
+	layout->addWidget(textLabel);
+}
+
+void SettingsTab::onTabOpened() {
+	if (!mParent->authorized() && button->isVisible())
+		button->setFocus(Qt::TabFocusReason);
 }
 
 void SettingsTab::createTabContents() {
@@ -43,9 +61,11 @@ void SettingsTab::createTabContents() {
 	password->setMaximumWidth(200);
 	password->setEchoMode(QLineEdit::Password);
 
-	QPushButton* button = new QPushButton{this};
+	button = new QPushButton{this};
 	button->setText(tr("Authorize"));
 	button->setMaximumWidth(200);
+	button->setDefault(false);
+	button->setAutoDefault(true);
 
 	gridLayout->addWidget(serverAddress, 0, 0);
 	gridLayout->addWidget(serverPort, 1, 0);
@@ -74,7 +94,7 @@ void SettingsTab::createTabContents() {
 	});
 }
 
-void SettingsTab::removeTabContents(const QString& text) {
+void SettingsTab::removeTabContents(const QString& /*text*/) {
 
 }
 

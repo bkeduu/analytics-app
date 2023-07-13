@@ -17,5 +17,7 @@
         <file>static/stylesheets/progressbar.css</file>
         <file>static/requests/shutdown.json</file>
         <file>static/requests/consumers.json</file>
+        <file>static/stylesheets/qgroupbox.css</file>
+        <file>static/stylesheets/global.css</file>
     </qresource>
 </RCC>

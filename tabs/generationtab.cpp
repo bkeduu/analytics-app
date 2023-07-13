@@ -20,6 +20,10 @@ void GenerationTab::onAuthorized() {
 	createTabContents();
 }
 
+void GenerationTab::onTabOpened() {
+
+}
+
 void GenerationTab::createTabContents() {
 	clearTab();
 	delete this->layout;
@@ -41,6 +45,7 @@ void GenerationTab::removeTabContents(const QString& text) {
 	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
+	textLabel->setProperty("class", "tab-standalone-text");
 	textLabel->setText(text);
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);

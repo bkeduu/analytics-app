@@ -18,6 +18,7 @@ public:
 
 public slots:
 	virtual void onAuthorized() final override;
+	virtual void onTabOpened() final override;
 
 private:
 	GenerationTab(const QString& tabName, QWidget* parent = nullptr);

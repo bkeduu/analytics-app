@@ -14,7 +14,7 @@ public:
 	static SettingsTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
 
 	virtual void createTabContents() final override;
-	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting"));
+	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
 	void load(QSettings& settings) final;
 	void save(QSettings& settings) final;
@@ -29,6 +29,7 @@ signals:
 
 public slots:
 	virtual void onAuthorized() final override;
+	virtual void onTabOpened() final override;
 
 private:
 	SettingsTab(const QString& tabName, QWidget* parent = nullptr);
@@ -38,6 +39,8 @@ private:
 	QLineEdit* serverPort;
 	QLineEdit* login;
 	QLineEdit* password;
+
+	QPushButton* button;
 
 	static SettingsTab* instance;
 	static QMutex lock;

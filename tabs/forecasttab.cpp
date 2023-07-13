@@ -15,7 +15,11 @@ ForecastTab::ForecastTab(const QString& tabName, QWidget* parent) : ITab{parent,
 }
 
 void ForecastTab::onAuthorized() {
-	removeTabContents(tr("In development"));
+
+}
+
+void ForecastTab::onTabOpened() {
+
 }
 
 void ForecastTab::createTabContents() {
@@ -30,6 +34,7 @@ void ForecastTab::removeTabContents(const QString& text) {
 	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
+	textLabel->setProperty("class", "tab-standalone-text");
 	textLabel->setText(text);
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);
