@@ -1,1 +1,3 @@
-analytics-app.pro.user
+*.user
+*.qm
+build/
