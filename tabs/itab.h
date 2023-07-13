@@ -19,8 +19,8 @@ public:
 	virtual void createTabContents() = 0;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) = 0;
 
-	virtual void load(QSettings& settings) { };
-	virtual void save(QSettings& settings) { };
+    virtual void load(QSettings&) { };
+    virtual void save(QSettings&) { };
 
 	virtual ~ITab() = default;
 
