@@ -2,16 +2,7 @@
 #include "mainwindow.h"
 
 #include <QLineEdit>
-
-SettingsTab* SettingsTab::instance = nullptr;
-QMutex SettingsTab::lock{};
-
-SettingsTab* SettingsTab::getWidget(const QString& tabName, QWidget* parent) {
-	QMutexLocker locker{&SettingsTab::lock};
-	if (!instance)
-		instance = new SettingsTab{tabName, parent};
-	return instance;
-}
+#include <QMessageBox>
 
 SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
 	createTabContents();
@@ -34,8 +25,12 @@ void SettingsTab::onAuthorized() {
 }
 
 void SettingsTab::onTabOpened() {
-	if (!mParent->authorized() && button->isVisible())
-		button->setFocus(Qt::TabFocusReason);
+//	if (!mParent->authorized() && button->isVisible())
+//		button->setFocus(Qt::TabFocusReason);
+}
+
+void SettingsTab::onDataReceived(const QJsonObject&) {
+
 }
 
 void SettingsTab::createTabContents() {
@@ -73,24 +68,47 @@ void SettingsTab::createTabContents() {
 	gridLayout->addWidget(password, 3, 0);
 	gridLayout->addWidget(button, 0, 1);
 
-	connect(serverAddress, &QLineEdit::textChanged, serverAddress, [=](const QString& newAddress) {
-		emit serverAddressUpdated(newAddress);
-	});
+	connect(button, &QPushButton::clicked, button, [&]() {
 
-	connect(serverPort, &QLineEdit::textChanged, serverPort, [=](const QString& newPort) {
-		emit serverPortUpdated(newPort);
-	});
+		if (serverAddress->text().isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Server address is not set."),
+						   tr("You need to set the server address."), QMessageBox::Ok};
+			mb.exec();
+			return;
+		}
 
-	connect(login, &QLineEdit::textChanged, login, [=](const QString& newLogin) {
-		emit loginUpdated(newLogin);
-	});
+		if (serverPort->text().isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Server port is not set."),
+						   tr("You need to set the server port."), QMessageBox::Ok};
+			mb.exec();
+			return;
+		}
 
-	connect(password, &QLineEdit::textChanged, password, [=](const QString& newPassword) {
-		emit passwordUpdated(newPassword);
-	});
+		bool portConversionOk;
+		int port = serverPort->text().toInt(&portConversionOk);
 
-	connect(button, &QPushButton::clicked, button, [=]() {
-		emit authorizationClicked();
+		if (!portConversionOk || port <= 0) {
+			QMessageBox mb{QMessageBox::Critical, tr("Server port is incorrect."),
+						   tr("You need to set correct server port."), QMessageBox::Ok};
+			mb.exec();
+			return;
+		}
+
+		if (login->text().isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Login is not set."),
+						   tr("You need to set the login."), QMessageBox::Ok};
+			mb.exec();
+			return;
+		}
+
+		if (password->text().isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Password is not set."),
+						   tr("You need to set the password."), QMessageBox::Ok};
+			mb.exec();
+			return;
+		}
+
+		emit authorizationClicked(serverAddress->text(), port, login->text(), password->text());
 	});
 }
 
@@ -99,15 +117,15 @@ void SettingsTab::removeTabContents(const QString& /*text*/) {
 }
 
 void SettingsTab::load(QSettings& settings) {
-	serverAddress->setText(settings.value("serverAddress", "").toString());
-	serverPort->setText(settings.value("serverPort").toString());
-	login->setText(settings.value("login").toString());
-	password->setText(settings.value("password").toString());
+//	serverAddress->setText(settings.value("serverAddress", "").toString());
+//	serverPort->setText(settings.value("serverPort").toString());
+//	login->setText(settings.value("login").toString());
+//	password->setText(settings.value("password").toString());
 }
 
 void SettingsTab::save(QSettings& settings) {
-	settings.setValue("serverAddress", serverAddress->text());
-	settings.setValue("serverPort", serverPort->text());
-	settings.setValue("login", login->text());
-	settings.setValue("password", password->text());
+//	settings.setValue("serverAddress", serverAddress->text());
+//	settings.setValue("serverPort", serverPort->text());
+//	settings.setValue("login", login->text());
+//	settings.setValue("password", password->text());
 }

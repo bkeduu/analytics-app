@@ -1,10 +1,8 @@
 #pragma once
 
-#include <QMutex>
-#include <QLabel>
 #include <QFrame>
-#include <QLayout>
 #include <QSettings>
+#include <QJsonObject>
 
 class MainWindow;
 
@@ -15,7 +13,7 @@ public:
 	QString getName() const;
 
 	virtual void createTabContents() = 0;
-	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) = 0;
+	virtual void removeTabContents(const QString& text = "") = 0;
 
 	virtual void load(QSettings&) { };
 	virtual void save(QSettings&) { };
@@ -25,6 +23,7 @@ public:
 public slots:
 	virtual void onAuthorized() = 0;
 	virtual void onTabOpened() = 0;
+	virtual void onDataReceived(const QJsonObject&) = 0;
 
 private:
 	const QString tabName;

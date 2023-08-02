@@ -8,16 +8,18 @@
 #include <QLineEdit>
 #include <QString>
 
-class SettingsTab : public ITab {
+class SettingsTab final : public ITab {
 	Q_OBJECT
 public:
-	static SettingsTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+	SettingsTab(const QString& tabName, QWidget* parent = nullptr);
 
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
-	void load(QSettings& settings) final;
-	void save(QSettings& settings) final;
+	void load(QSettings& settings) final override;
+	void save(QSettings& settings) final override;
+
+	virtual ~SettingsTab() final override {};
 
 signals:
 	void serverAddressUpdated(const QString& newAddress);
@@ -25,14 +27,15 @@ signals:
 	void loginUpdated(const QString& newLogin);
 	void passwordUpdated(const QString& newpassword);
 
-	void authorizationClicked();
+	void authorizationClicked(const QString& serverAddress, int serverPort,
+								const QString& login, const QString& password);
 
 public slots:
 	virtual void onAuthorized() final override;
 	virtual void onTabOpened() final override;
+	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:
-	SettingsTab(const QString& tabName, QWidget* parent = nullptr);
 	QLayout* layout;
 
 	QLineEdit* serverAddress;
@@ -41,9 +44,4 @@ private:
 	QLineEdit* password;
 
 	QPushButton* button;
-
-	static SettingsTab* instance;
-	static QMutex lock;
-
-	virtual ~SettingsTab() {};
 };

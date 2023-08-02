@@ -25,31 +25,24 @@ struct Consumer {
 	QWidget* widget;
 };
 
-class ConsumersTab : public ITab {
+class ConsumersTab final : public ITab {
 	Q_OBJECT
 public:
-	static ConsumersTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);
+	virtual ~ConsumersTab() final override { };
 
 public slots:
-	void setJSONDocument(const QJsonObject& document);
 	virtual void onAuthorized() final override;
 	virtual void onTabOpened() final override;
+	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:
-	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);
-
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
+	void setJSONDocument(const QJsonObject& document);
 
 	QLayout* layout;
-
-	static ConsumersTab* instance;
-	static QMutex lock;
-
 	QVector<QMap<int, Consumer>> consumersGroups;
-
 	QVector<CustomCheckbox*> groupRelays;
 	QVector<QFrame*> groupWidgets;
-
-	virtual ~ConsumersTab() {};
 };

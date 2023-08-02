@@ -2,31 +2,25 @@
 
 #include "itab.h"
 
-#include <QWidget>
 #include <QGridLayout>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QString>
+#include <QLabel>
 
-class ForecastTab : public ITab {
+class ForecastTab final : public ITab {
 	Q_OBJECT
 public:
-	static ForecastTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+	ForecastTab(const QString& tabName, QWidget* parent = nullptr);
 
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
+	virtual ~ForecastTab() final override {};
+
 public slots:
 	virtual void onAuthorized() final override;
 	virtual void onTabOpened() final override;
+	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:
-	ForecastTab(const QString& tabName, QWidget* parent = nullptr);
 	QLayout* layout;
-
-	static ForecastTab* instance;
-	static QMutex lock;
-
-	virtual ~ForecastTab() {};
 };
 

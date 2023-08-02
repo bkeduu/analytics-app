@@ -1,19 +1,8 @@
 #include "statustab.h"
 
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QGroupBox>
 #include <QResizeEvent>
-
-StatusTab* StatusTab::instance = nullptr;
-QMutex StatusTab::lock{};
-
-StatusTab* StatusTab::getWidget(const QString& tabName, QWidget* parent) {
-	QMutexLocker locker{&StatusTab::lock};
-	if (!instance)
-		instance = new StatusTab{tabName, parent};
-	return instance;
-}
 
 StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
 	generators{nullptr}, consumers{nullptr}, layout{nullptr} {
@@ -118,58 +107,58 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 void StatusTab::onDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray solarArray = dataObject.value("solar").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[SolarVoltage])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[SolarCurrent])->setText(tr("A: %1").arg(solarArray[1].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[SolarPower])->setText(tr("W: %1").arg(solarArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(generatorsLabels[SolarProgress])->setValue(solarArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["solar-current-label"])->setText(tr("A: %1").arg(solarArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["solar-power-label"])->setText(tr("W: %1").arg(solarArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["solar-progressbar"])->setValue(solarArray[3].toInt());
 
 	QJsonArray windArray = dataObject.value("wind").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[WindVoltage])->setText(tr("V: %1").arg(windArray[0].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[WindCurrent])->setText(tr("A: %1").arg(windArray[1].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[WindPower])->setText(tr("W: %1").arg(windArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(generatorsLabels[WindProgress])->setValue(windArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["wind-voltage-label"])->setText(tr("V: %1").arg(windArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["wind-current-label"])->setText(tr("A: %1").arg(windArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["wind-power-label"])->setText(tr("W: %1").arg(windArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["wind-progressbar"])->setValue(windArray[3].toInt());
 
 	QJsonArray dieselArray = dataObject.value("gen").toArray();
-	dynamic_cast<QLabel*>(generatorsLabels[DieselVoltage])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[DieselCurrent])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
-	dynamic_cast<QLabel*>(generatorsLabels[DieselPower])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(generatorsLabels[DieselProgress])->setValue(dieselArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["diesel-progressbar"])->setValue(dieselArray[3].toInt());
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
-	dynamic_cast<QLabel*>(batteryLabels[BatteryVoltage])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["battery-voltage-label"])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
 	int status = batteryArray[4].toInt();
 
 	switch (BatteryInformation(status)) {
 	case Charging:
-		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Charging..."));
+		dynamic_cast<QLabel*>(widgetLocator["battery-status-label"])->setText(tr("Charging..."));
 		break;
 	case Discharging:
-		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Discharging..."));
+		dynamic_cast<QLabel*>(widgetLocator["battery-status-label"])->setText(tr("Discharging..."));
 		break;
 	default:
-		dynamic_cast<QLabel*>(batteryLabels[BatteryInfo])->setText(tr("Unknown..."));
+		dynamic_cast<QLabel*>(widgetLocator["battery-status-label"])->setText(tr("Unknown..."));
 		break;
 	}
 
-	dynamic_cast<QProgressBar*>(batteryLabels[BatteryProgress])->setValue(batteryArray[1].toInt());
+	dynamic_cast<QProgressBar*>(widgetLocator["battery-progressbar"])->setValue(batteryArray[1].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[FirstVoltage])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[FirstCurrent])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[FirstPower])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(consumersLabels[FirstProgress])->setValue(firstArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["first-voltage-label"])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["first-current-label"])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["first-power-label"])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["first-progressbar"])->setValue(firstArray[3].toInt());
 
 	QJsonArray secondArray = dataObject.value("2").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[SecondVoltage])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[SecondCurrent])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[SecondPower])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(consumersLabels[SecondProgress])->setValue(secondArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["second-voltage-label"])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["second-current-label"])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["second-power-label"])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["second-progressbar"])->setValue(secondArray[3].toInt());
 
 	QJsonArray thirdArray = dataObject.value("3").toArray();
-	dynamic_cast<QLabel*>(consumersLabels[ThirdVoltage])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[ThirdCurrent])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
-	dynamic_cast<QLabel*>(consumersLabels[ThirdPower])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(consumersLabels[ThirdProgress])->setValue(thirdArray[3].toInt());
+	dynamic_cast<QLabel*>(widgetLocator["third-voltage-label"])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["third-current-label"])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
+	dynamic_cast<QLabel*>(widgetLocator["third-power-label"])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
+	dynamic_cast<QProgressBar*>(widgetLocator["third-progressbar"])->setValue(thirdArray[3].toInt());
 }
 
 QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
@@ -187,7 +176,6 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 	switch (widgetType) {
 	case TabWidget::Generation: {
 		widget = new QGroupBox{parent};
-		QWidget* statusLabel = nullptr;
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
@@ -203,21 +191,17 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/static/images/solar-power.png",
 											   QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString{"V: -"});
-		generatorsLabels[SolarVoltage] = statusLabel;
-		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("solar-voltage-label", createLabel(solarInfoWidget, QString{"V: -"}));
+		solarInfoLayout->addWidget(widgetLocator["solar-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString{"A: -"});
-		generatorsLabels[SolarCurrent] = statusLabel;
-		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("solar-current-label", createLabel(solarInfoWidget, QString{"A: -"}));
+		solarInfoLayout->addWidget(widgetLocator["solar-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(solarInfoWidget, QString{"W: -"});
-		generatorsLabels[SolarPower] = statusLabel;
-		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("solar-power-label", createLabel(solarInfoWidget, QString{"W: -"}));
+		solarInfoLayout->addWidget(widgetLocator["solar-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(solarInfoWidget, QSize{70, 30});
-		generatorsLabels[SolarProgress] = statusLabel;
-		solarInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("solar-progressbar", createProgressBar(solarInfoWidget, QSize{70, 30}));
+		solarInfoLayout->addWidget(widgetLocator["solar-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* windInfoWidget = new QFrame{widget};
 		QHBoxLayout* windInfoLayout = new QHBoxLayout{windInfoWidget};
@@ -227,21 +211,17 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/static/images/wind-turbine.png",
 											  QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString{"V: -"});
-		generatorsLabels[WindVoltage] = statusLabel;
-		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("wind-voltage-label", createLabel(windInfoWidget, QString{"V: -"}));
+		windInfoLayout->addWidget(widgetLocator["wind-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString{"A: -"});
-		generatorsLabels[WindCurrent] = statusLabel;
-		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("wind-current-label", createLabel(windInfoWidget, QString{"A: -"}));
+		windInfoLayout->addWidget(widgetLocator["wind-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(windInfoWidget, QString{"W: -"});
-		generatorsLabels[WindPower] = statusLabel;
-		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("wind-power-label", createLabel(windInfoWidget, QString{"W: -"}));
+		windInfoLayout->addWidget(widgetLocator["wind-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(windInfoWidget, QSize{70, 30});
-		generatorsLabels[WindProgress] = statusLabel;
-		windInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("wind-progressbar", createProgressBar(windInfoWidget, QSize{70, 30}));
+		windInfoLayout->addWidget(widgetLocator["wind-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* dieselInfoWidget = new QFrame{widget};
 		QHBoxLayout* dieselInfoLayout = new QHBoxLayout{dieselInfoWidget};
@@ -251,21 +231,17 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/static/images/diesel.png",
 												QSize{30, 30}), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString{"V: -"});
-		generatorsLabels[DieselVoltage] = statusLabel;
-		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("diesel-voltage-label", createLabel(dieselInfoWidget, QString{"V: -"}));
+		dieselInfoLayout->addWidget(widgetLocator["diesel-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString{"A: -"});
-		generatorsLabels[DieselCurrent] = statusLabel;
-		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("diesel-current-label", createLabel(dieselInfoWidget, QString{"A: -"}));
+		dieselInfoLayout->addWidget(widgetLocator["diesel-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(dieselInfoWidget, QString{"W: -"});
-		generatorsLabels[DieselPower] = statusLabel;
-		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("diesel-power-label", createLabel(dieselInfoWidget, QString{"W: -"}));
+		dieselInfoLayout->addWidget(widgetLocator["diesel-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(dieselInfoWidget, QSize{70, 30});
-		generatorsLabels[DieselProgress] = statusLabel;
-		dieselInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("diesel-progressbar", createProgressBar(dieselInfoWidget, QSize{70, 30}));
+		dieselInfoLayout->addWidget(widgetLocator["diesel-progressbar"], 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -273,7 +249,6 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widget = new QGroupBox{parent};
 		widget->setTitle(tr("Consumers"));
 		widget->setStyleSheet(groupBoxStylesheet);
-
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
@@ -283,25 +258,19 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		firstInfoWidget->setLayout(firstInfoLayout);
 		layout->addWidget(firstInfoWidget);
 
-		QWidget* statusLabel = nullptr;
-
 		firstInfoLayout->addWidget(createLabel(firstInfoWidget, tr("1st group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString{"V: -"});
-		consumersLabels[FirstVoltage] = statusLabel;
-		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("first-voltage-label", createLabel(firstInfoWidget, QString{"V: -"}));
+		firstInfoLayout->addWidget(widgetLocator["first-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString{"A: -"});
-		consumersLabels[FirstCurrent] = statusLabel;
-		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("first-current-label", createLabel(firstInfoWidget, QString{"A: -"}));
+		firstInfoLayout->addWidget(widgetLocator["first-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(firstInfoWidget, QString{"W: -"});
-		consumersLabels[FirstPower] = statusLabel;
-		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("first-power-label", createLabel(firstInfoWidget, QString{"W: -"}));
+		firstInfoLayout->addWidget(widgetLocator["first-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(firstInfoWidget, QSize{70, 30});
-		consumersLabels[FirstProgress] = statusLabel;
-		firstInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("first-progressbar", createProgressBar(firstInfoWidget, QSize{70, 30}));
+		firstInfoLayout->addWidget(widgetLocator["first-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* secondInfoWidget = new QFrame{widget};
 		QHBoxLayout* secondInfoLayout = new QHBoxLayout{secondInfoWidget};
@@ -310,21 +279,17 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		secondInfoLayout->addWidget(createLabel(secondInfoWidget, tr("2nd group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString{"V: -"});
-		consumersLabels[SecondVoltage] = statusLabel;
-		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("second-voltage-label", createLabel(secondInfoWidget, QString{"V: -"}));
+		secondInfoLayout->addWidget(widgetLocator["second-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString{"A: -"});
-		consumersLabels[SecondCurrent] = statusLabel;
-		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("second-current-label", createLabel(secondInfoWidget, QString{"A: -"}));
+		secondInfoLayout->addWidget(widgetLocator["second-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(secondInfoWidget, QString{"W: -"});
-		consumersLabels[SecondPower] = statusLabel;
-		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("second-power-label", createLabel(secondInfoWidget, QString{"W: -"}));
+		secondInfoLayout->addWidget(widgetLocator["second-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(secondInfoWidget, QSize{70, 30});
-		consumersLabels[SecondProgress] = statusLabel;
-		secondInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("second-progressbar", createProgressBar(secondInfoWidget, QSize{70, 30}));
+		secondInfoLayout->addWidget(widgetLocator["second-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* thirdInfoWidget = new QFrame{widget};
 		QHBoxLayout* thirdInfoLayout = new QHBoxLayout{thirdInfoWidget};
@@ -333,21 +298,17 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		thirdInfoLayout->addWidget(createLabel(thirdInfoWidget, tr("3rd group")), 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString{"V: -"});
-		consumersLabels[ThirdVoltage] = statusLabel;
-		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("third-voltage-label", createLabel(thirdInfoWidget, QString{"V: -"}));
+		thirdInfoLayout->addWidget(widgetLocator["third-voltage-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString{"A: -"});
-		consumersLabels[ThirdCurrent] = statusLabel;
-		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("third-current-label", createLabel(thirdInfoWidget, QString{"A: -"}));
+		thirdInfoLayout->addWidget(widgetLocator["third-current-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createLabel(thirdInfoWidget, QString{"W: -"});
-		consumersLabels[ThirdPower] = statusLabel;
-		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("third-power-label", createLabel(thirdInfoWidget, QString{"W: -"}));
+		thirdInfoLayout->addWidget(widgetLocator["third-power-label"], 10, Qt::AlignCenter);
 
-		statusLabel = createProgressBar(thirdInfoWidget, QSize{70, 30});
-		consumersLabels[ThirdProgress] = statusLabel;
-		thirdInfoLayout->addWidget(statusLabel, 10, Qt::AlignCenter);
+		widgetLocator.insert("third-progressbar", createProgressBar(thirdInfoWidget, QSize{70, 30}));
+		thirdInfoLayout->addWidget(widgetLocator["third-progressbar"], 10, Qt::AlignCenter);
 
 		break;
 	}
@@ -448,7 +409,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QProgressBar* batteryChargeIndicator = createProgressBar(batteryStatusWidget, QSize{60, 100});
 		batteryChargeIndicator->setValue(0);
 		batteryChargeIndicator->setOrientation(Qt::Vertical);
-		batteryLabels[BatteryProgress] = batteryChargeIndicator;
+		widgetLocator.insert("battery-progressbar", batteryChargeIndicator);
 		batteryStatusLayout->addWidget(batteryChargeIndicator);
 
 		QFrame* batteryStatusInformation = new QFrame{widget};
@@ -456,10 +417,10 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QVBoxLayout* batteryStatusInformationLayout = new QVBoxLayout{batteryStatusInformation};
 		batteryStatusInformation->setLayout(batteryStatusInformationLayout);
 
-		QLabel* batteryCurrentCapacity = new QLabel{batteryStatusInformation};
-		batteryCurrentCapacity->setText(QString{tr("%1 V")}.arg(0));
-		batteryLabels[BatteryVoltage] = batteryCurrentCapacity;
-		batteryStatusInformationLayout->addWidget(batteryCurrentCapacity);
+		QLabel* batteryCurrentVoltage = new QLabel{batteryStatusInformation};
+		batteryCurrentVoltage->setText(QString{tr("- V")});
+		widgetLocator.insert("battery-voltage-label", batteryCurrentVoltage);
+		batteryStatusInformationLayout->addWidget(batteryCurrentVoltage);
 
 		QFrame* batteryInformationDelimeter = new QFrame{batteryStatusInformation};
 		batteryInformationDelimeter->setFrameShape(QFrame::HLine);
@@ -467,7 +428,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 
 		QLabel* batteryCurrentStatus = new QLabel{batteryStatusInformation};
 		batteryCurrentStatus->setText(QString{tr("Charging...")});
-		batteryLabels[BatteryInfo] = batteryCurrentStatus;
+		widgetLocator.insert("battery-status-label", batteryCurrentStatus);
 		batteryStatusInformationLayout->addWidget(batteryCurrentStatus);
 
 		break;

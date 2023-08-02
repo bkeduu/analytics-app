@@ -1,52 +1,13 @@
 #pragma once
 
-#include <QWidget>
 #include <QGridLayout>
-#include <QTableView>
-#include <QFrame>
+#include <QLabel>
 #include <QFile>
-#include <QString>
 #include <QRadioButton>
 #include <QJsonObject>
 #include <QProgressBar>
 
 #include "itab.h"
-
-enum GeneratorsStatus {
-	SolarVoltage,
-	SolarCurrent,
-	SolarPower,
-	SolarProgress,
-	WindVoltage,
-	WindCurrent,
-	WindPower,
-	WindProgress,
-	DieselVoltage,
-	DieselCurrent,
-	DieselPower,
-	DieselProgress
-};
-
-enum ConsumersStatus {
-	FirstVoltage,
-	FirstCurrent,
-	FirstPower,
-	FirstProgress,
-	SecondVoltage,
-	SecondCurrent,
-	SecondPower,
-	SecondProgress,
-	ThirdVoltage,
-	ThirdCurrent,
-	ThirdPower,
-	ThirdProgress
-};
-
-enum BatteryStatus {
-	BatteryVoltage,
-	BatteryInfo,
-	BatteryProgress
-};
 
 enum BatteryInformation {
 	Charging,
@@ -54,21 +15,20 @@ enum BatteryInformation {
 	NoData
 };
 
-class StatusTab : public ITab {
+class StatusTab final : public ITab {
 	Q_OBJECT
 
 public:
-	static StatusTab* getWidget(const QString& tabName, QWidget* parent = nullptr);
+	StatusTab(const QString& tabName, QWidget* parent = nullptr);
+	virtual ~StatusTab() final override {};
 
 public slots:
-	void onDataReceived(const QJsonObject& values);
 	virtual void onAuthorized() final override;
 	virtual void onTabOpened() final override;
+	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:
 	enum class TabWidget { Generation, Consumers, WorkMode, BatteryStatus };
-
-	StatusTab(const QString& tabName, QWidget* parent = nullptr);
 
 	QLabel* createLabel(QWidget* parent, const QString& text) const;
 	QLabel* createLabel(QWidget* parent, const QString& imagePath, const QSize& sz) const;
@@ -81,14 +41,7 @@ private:
 
 	QLayout* layout;
 
-	static StatusTab* instance;
-	static QMutex lock;
-
 	QWidget* createWidget(TabWidget widgetType, QWidget* parent);
 
-	QHash<GeneratorsStatus, QWidget*> generatorsLabels;
-	QHash<ConsumersStatus, QWidget*> consumersLabels;
-	QHash<BatteryStatus, QWidget*> batteryLabels;
-
-	virtual ~StatusTab() {};
+	QHash<QString, QWidget*> widgetLocator;
 };
