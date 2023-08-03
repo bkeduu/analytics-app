@@ -1,14 +1,11 @@
 #include "mainwindow.h"
-#include "statustab.h"
-#include "consumerstab.h"
-#include "generationtab.h"
-#include "forecasttab.h"
-#include "settingstab.h"
 #include "./ui_mainwindow.h"
+#include "client.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
-	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mAuthorized{false}, mESPConnected{false},
-	settings{"ICS4", "Analytics app"} {
+#include <QGroupBox>
+
+MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
+	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mClient{client} {
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -25,96 +22,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWi
 	setWindowTitle(currentWindowTitle);
 	setWindowIcon(QIcon{":/static/images/window_icon.png"});
 
-	connector = new Networker{this};
 	windowTitleChangingTimer = new QTimer{this};
 	windowTitleChangingTimer->setInterval(1000);
 	windowTitleChangingTimer->start();
 
-	connect(windowTitleChangingTimer, &QTimer::timeout, windowTitleChangingTimer, [=]() {
+	connect(windowTitleChangingTimer, &QTimer::timeout, windowTitleChangingTimer, [&]() {
 		std::swap(currentWindowTitle, windowTitle);
 		setWindowTitle(currentWindowTitle);
 		windowTitleChangingTimer->start();
 	});
 
-	connect(connector, SIGNAL(authorized(QJsonObject)), this, SLOT(onAuthorized(QJsonObject)));
-	connect(connector, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
-	// connect(connector, SIGNAL(ESPStatusChanged(const QJsonObject&)), this, SLOT(onESPStatusChanged(const QJsonObject&)));
-
-	layout = new QHBoxLayout{this};
-	tabWidget = new QTabWidget{this};
-	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-	tabWidget->tabBar()->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-	tabWidget->tabBar()->setDocumentMode(true);
-	tabWidget->tabBar()->setExpanding(true);
-
-	StatusTab* statusTab = StatusTab::getWidget(tr("Status"), this);
-	connect(connector, SIGNAL(dataReceived(QJsonObject)), statusTab, SLOT(onDataReceived(QJsonObject)));
-	tabs[Tab::Status] = statusTab;
-
-	ConsumersTab* consumersTab = ConsumersTab::getWidget(tr("Consumers"), this);
-
-	connect(connector, SIGNAL(consumersReceived(QJsonObject)), consumersTab, SLOT(setJSONDocument(QJsonObject)));
-	tabs[Tab::Consumers] = consumersTab;
-
-	tabs[Tab::Generation] = GenerationTab::getWidget(tr("Generation"), this);
-	tabs[Tab::Forecast] = ForecastTab::getWidget(tr("Forecast"), this);
-
-	SettingsTab* settingsTab = SettingsTab::getWidget(tr("Settings"), this);
-
-	connect(settingsTab, &SettingsTab::serverAddressUpdated, this, [=](const QString& newAddress) {
-		serverAddress = newAddress;
-		connector->setHostAddress(QHostAddress{serverAddress});
-	});
-
-	connect(settingsTab, &SettingsTab::serverPortUpdated, this, [=](const QString& newPort) {
-		serverPort = newPort;
-		connector->setHostPort(serverPort.toInt());
-	});
-
-	connect(settingsTab, &SettingsTab::loginUpdated, this, [=](const QString& newLogin) {
-		login = newLogin;
-	});
-
-	connect(settingsTab, &SettingsTab::passwordUpdated, this, [=](const QString& newPassword) {
-		password = newPassword;
-	});
-
-	connect(settingsTab, &SettingsTab::authorizationClicked, this, [=]() {
-		connector->connectToHost();
-		authorize();
-	});
-
-	tabs[Tab::Settings] = settingsTab;
-
-	foreach (Tab tab, tabs.keys()) {
-		tabWidget->addTab(tabs[tab], tabs[tab]->getName());
-
-		int tabIndex = tabWidget->indexOf(tabs[tab]);
-		tabWidget->setTabIcon(tabIndex,
-							  QIcon{QString{":/static/images/page_"} + QString::number((int)tab) + ".png"});
-		connect(connector, SIGNAL(authorized(QJsonObject)), tabs[tab], SLOT(onAuthorized()));
-		connect(tabWidget, &QTabWidget::currentChanged, this, [tabIndex, this, tab](int clickedTabIndex) {
-			if (tabIndex == clickedTabIndex)
-				this->tabs[tab]->onTabOpened();
-		});
-	}
-
-	tabWidget->tabBar()->setIconSize(QSize(30, 30));
-
-	layout->addWidget(tabWidget);
-	tabWidget->setCurrentWidget(tabs[Tab::Status]);
-	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-
-	this->setLayout(layout);
-	this->load();
+	createStartScreen();
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
-	tabWidget->resize(event->size());
-	event->accept();
+//	tabWidget->resize(event->size());
+//	event->accept();
 }
 
-void MainWindow::authorize() {
+void MainWindow::authorize() {  // rewrite
 
 	setChangingTitle(tr("Authorization..."));
 
@@ -123,7 +49,7 @@ void MainWindow::authorize() {
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
 	static QString request = file.readAll();
 
-	connector->sendToHost(request.arg(login, password));
+//	mNetworker.data()->sendToHost(request.arg(mLogin, mPassword));
 }
 
 void MainWindow::onAuthorized(const QJsonObject& dataObject) {
@@ -131,13 +57,13 @@ void MainWindow::onAuthorized(const QJsonObject& dataObject) {
 	int status = dataObject.value("status").toInt();
 	if (status == 0) {
 		// success authorization
-		mAuthorized = true;
-		mESPConnected = true;
 		setChangingTitle(tr("Analytics system"));
 
-		foreach (ITab* tab, tabs) {
-			tab->onAuthorized();
-		}
+		mStatusTab->onAuthorized();
+		mForecastTab->onAuthorized();
+		mGenerationTab->onAuthorized();
+		mConsumersTab->onAuthorized();
+		mSettingsTab->onAuthorized();
 	}
 	else {
 		// error
@@ -151,13 +77,11 @@ void MainWindow::onESPStatusChanged(const QJsonObject& dataObject) {
 
 	if (status) {
 		// esp connected
-		mESPConnected = true;
 		setChangingTitle(tr("Analytics system"));
 	}
 	else {
 		// esp disconnected
 		setChangingTitle(tr("ESP disconnected!!!"));
-		mESPConnected = false;
 	}
 }
 
@@ -167,23 +91,151 @@ void MainWindow::onRelayClicked(int group, bool newState) {
 		file.open(QIODevice::ReadOnly | QIODevice::Text);
 	static QString request = file.readAll();
 
-	connector->sendToHost(request.arg(group).arg(newState));
+//	connector->sendToHost(request.arg(group).arg(newState));
 }
 
-void MainWindow::load() {
+void MainWindow::load(QSettings& settings) {
 	this->restoreGeometry(settings.value("windowGeometry").toByteArray());
 
 	settings.beginGroup("SETTINGS");
-	tabs[Tab::Settings]->load(settings);
+	mSettingsTab->load(settings);
 	settings.endGroup();
 }
 
-void MainWindow::save() {
+void MainWindow::save(QSettings& settings) {
 	settings.setValue("windowGeometry", this->saveGeometry());
 
 	settings.beginGroup("SETTINGS");
-	tabs[Tab::Settings]->save(settings);
+	mSettingsTab->save(settings);
 	settings.endGroup();
+}
+
+void MainWindow::createMainContents() {
+	layout = new QHBoxLayout{this};
+	tabWidget = new QTabWidget{this};
+	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+	tabWidget->tabBar()->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+	tabWidget->tabBar()->setDocumentMode(true);
+	tabWidget->tabBar()->setExpanding(true);
+
+	mStatusTab = QSharedPointer<StatusTab>::create("Status", this);
+	mForecastTab = QSharedPointer<ForecastTab>::create("Forecast", this);
+	mGenerationTab = QSharedPointer<GenerationTab>::create("Generation", this);
+	mConsumersTab = QSharedPointer<ConsumersTab>::create("Consumers", this);
+	mSettingsTab = QSharedPointer<SettingsTab>::create("Settings", this);
+
+	tabWidget->addTab(mStatusTab.data(), tr(mStatusTab->getName().toStdString().c_str()));
+	tabWidget->addTab(mForecastTab.data(), tr(mForecastTab->getName().toStdString().c_str()));
+	tabWidget->addTab(mGenerationTab.data(), tr(mGenerationTab->getName().toStdString().c_str()));
+	tabWidget->addTab(mConsumersTab.data(), tr(mConsumersTab->getName().toStdString().c_str()));
+	tabWidget->addTab(mSettingsTab.data(), tr(mStatusTab->getName().toStdString().c_str()));
+
+	tabWidget->setTabIcon(tabWidget->indexOf(mStatusTab.data()),
+						  QIcon{QString{":/static/images/page_"} + mStatusTab->getName() + ".png"});
+	tabWidget->setTabIcon(tabWidget->indexOf(mForecastTab.data()),
+						  QIcon{QString{":/static/images/page_"} + mForecastTab->getName() + ".png"});
+	tabWidget->setTabIcon(tabWidget->indexOf(mGenerationTab.data()),
+						  QIcon{QString{":/static/images/page_"} + mGenerationTab->getName() + ".png"});
+	tabWidget->setTabIcon(tabWidget->indexOf(mConsumersTab.data()),
+						  QIcon{QString{":/static/images/page_"} + mConsumersTab->getName() + ".png"});
+	tabWidget->setTabIcon(tabWidget->indexOf(mSettingsTab.data()),
+						  QIcon{QString{":/static/images/page_"} + mSettingsTab->getName() + ".png"});
+
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
+		if (tabWidget->indexOf(mStatusTab.data()) == clickedTabIndex)
+			mStatusTab->onTabOpened();
+	});
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
+		if (tabWidget->indexOf(mForecastTab.data()) == clickedTabIndex)
+			mForecastTab->onTabOpened();
+	});
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
+		if (tabWidget->indexOf(mGenerationTab.data()) == clickedTabIndex)
+			mGenerationTab->onTabOpened();
+	});
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
+		if (tabWidget->indexOf(mConsumersTab.data()) == clickedTabIndex)
+			mConsumersTab->onTabOpened();
+	});
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
+		if (tabWidget->indexOf(mSettingsTab.data()) == clickedTabIndex)
+			mSettingsTab->onTabOpened();
+	});
+
+	tabWidget->tabBar()->setIconSize(QSize(30, 30));
+
+	layout->addWidget(tabWidget);
+	tabWidget->setCurrentWidget(mStatusTab.data());
+	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+
+	this->setLayout(layout);
+}
+
+void MainWindow::createStartScreen() {
+	QVBoxLayout* layout = new QVBoxLayout{this->centralWidget()};
+	QGroupBox* formWidget = new QGroupBox{this->centralWidget()};
+
+	QVBoxLayout* formLayout = new QVBoxLayout{formWidget};
+	formLayout->setSpacing(0);
+	formLayout->setContentsMargins(0, 0, 0, 0);
+	formLayout->setAlignment(Qt::AlignCenter);
+	formWidget->setLayout(formLayout);
+
+	static QString groupBoxStylesheet{""};
+
+	if (!groupBoxStylesheet.length()) {
+		QFile stylesheet{":/static/stylesheets/qgroupbox.css"};
+		stylesheet.open(QIODevice::ReadOnly);
+		groupBoxStylesheet = stylesheet.readAll();
+		stylesheet.close();
+	}
+	formWidget->setStyleSheet(groupBoxStylesheet);
+
+	CustomLoginField* loginField = new CustomLoginField{tr("Login"), tr("Login"), formWidget};
+	CustomLoginField* passwordField = new CustomLoginField{tr("Password"), tr("Password"), formWidget};
+	CustomLoginField* serverAddressField = new CustomLoginField{tr("Server address"), tr("Server address"), formWidget};
+	CustomLoginField* serverPortField = new CustomLoginField{tr("Server port"), tr("Server port"), formWidget};
+
+	passwordField->setPasswordMode(true);
+
+	formLayout->addWidget(loginField, 1, Qt::AlignCenter);
+	formLayout->addWidget(passwordField, 1, Qt::AlignCenter);
+	formLayout->addWidget(serverAddressField, 1, Qt::AlignCenter);
+	formLayout->addWidget(serverPortField, 1, Qt::AlignCenter);
+
+	static QString buttonStylesheet{""};
+
+	if (!buttonStylesheet.length()) {
+		QFile stylesheet{":/static/stylesheets/qpushbutton.css"};
+		stylesheet.open(QIODevice::ReadOnly);
+		buttonStylesheet = stylesheet.readAll();
+		stylesheet.close();
+	}
+
+	QPushButton* authorizeButton = new QPushButton{formWidget};
+	authorizeButton->setText(tr("Authorize"));
+	authorizeButton->setStyleSheet(buttonStylesheet);
+
+	formLayout->addWidget(authorizeButton, 1, Qt::AlignCenter);
+
+	formWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	formWidget->setMinimumHeight(300);
+	formWidget->setMinimumWidth(400);
+
+	// layout->addItem(new QSpacerItem{100, 100, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding});
+	layout->addStretch();
+	layout->addWidget(formWidget);//, 0, 0, Qt::AlignCenter);
+	layout->addStretch();
+	// layout->addItem(new QSpacerItem{100, 100, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding});
+
+	layout->setAlignment(formWidget, Qt::AlignCenter);
+
+	this->centralWidget()->setLayout(layout);
+	//setCentralWidget(formWidget);
+}
+
+void MainWindow::clearScreen() {
+
 }
 
 void MainWindow::onDisconnect() {
@@ -193,8 +245,5 @@ void MainWindow::onDisconnect() {
 }
 
 MainWindow::~MainWindow() {
-
-	this->save();
-
 	delete ui;
 }

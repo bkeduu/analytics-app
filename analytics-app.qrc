@@ -4,11 +4,11 @@
         <file>static/images/diesel.png</file>
         <file>static/images/electricity (1).png</file>
         <file>static/images/energy (1).png</file>
-        <file>static/images/page_1.png</file>
-        <file>static/images/page_2.png</file>
-        <file>static/images/page_3.png</file>
-        <file>static/images/page_4.png</file>
-        <file>static/images/page_5.png</file>
+        <file>static/images/page_Status.png</file>
+        <file>static/images/page_Forecast.png</file>
+        <file>static/images/page_Generation.png</file>
+        <file>static/images/page_Consumers.png</file>
+        <file>static/images/page_Settings.png</file>
         <file>static/images/solar-power.png</file>
         <file>static/images/window_icon.png</file>
         <file>static/images/wind-turbine.png</file>
@@ -19,5 +19,6 @@
         <file>static/requests/consumers.json</file>
         <file>static/stylesheets/qgroupbox.css</file>
         <file>static/stylesheets/global.css</file>
+        <file>static/stylesheets/qpushbutton.css</file>
     </qresource>
 </RCC>

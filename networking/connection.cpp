@@ -3,24 +3,15 @@
 #include <QJsonArray>
 #include <QFile>
 
-Networker::Networker(QObject* parent, QHostAddress address, int port) : QObject{parent}, mAddr{address}, mPort{port} {
+Networker::Networker(QObject* parent, const QString& address, int port) : QObject{parent}, mHost{address}, mPort{port} {
 	socket = new QTcpSocket{this};
 
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSocket()));
-	connect(socket, &QTcpSocket::disconnected, socket, [=]() {
-		emit disconnected();
-	});
-
-	connectionTimeout = new QTimer{this};
-
-	connectionTimeout->setInterval(15000);
-	connectionTimeout->start();
-
-	connect(connectionTimeout, SIGNAL(timeout()), this, SLOT(onConnectionTimeout()));
+	connect(socket, SLOT(disconnected()), this, SIGNAL(disconnected()));
 }
 
-void Networker::setHostAddress(QHostAddress addr) {
-	mAddr = addr;
+void Networker::setHostAddress(const QString& addr) {
+	mHost = addr;
 }
 
 void Networker::setHostPort(int port) {
@@ -28,8 +19,17 @@ void Networker::setHostPort(int port) {
 }
 
 void Networker::connectToHost() {
-	socket->connectToHost(mAddr, mPort);
-	socket->waitForConnected();
+	QList<QHostAddress> addresses = QHostInfo::fromName(mHost).addresses();
+
+	for (auto it = addresses.begin(); it != addresses.end(); ++it) {
+		if (!((*it).isNull()) && (*it).protocol() == QAbstractSocket::IPv4Protocol) {
+			socket->connectToHost(*it, mPort);
+			if (!socket->waitForConnected(10000)) {
+				emit unableToConnect();
+			}
+			return;
+		}
+	}
 }
 
 void Networker::sendToHost(const QString& data) {
@@ -37,44 +37,10 @@ void Networker::sendToHost(const QString& data) {
 }
 
 void Networker::readFromSocket() {
-	connectionTimeout->start();
-
 	QString line = socket->readLine();
+	QJsonObject inputObject = QJsonDocument::fromJson(line.toUtf8()).object();
 
-	QJsonDocument input = QJsonDocument::fromJson(line.toUtf8());
-	QJsonObject inputObject = input.object();
-
-	MessageType messageType = MessageType(inputObject.value("type").toInt(-1));
-
-	QJsonObject dataObject = inputObject.value("data").toObject();
-
-	switch (messageType) {
-	case AuthorizationReply:
-		emit authorized(dataObject);
-		break;
-	case ESPStatus:
-		emit ESPStatusReceived(dataObject);
-		break;
-	case RelaySwitch:
-		// wtf?
-		break;
-	case ConsumersData:
-		emit consumersReceived(dataObject);
-		break;
-	case SensorsData:
-		emit dataReceived(dataObject);
-		break;
-	case Shutdown:
-		emit disconnected();
-		break;
-	default:
-		// wtf?
-		break;
-	}
-}
-
-void Networker::onConnectionTimeout() {
-
+	emit dataReceived(inputObject);
 }
 
 Networker::~Networker() {
@@ -83,4 +49,3 @@ Networker::~Networker() {
 	sendToHost(QString::fromStdString(file.readAll().toStdString()));
 	socket->close();
 }
-

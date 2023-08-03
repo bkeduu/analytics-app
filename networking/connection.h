@@ -3,29 +3,19 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>
+#include <QHostInfo>
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-enum MessageType {
-	Error = 0,
-	Authorization,
-	AuthorizationReply,
-	ESPStatus,
-	RelaySwitch,
-	ConsumersData,
-	SensorsData,
-	Shutdown
-};
-
-class Networker : public QObject {
+class Networker final : public QObject {
 Q_OBJECT
 
 public:
-	Networker(QObject* parent, QHostAddress address = QHostAddress::Any, int port = 7777);
+	Networker(QObject* parent, const QString& address = "", int port = 7777);
 
-	void setHostAddress(QHostAddress addr);
+	void setHostAddress(const QString& addr);
 	void setHostPort(int port);
 	void connectToHost();
 
@@ -33,25 +23,21 @@ public:
 
 	void sendToHost(const QString& data);
 
-	~Networker();
+	virtual ~Networker() final override;
 
 signals:
-	void authorized(const QJsonObject&);
-	void consumersReceived(const QJsonObject&);
-	void ESPStatusReceived(const QJsonObject&);
 	void dataReceived(const QJsonObject&);
 	void disconnected();
+	void unableToConnect();
 
 private slots:
 	void readFromSocket();
-	void onConnectionTimeout();
 
 private:
 	QTcpSocket* socket;
 
-	QTimer* connectionTimeout;
-
 	QHostAddress mAddr;
+	QString mHost;
 	int mPort;
 };
 

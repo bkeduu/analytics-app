@@ -1,7 +1,12 @@
 #pragma once
 
-#include "itab.h"
-#include "networking/connection.h"
+#include "connection.h"
+
+#include "statustab.h"
+#include "consumerstab.h"
+#include "generationtab.h"
+#include "forecasttab.h"
+#include "settingstab.h"
 
 #include <QMainWindow>
 #include <QTabWidget>
@@ -12,42 +17,35 @@
 #include <QJsonDocument>
 #include <QResizeEvent>
 #include <QVBoxLayout>
-#include <QLayout>
+#include <QSharedPointer>
 
-enum class Tab {
-	Status = 1,
-	Forecast,
-	Generation,
-	Consumers,
-	Settings
-};
+class Client;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow {
+class MainWindow final : public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-	virtual void resizeEvent(QResizeEvent* event);
-    ~MainWindow();
+	MainWindow(Client* client, QWidget *parent = nullptr);  // legacy
+	virtual void resizeEvent(QResizeEvent* event) final override;  // legacy
+	virtual ~MainWindow() final override;
 
-	void authorize();
-	void onRelayClicked(int group, bool newState);
+	void authorize();  // legacy
+	void onRelayClicked(int group, bool newState);  // legacy
 
-	void setChangingTitle(QString newTitle) {
+	void setChangingTitle(QString newTitle) {  // rewrite
 		if (currentWindowTitle == tr("Analytics system"))
 			windowTitle = newTitle;
 		else
 			currentWindowTitle = newTitle;
 	}
 
-	bool authorized() const { return mAuthorized; };
 
-	void load();
-	void save();
+	void load(QSettings& settings);
+	void save(QSettings& settings);
 
 public slots:
 	void onAuthorized(const QJsonObject&);
@@ -56,26 +54,24 @@ public slots:
 	void onDisconnect();
 
 private:
+	void createMainContents();
+	void createStartScreen();
+	void clearScreen();
+
     Ui::MainWindow *ui;
 	QTabWidget* tabWidget;
 	QDialog* tabDialog;
-	QHBoxLayout* layout;
-
-	QString serverAddress;
-	QString serverPort;
-	QString login;
-	QString password;
-
-	bool mAuthorized;
-	bool mESPConnected;
+	QLayout* layout;
 
 	QTimer* windowTitleChangingTimer;
 	QString windowTitle;
 	QString currentWindowTitle;
 
-	Networker* connector;
+	Client* mClient;
 
-	QMap<Tab, ITab*> tabs;
-
-	QSettings settings;
+	QSharedPointer<StatusTab> mStatusTab;
+	QSharedPointer<ForecastTab> mForecastTab;
+	QSharedPointer<GenerationTab> mGenerationTab;
+	QSharedPointer<ConsumersTab> mConsumersTab;
+	QSharedPointer<SettingsTab> mSettingsTab;
 };
