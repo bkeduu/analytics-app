@@ -6,11 +6,11 @@
 
 StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
 	generators{nullptr}, consumers{nullptr}, layout{nullptr} {
-	removeTabContents();
+	createTabContents();
 }
 
 void StatusTab::onAuthorized() {
-	createTabContents();
+
 }
 
 void StatusTab::onTabOpened() {
@@ -21,8 +21,9 @@ void StatusTab::createTabContents() {
 	clearTab();
 	delete this->layout;
 	QGridLayout* gridLayout = new QGridLayout{this};
-	gridLayout->setContentsMargins(15, 15, 15, 15);
-	gridLayout->setSpacing(20);
+	gridLayout->setAlignment(Qt::AlignCenter);
+	gridLayout->setContentsMargins(5, 5, 5, 5);
+	gridLayout->setSpacing(10);
 	this->layout = gridLayout;
 	this->setLayout(gridLayout);
 
@@ -49,7 +50,7 @@ void StatusTab::removeTabContents(const QString& text) {
 	delete this->layout;
 	layout = new QGridLayout{this};
 	this->setLayout(layout);
-	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	layout->setAlignment(Qt::AlignCenter);
 
 	QLabel* textLabel = new QLabel{this};
 	textLabel->setProperty("class", "tab-standalone-text");
@@ -67,8 +68,8 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& text) const {
 	result->setMargin(0);
 	result->setIndent(0);
 	result->setContentsMargins(0, 0, 0, 0);
-	result->setAlignment(Qt::AlignCenter);
-	result->setMaximumSize(QSize{90, 30});
+	result->setAlignment(Qt::AlignLeading);
+	result->setMaximumSize(QSize{90, 40});
 	return result;
 }
 
@@ -82,7 +83,7 @@ QLabel* StatusTab::createLabel(QWidget* parent, const QString& imagePath, const 
 	result->setIndent(0);
 	result->setContentsMargins(0, 0, 0, 0);
 	result->setAlignment(Qt::AlignCenter);
-	result->setMaximumSize(QSize{90, 30});
+	result->setMaximumSize(QSize{90, 40});
 	return result;
 }
 
@@ -176,12 +177,12 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 	switch (widgetType) {
 	case TabWidget::Generation: {
 		widget = new QGroupBox{parent};
+		widget->setTitle(tr("Generators"));
+		widget->setStyleSheet(groupBoxStylesheet);
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
+		layout->setContentsMargins(0, 15, 0, 15);
 		widget->setLayout(layout);
-		widget->setTitle(tr("Generators"));
-
-		widget->setStyleSheet(groupBoxStylesheet);
 
 		QFrame* solarInfoWidget = new QFrame{widget};
 		QHBoxLayout* solarInfoLayout = new QHBoxLayout{solarInfoWidget};
@@ -189,7 +190,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(solarInfoWidget, Qt::AlignCenter);
 
 		solarInfoLayout->addWidget(createLabel(solarInfoWidget, ":/static/images/solar-power.png",
-											   QSize{30, 30}), 10, Qt::AlignCenter);
+											   QSize{40, 40}), 10, Qt::AlignCenter);
 
 		widgetLocator.insert("solar-voltage-label", createLabel(solarInfoWidget, QString{"V: -"}));
 		solarInfoLayout->addWidget(widgetLocator["solar-voltage-label"], 10, Qt::AlignCenter);
@@ -200,7 +201,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("solar-power-label", createLabel(solarInfoWidget, QString{"W: -"}));
 		solarInfoLayout->addWidget(widgetLocator["solar-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("solar-progressbar", createProgressBar(solarInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("solar-progressbar", createProgressBar(solarInfoWidget, QSize{70, 40}));
 		solarInfoLayout->addWidget(widgetLocator["solar-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* windInfoWidget = new QFrame{widget};
@@ -209,7 +210,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(windInfoWidget, Qt::AlignCenter);
 
 		windInfoLayout->addWidget(createLabel(windInfoWidget, ":/static/images/wind-turbine.png",
-											  QSize{30, 30}), 10, Qt::AlignCenter);
+											  QSize{40, 40}), 10, Qt::AlignCenter);
 
 		widgetLocator.insert("wind-voltage-label", createLabel(windInfoWidget, QString{"V: -"}));
 		windInfoLayout->addWidget(widgetLocator["wind-voltage-label"], 10, Qt::AlignCenter);
@@ -220,7 +221,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("wind-power-label", createLabel(windInfoWidget, QString{"W: -"}));
 		windInfoLayout->addWidget(widgetLocator["wind-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("wind-progressbar", createProgressBar(windInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("wind-progressbar", createProgressBar(windInfoWidget, QSize{70, 40}));
 		windInfoLayout->addWidget(widgetLocator["wind-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* dieselInfoWidget = new QFrame{widget};
@@ -229,7 +230,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(dieselInfoWidget, Qt::AlignCenter);
 
 		dieselInfoLayout->addWidget(createLabel(dieselInfoWidget, ":/static/images/diesel.png",
-												QSize{30, 30}), 10, Qt::AlignCenter);
+												QSize{40, 40}), 10, Qt::AlignCenter);
 
 		widgetLocator.insert("diesel-voltage-label", createLabel(dieselInfoWidget, QString{"V: -"}));
 		dieselInfoLayout->addWidget(widgetLocator["diesel-voltage-label"], 10, Qt::AlignCenter);
@@ -240,7 +241,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("diesel-power-label", createLabel(dieselInfoWidget, QString{"W: -"}));
 		dieselInfoLayout->addWidget(widgetLocator["diesel-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("diesel-progressbar", createProgressBar(dieselInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("diesel-progressbar", createProgressBar(dieselInfoWidget, QSize{70, 40}));
 		dieselInfoLayout->addWidget(widgetLocator["diesel-progressbar"], 10, Qt::AlignCenter);
 
 		break;
@@ -251,6 +252,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widget->setStyleSheet(groupBoxStylesheet);
 
 		QVBoxLayout* layout = new QVBoxLayout{widget};
+		layout->setContentsMargins(0, 15, 0, 15);
 		widget->setLayout(layout);
 
 		QFrame* firstInfoWidget = new QFrame{widget};
@@ -269,7 +271,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("first-power-label", createLabel(firstInfoWidget, QString{"W: -"}));
 		firstInfoLayout->addWidget(widgetLocator["first-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("first-progressbar", createProgressBar(firstInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("first-progressbar", createProgressBar(firstInfoWidget, QSize{70, 40}));
 		firstInfoLayout->addWidget(widgetLocator["first-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* secondInfoWidget = new QFrame{widget};
@@ -288,7 +290,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("second-power-label", createLabel(secondInfoWidget, QString{"W: -"}));
 		secondInfoLayout->addWidget(widgetLocator["second-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("second-progressbar", createProgressBar(secondInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("second-progressbar", createProgressBar(secondInfoWidget, QSize{70, 40}));
 		secondInfoLayout->addWidget(widgetLocator["second-progressbar"], 10, Qt::AlignCenter);
 
 		QFrame* thirdInfoWidget = new QFrame{widget};
@@ -307,7 +309,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		widgetLocator.insert("third-power-label", createLabel(thirdInfoWidget, QString{"W: -"}));
 		thirdInfoLayout->addWidget(widgetLocator["third-power-label"], 10, Qt::AlignCenter);
 
-		widgetLocator.insert("third-progressbar", createProgressBar(thirdInfoWidget, QSize{70, 30}));
+		widgetLocator.insert("third-progressbar", createProgressBar(thirdInfoWidget, QSize{70, 40}));
 		thirdInfoLayout->addWidget(widgetLocator["third-progressbar"], 10, Qt::AlignCenter);
 
 		break;
@@ -377,14 +379,15 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		autoModeDescriptionLayout->addWidget(autoModeWidgetDescription, Qt::AlignLeft);
 
 		// clicked signal prevents infinite recursion against toggled signal
-		connect(manualModeButton, &QRadioButton::clicked, manualModeButton, [=](bool state) {
+		// TODO rewrite to qbuttongroup
+		connect(manualModeButton, &QRadioButton::clicked, manualModeButton, [autoModeButton, manualModeButton](bool state) {
 			if (state)
 				autoModeButton->setChecked(!state);
 			else
 				manualModeButton->setChecked(!state);
 		});
 
-		connect(autoModeButton, &QRadioButton::clicked, autoModeButton, [=](bool state) {
+		connect(autoModeButton, &QRadioButton::clicked, autoModeButton, [autoModeButton, manualModeButton](bool state) {
 			if (state)
 				manualModeButton->setChecked(!state);
 			else
@@ -401,7 +404,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
 
-		QFrame* batteryStatusWidget = new QFrame{this};
+		QFrame* batteryStatusWidget = new QFrame{widget};
 		layout->addWidget(batteryStatusWidget);
 		QHBoxLayout* batteryStatusLayout = new QHBoxLayout{batteryStatusWidget};
 		batteryStatusWidget->setLayout(batteryStatusLayout);
@@ -434,6 +437,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	default:
+		throw InternalErrorException{QString{"Bad internal argument received. The app will be closed."} + FLF};
 		break;
 	}
 

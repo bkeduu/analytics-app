@@ -20,5 +20,6 @@
         <file>static/stylesheets/qgroupbox.css</file>
         <file>static/stylesheets/global.css</file>
         <file>static/stylesheets/qpushbutton.css</file>
+        <file>static/images/error.png</file>
     </qresource>
 </RCC>

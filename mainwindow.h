@@ -30,44 +30,42 @@ class MainWindow final : public QMainWindow {
 
 public:
 	MainWindow(Client* client, QWidget *parent = nullptr);  // legacy
-	virtual void resizeEvent(QResizeEvent* event) final override;  // legacy
 	virtual ~MainWindow() final override;
 
-	void authorize();  // legacy
 	void onRelayClicked(int group, bool newState);  // legacy
 
-	void setChangingTitle(QString newTitle) {  // rewrite
-		if (currentWindowTitle == tr("Analytics system"))
-			windowTitle = newTitle;
-		else
-			currentWindowTitle = newTitle;
-	}
-
+	virtual void resizeEvent(QResizeEvent* event) final override;
 
 	void load(QSettings& settings);
 	void save(QSettings& settings);
 
+signals:
+	void authorize(QString login, QString password, QString serverAddress, int serverPort);
+
 public slots:
-	void onAuthorized(const QJsonObject&);
+	void onAuthorized(bool status);
 	void onESPStatusChanged(const QJsonObject&);
 	//void onConsumersReceived(const QJsonObject&);
 	void onDisconnect();
 
 private:
-	void createMainContents();
-	void createStartScreen();
-	void clearScreen();
+	QWidget* createMainContents();
+	QWidget* createStartScreen();
 
     Ui::MainWindow *ui;
-	QTabWidget* tabWidget;
-	QDialog* tabDialog;
-	QLayout* layout;
-
-	QTimer* windowTitleChangingTimer;
-	QString windowTitle;
-	QString currentWindowTitle;
+	QWidget* mMainContent;
+	QWidget* mStartScreen;
+	CustomLayout* layout;
+	QWidget* tabWidget;
 
 	Client* mClient;
+
+	QLabel* mAuthLabel;
+
+	CustomLineEdit* mLoginField;
+	CustomLineEdit* mPasswordField;
+	CustomLineEdit* mServerAddressField;
+	CustomLineEdit* mServerPortField;
 
 	QSharedPointer<StatusTab> mStatusTab;
 	QSharedPointer<ForecastTab> mForecastTab;

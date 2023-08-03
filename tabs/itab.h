@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+
 #include <QFrame>
 #include <QSettings>
 #include <QJsonObject>

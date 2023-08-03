@@ -1,11 +1,17 @@
 QGroupBox {
-	border: 2px solid gray;
-	border-radius: 5px;
-	padding: 10px;
+    border: 2px solid gray;
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
 QGroupBox::title {
-	subcontrol-origin: margin;
-	subcontrol-position: top center;
-	padding: 0 3px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0px 10px;
+}
+
+.authGroupBox {
+    padding: 15px;
 }

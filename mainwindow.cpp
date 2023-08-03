@@ -3,9 +3,14 @@
 #include "client.h"
 
 #include <QGroupBox>
+#include <QMessageBox>
+#include <QApplication>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QSequentialAnimationGroup>
 
 MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, ui{new Ui::MainWindow},
-	tabWidget{nullptr}, tabDialog{nullptr}, layout{nullptr}, mClient{client} {
+	layout{nullptr}, mClient{client} {
 	ui->setupUi(this);
 
 	QFont appFont{this->font()};
@@ -18,117 +23,107 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 	qApp->setStyleSheet(globalStylesheet.readAll());
 	globalStylesheet.close();
 
-	currentWindowTitle = windowTitle = tr("Analytics system");
-	setWindowTitle(currentWindowTitle);
+	setWindowTitle(tr("Analytics system"));
 	setWindowIcon(QIcon{":/static/images/window_icon.png"});
 
-	windowTitleChangingTimer = new QTimer{this};
-	windowTitleChangingTimer->setInterval(1000);
-	windowTitleChangingTimer->start();
+	layout = new CustomLayout{this->centralWidget()};
+	layout->setContentsMargins(5, 5, 5, 5);
 
-	connect(windowTitleChangingTimer, &QTimer::timeout, windowTitleChangingTimer, [&]() {
-		std::swap(currentWindowTitle, windowTitle);
-		setWindowTitle(currentWindowTitle);
-		windowTitleChangingTimer->start();
-	});
+	mMainContent = createMainContents();
+	mStartScreen = createStartScreen();
 
-	createStartScreen();
+	layout->addWidget(mMainContent);
+	layout->addWidget(mStartScreen);
+
+	mMainContent->hide();
+
+	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorized(bool)));
+
+	// TODO на главном экране марджины слева и справа не совпадают
 }
 
-void MainWindow::resizeEvent(QResizeEvent* event) {
-//	tabWidget->resize(event->size());
-//	event->accept();
-}
+void MainWindow::onAuthorized(bool status) {
+	if (status) {
+		// authorization successfull, starting animation
 
-void MainWindow::authorize() {  // rewrite
+		QGraphicsOpacityEffect* mainEffect = new QGraphicsOpacityEffect{mMainContent};
+		QPropertyAnimation* mainAnimation = new QPropertyAnimation{mainEffect, "opacity"};
 
-	setChangingTitle(tr("Authorization..."));
+		mMainContent->setGraphicsEffect(mainEffect);
+		mainAnimation->setStartValue(0);
+		mainAnimation->setEndValue(1);
+		mainAnimation->setDuration(500);
 
-	static QFile file{":/static/requests/authorization.json"};
-	if (!file.isOpen())
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-	static QString request = file.readAll();
+		QGraphicsOpacityEffect* authEffect = new QGraphicsOpacityEffect{mStartScreen};
+		QPropertyAnimation* authAnimation = new QPropertyAnimation{authEffect, "opacity"};
 
-//	mNetworker.data()->sendToHost(request.arg(mLogin, mPassword));
-}
+		mStartScreen->setGraphicsEffect(authEffect);
+		authAnimation->setStartValue(1);
+		authAnimation->setEndValue(0);
+		authAnimation->setDuration(500);
 
-void MainWindow::onAuthorized(const QJsonObject& dataObject) {
+		QSequentialAnimationGroup* group = new QSequentialAnimationGroup{};
+		group->addAnimation(mainAnimation);
+		group->addAnimation(authAnimation);
 
-	int status = dataObject.value("status").toInt();
-	if (status == 0) {
-		// success authorization
-		setChangingTitle(tr("Analytics system"));
+		authAnimation->start();
 
-		mStatusTab->onAuthorized();
-		mForecastTab->onAuthorized();
-		mGenerationTab->onAuthorized();
-		mConsumersTab->onAuthorized();
-		mSettingsTab->onAuthorized();
+		connect(authAnimation, &QPropertyAnimation::finished, authAnimation, [this]() {
+			mStartScreen->hide();
+		});
+
+		mMainContent->show();
+		mainAnimation->start();
+
+		QFont appFont{this->font()};
+		appFont.setPixelSize(18);
+		appFont.setHintingPreference(QFont::PreferFullHinting);
+		qApp->setFont(appFont);
+
+		QFile globalStylesheet{":/static/stylesheets/global.css"};
+		globalStylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
+		qApp->setStyleSheet(globalStylesheet.readAll());
+		globalStylesheet.close();
+
+		resizeEvent(nullptr);
 	}
 	else {
-		// error
-		setChangingTitle(tr("Unsuccessfull authorization!!!"));
+		// authorization unsuccessfull, showing dialog with error message
 	}
 }
 
 void MainWindow::onESPStatusChanged(const QJsonObject& dataObject) {
 
-	int status = dataObject.value("status").toInt();
-
-	if (status) {
-		// esp connected
-		setChangingTitle(tr("Analytics system"));
-	}
-	else {
-		// esp disconnected
-		setChangingTitle(tr("ESP disconnected!!!"));
-	}
 }
 
 void MainWindow::onRelayClicked(int group, bool newState) {
-	static QFile file{":/static/requests/relay.json"};
-	if (!file.isOpen())
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-	static QString request = file.readAll();
 
-//	connector->sendToHost(request.arg(group).arg(newState));
 }
 
-void MainWindow::load(QSettings& settings) {
-	this->restoreGeometry(settings.value("windowGeometry").toByteArray());
+QWidget* MainWindow::createMainContents() {
+//	QWidget* result = new QWidget{};
+//	QVBoxLayout* resultLayout = new QVBoxLayout{result};
+//	resultLayout->setContentsMargins(5, 5, 5, 5);
+//	resultLayout->setAlignment(Qt::AlignCenter);
+//	result->setLayout(resultLayout);
 
-	settings.beginGroup("SETTINGS");
-	mSettingsTab->load(settings);
-	settings.endGroup();
-}
-
-void MainWindow::save(QSettings& settings) {
-	settings.setValue("windowGeometry", this->saveGeometry());
-
-	settings.beginGroup("SETTINGS");
-	mSettingsTab->save(settings);
-	settings.endGroup();
-}
-
-void MainWindow::createMainContents() {
-	layout = new QHBoxLayout{this};
-	tabWidget = new QTabWidget{this};
+	QTabWidget* tabWidget = new QTabWidget{this->centralWidget()};
 	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 	tabWidget->tabBar()->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 	tabWidget->tabBar()->setDocumentMode(true);
 	tabWidget->tabBar()->setExpanding(true);
 
-	mStatusTab = QSharedPointer<StatusTab>::create("Status", this);
-	mForecastTab = QSharedPointer<ForecastTab>::create("Forecast", this);
-	mGenerationTab = QSharedPointer<GenerationTab>::create("Generation", this);
-	mConsumersTab = QSharedPointer<ConsumersTab>::create("Consumers", this);
-	mSettingsTab = QSharedPointer<SettingsTab>::create("Settings", this);
+	mStatusTab = QSharedPointer<StatusTab>::create(QT_TR_NOOP("Status"), this);
+	mForecastTab = QSharedPointer<ForecastTab>::create(QT_TR_NOOP("Forecast"), this);
+	mGenerationTab = QSharedPointer<GenerationTab>::create(QT_TR_NOOP("Generation"), this);
+	mConsumersTab = QSharedPointer<ConsumersTab>::create(QT_TR_NOOP("Consumers"), this);
+	mSettingsTab = QSharedPointer<SettingsTab>::create(QT_TR_NOOP("Settings"), this);
 
 	tabWidget->addTab(mStatusTab.data(), tr(mStatusTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mForecastTab.data(), tr(mForecastTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mGenerationTab.data(), tr(mGenerationTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mConsumersTab.data(), tr(mConsumersTab->getName().toStdString().c_str()));
-	tabWidget->addTab(mSettingsTab.data(), tr(mStatusTab->getName().toStdString().c_str()));
+	tabWidget->addTab(mSettingsTab.data(), tr(mSettingsTab->getName().toStdString().c_str()));
 
 	tabWidget->setTabIcon(tabWidget->indexOf(mStatusTab.data()),
 						  QIcon{QString{":/static/images/page_"} + mStatusTab->getName() + ".png"});
@@ -141,70 +136,80 @@ void MainWindow::createMainContents() {
 	tabWidget->setTabIcon(tabWidget->indexOf(mSettingsTab.data()),
 						  QIcon{QString{":/static/images/page_"} + mSettingsTab->getName() + ".png"});
 
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
-		if (tabWidget->indexOf(mStatusTab.data()) == clickedTabIndex)
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
+		if (clickedTabIndex != -1 && tabWidget->indexOf(mStatusTab.data()) == clickedTabIndex)
 			mStatusTab->onTabOpened();
 	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
-		if (tabWidget->indexOf(mForecastTab.data()) == clickedTabIndex)
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
+		if (clickedTabIndex != -1 && tabWidget->indexOf(mForecastTab.data()) == clickedTabIndex)
 			mForecastTab->onTabOpened();
 	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
-		if (tabWidget->indexOf(mGenerationTab.data()) == clickedTabIndex)
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
+		if (clickedTabIndex != -1 && tabWidget->indexOf(mGenerationTab.data()) == clickedTabIndex)
 			mGenerationTab->onTabOpened();
 	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
-		if (tabWidget->indexOf(mConsumersTab.data()) == clickedTabIndex)
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
+		if (clickedTabIndex != -1 && tabWidget->indexOf(mConsumersTab.data()) == clickedTabIndex)
 			mConsumersTab->onTabOpened();
 	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [&](int clickedTabIndex) {
-		if (tabWidget->indexOf(mSettingsTab.data()) == clickedTabIndex)
+	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
+		if (clickedTabIndex != -1 && tabWidget->indexOf(mSettingsTab.data()) == clickedTabIndex)
 			mSettingsTab->onTabOpened();
 	});
 
-	tabWidget->tabBar()->setIconSize(QSize(30, 30));
-
-	layout->addWidget(tabWidget);
+	tabWidget->tabBar()->setIconSize(QSize(35, 35));
 	tabWidget->setCurrentWidget(mStatusTab.data());
-	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+	tabWidget->setMinimumSize(this->centralWidget()->size());
 
-	this->setLayout(layout);
+	// resultLayout->addWidget(tabWidget, 1, Qt::AlignCenter);
+
+	this->tabWidget = tabWidget;
+
+	return tabWidget;
 }
 
-void MainWindow::createStartScreen() {
-	QVBoxLayout* layout = new QVBoxLayout{this->centralWidget()};
-	QGroupBox* formWidget = new QGroupBox{this->centralWidget()};
+QWidget* MainWindow::createStartScreen() {
+	QWidget* result = new QWidget{this->centralWidget()};
+	QVBoxLayout* resultLayout = new QVBoxLayout{result};
+	result->setLayout(resultLayout);
 
+	QGroupBox* formWidget = new QGroupBox{result};
 	QVBoxLayout* formLayout = new QVBoxLayout{formWidget};
 	formLayout->setSpacing(0);
 	formLayout->setContentsMargins(0, 0, 0, 0);
 	formLayout->setAlignment(Qt::AlignCenter);
 	formWidget->setLayout(formLayout);
 
-	static QString groupBoxStylesheet{""};
-
-	if (!groupBoxStylesheet.length()) {
+	static QString groupBoxStylesheet;
+	if (groupBoxStylesheet.isEmpty()) {
 		QFile stylesheet{":/static/stylesheets/qgroupbox.css"};
-		stylesheet.open(QIODevice::ReadOnly);
+		stylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
 		groupBoxStylesheet = stylesheet.readAll();
 		stylesheet.close();
 	}
+	formWidget->setProperty("class", "authGroupBox");
 	formWidget->setStyleSheet(groupBoxStylesheet);
 
-	CustomLoginField* loginField = new CustomLoginField{tr("Login"), tr("Login"), formWidget};
-	CustomLoginField* passwordField = new CustomLoginField{tr("Password"), tr("Password"), formWidget};
-	CustomLoginField* serverAddressField = new CustomLoginField{tr("Server address"), tr("Server address"), formWidget};
-	CustomLoginField* serverPortField = new CustomLoginField{tr("Server port"), tr("Server port"), formWidget};
+	mAuthLabel = new QLabel{formWidget};
+	mAuthLabel->setText(tr("Log in to the system"));
+	mAuthLabel->setStyleSheet("font-weight:bold; font-size: 32px;");
 
-	passwordField->setPasswordMode(true);
+	mLoginField = new CustomLineEdit{tr("Login"), tr("Login"), formWidget};
+	mPasswordField = new CustomLineEdit{tr("Password"), tr("Password"), formWidget};
+	mServerAddressField = new CustomLineEdit{tr("Server address"), tr("Server address"), formWidget};
+	mServerPortField = new CustomLineEdit{tr("Server port"), tr("Server port"), formWidget};
 
-	formLayout->addWidget(loginField, 1, Qt::AlignCenter);
-	formLayout->addWidget(passwordField, 1, Qt::AlignCenter);
-	formLayout->addWidget(serverAddressField, 1, Qt::AlignCenter);
-	formLayout->addWidget(serverPortField, 1, Qt::AlignCenter);
+	mPasswordField->setPasswordMode(true);
+
+	formLayout->addWidget(mAuthLabel, 1, Qt::AlignCenter);
+	formLayout->addSpacing(40);
+	formLayout->addWidget(mLoginField, 1, Qt::AlignCenter);
+	formLayout->addWidget(mPasswordField, 1, Qt::AlignCenter);
+	formLayout->addWidget(mServerAddressField, 1, Qt::AlignCenter);
+	formLayout->addWidget(mServerPortField, 1, Qt::AlignCenter);
+	formLayout->addSpacing(30);
 
 	static QString buttonStylesheet{""};
-
 	if (!buttonStylesheet.length()) {
 		QFile stylesheet{":/static/stylesheets/qpushbutton.css"};
 		stylesheet.open(QIODevice::ReadOnly);
@@ -215,33 +220,100 @@ void MainWindow::createStartScreen() {
 	QPushButton* authorizeButton = new QPushButton{formWidget};
 	authorizeButton->setText(tr("Authorize"));
 	authorizeButton->setStyleSheet(buttonStylesheet);
+	authorizeButton->setAutoDefault(true);
 
 	formLayout->addWidget(authorizeButton, 1, Qt::AlignCenter);
 
-	formWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	formWidget->setMinimumHeight(300);
-	formWidget->setMinimumWidth(400);
+	formWidget->setMinimumSize(400, 300);
+	formWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	// layout->addItem(new QSpacerItem{100, 100, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding});
-	layout->addStretch();
-	layout->addWidget(formWidget);//, 0, 0, Qt::AlignCenter);
-	layout->addStretch();
-	// layout->addItem(new QSpacerItem{100, 100, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding});
+	resultLayout->addWidget(formWidget, 1, Qt::AlignCenter);
 
-	layout->setAlignment(formWidget, Qt::AlignCenter);
+	connect(authorizeButton, &QPushButton::clicked, authorizeButton, [&]() {
+		QString login = mLoginField->text().trimmed();
+		QString password = mPasswordField->text().trimmed();
+		QString serverAddress = mServerAddressField->text().trimmed();
+		int serverPort;
 
-	this->centralWidget()->setLayout(layout);
-	//setCentralWidget(formWidget);
-}
+		if (login.isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Empty login"),
+						   tr("You need to fill all fields, but login field is empty."), QMessageBox::Ok, this};
+			mb.setWindowIcon(QIcon{":/static/images/error.png"});
+			mb.exec();
+			return;
+		}
 
-void MainWindow::clearScreen() {
+		if (password.isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Empty password"),
+						   tr("You need to fill all fields, but password field is empty."), QMessageBox::Ok, this};
+			mb.setWindowIcon(QIcon{":/static/images/error.png"});
+			mb.exec();
+			return;
+		}
 
+		if (serverAddress.isEmpty()) {
+			QMessageBox mb{QMessageBox::Critical, tr("Empty server address"),
+						   tr("You need to fill all fields, but server address field is empty."), QMessageBox::Ok, this};
+			mb.setWindowIcon(QIcon{":/static/images/error.png"});
+			mb.exec();
+			return;
+		}
+
+		bool conversionOk = false;
+		serverPort = mServerPortField->text().trimmed().toInt(&conversionOk);
+
+		if (!conversionOk || serverPort < 0) {
+			QMessageBox mb{QMessageBox::Critical, tr("Incorrect server port"),
+						   tr("Server port field is empty or contains incorrect value."), QMessageBox::Ok, this};
+			mb.setWindowIcon(QIcon{":/static/images/error.png"});
+			mb.exec();
+			return;
+		}
+
+		mAuthLabel->setText(tr("Authorization..."));
+		emit authorize(login, password, serverAddress, serverPort);
+	});
+
+	return result;
 }
 
 void MainWindow::onDisconnect() {
 
 
 
+}
+
+void MainWindow::load(QSettings& settings) {
+	restoreGeometry(settings.value("windowGeometry").toByteArray());
+
+	settings.beginGroup("loginData");
+
+	mLoginField->setText(settings.value("login").toString());
+	mServerAddressField->setText(settings.value("serverAddress").toString());
+	mServerPortField->setText(settings.value("serverPort").toString());
+
+	settings.endGroup();
+}
+
+void MainWindow::save(QSettings& settings) {
+	settings.setValue("windowGeometry", saveGeometry());
+
+	settings.beginGroup("loginData");
+
+	settings.setValue("login", mLoginField->text());
+	settings.setValue("serverAddress", mServerAddressField->text());
+	settings.setValue("serverPort", mServerPortField->text());
+
+	settings.endGroup();
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event) {
+	QSize s = centralWidget()->size();
+	QMargins m = centralWidget()->layout()->contentsMargins();
+	s.setHeight(s.height() - m.top() - m.bottom());
+	s.setWidth(s.width() - m.left() - m.right());
+	tabWidget->setMinimumSize(s);
+	QMainWindow::resizeEvent(event);
 }
 
 MainWindow::~MainWindow() {

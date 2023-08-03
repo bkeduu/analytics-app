@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     client.cpp \
+    etc/utils.cpp \
     main.cpp \
 	mainwindow.cpp \
 	tabs/consumerstab.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
 	client.h \
+	etc/utils.h \
 	mainwindow.h \
 	etc/customwidgets.h \
 	tabs/consumerstab.h \
@@ -42,7 +44,7 @@ TRANSLATIONS += \
 CONFIG += lrelease
 CONFIG += embed_translations
 
-INCLUDEPATH += tabs networking
+INCLUDEPATH += tabs networking etc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

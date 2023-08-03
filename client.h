@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.h"
 #include "connection.h"
 #include "mainwindow.h"
 
@@ -18,12 +19,13 @@ enum MessageType {
 
 class Client final : public QObject {
 	Q_OBJECT
+
 public:
 	Client(QObject *parent = nullptr);
 	virtual ~Client() final override;
 
 signals:
-	void authorized();
+	void authorized(bool status);
 	void ESPStatusChanged();
 	void relaySwitched();
 	void consumersData();
@@ -32,6 +34,8 @@ signals:
 
 public slots:
 	void onDataReceived(const QJsonObject& data);
+	void sendAuth(const QString& login, const QString& password, const QString& serverAddress, int serverPort);
+
 	void sendData();
 
 private:
@@ -43,4 +47,3 @@ private:
 
 	QSettings mSettings;
 };
-

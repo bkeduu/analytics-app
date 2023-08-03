@@ -22,15 +22,31 @@ private:
 };
 
 
-class CustomLoginField : public QWidget {
+class CustomLineEdit : public QWidget {
 	Q_OBJECT
 
 public:
-	CustomLoginField(const QString& labelText, const QString& placeholder = "", QWidget* parent = nullptr);
+	CustomLineEdit(const QString& labelText, const QString& placeholder = "", QWidget* parent = nullptr);
 	void setPasswordMode(bool state);
+	void setText(const QString& text);
 	QString text() const;
 
 private:
 	QLabel* textLabel;
 	QLineEdit* inputWidget;
+};
+
+class CustomLayout final : public QGridLayout {
+	Q_OBJECT
+
+public:
+	CustomLayout(QWidget* parent = nullptr);
+	virtual void setGeometry(const QRect& rect) final override;
+
+	void addWidget(QWidget* widget, int row = 0, int column = 0, Qt::Alignment = Qt::Alignment());
+
+private:
+	void updateWidgetsGeometry();
+
+	QList<QWidget*> widgets;
 };

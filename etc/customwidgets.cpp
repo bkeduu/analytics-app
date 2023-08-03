@@ -26,7 +26,7 @@ void CustomCheckbox::mousePressEvent(QMouseEvent* /*event*/) {
 }
 
 
-CustomLoginField::CustomLoginField(const QString& labelText, const QString& placeholder, QWidget* parent) : QWidget{parent} {
+CustomLineEdit::CustomLineEdit(const QString& labelText, const QString& placeholder, QWidget* parent) : QWidget{parent} {
 	QHBoxLayout* widgetLayout = new QHBoxLayout{this};
 	setLayout(widgetLayout);
 
@@ -44,7 +44,7 @@ CustomLoginField::CustomLoginField(const QString& labelText, const QString& plac
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
-void CustomLoginField::setPasswordMode(bool state) {
+void CustomLineEdit::setPasswordMode(bool state) {
 	if (state) {
 		inputWidget->setEchoMode(QLineEdit::Password);
 	}
@@ -53,6 +53,38 @@ void CustomLoginField::setPasswordMode(bool state) {
 	}
 }
 
-QString CustomLoginField::text() const {
+void CustomLineEdit::setText(const QString& text) {
+	inputWidget->setText(text);
+}
+
+QString CustomLineEdit::text() const {
 	return inputWidget->text();
+}
+
+CustomLayout::CustomLayout(QWidget* parent) : QGridLayout{parent} { }
+
+void CustomLayout::setGeometry(const QRect& rect) {
+	QRect copy{rect};
+	copy.setX(0);
+	copy.setY(0);
+	QGridLayout::setGeometry(copy);
+
+	updateWidgetsGeometry();
+}
+
+void CustomLayout::addWidget(QWidget* widget, int row, int column, Qt::Alignment alignment) {
+	widgets.push_back(widget);
+	QGridLayout::addWidget(widget, row, column, alignment);
+
+	updateWidgetsGeometry();
+}
+
+void CustomLayout::updateWidgetsGeometry() {
+	foreach (QWidget* widget, widgets) {
+		QRect geometry = widget->geometry();
+		geometry.setX(0);
+		geometry.setY(0);
+		widget->setGeometry(geometry);
+		widget->move(0 - widget->x(), 0 - widget->y());
+	}
 }
