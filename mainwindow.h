@@ -46,6 +46,8 @@ public slots:
 	void onAuthorized(bool status);
 	void onESPStatusChanged(const QJsonObject&);
 	//void onConsumersReceived(const QJsonObject&);
+
+	void onServerLookupFailed();
 	void onDisconnect();
 
 private:

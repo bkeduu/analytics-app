@@ -38,6 +38,7 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 	mMainContent->hide();
 
 	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorized(bool)));
+	connect(client, SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFailed()));
 
 	// TODO на главном экране марджины слева и справа не совпадают
 }
@@ -169,6 +170,7 @@ QWidget* MainWindow::createMainContents() {
 }
 
 QWidget* MainWindow::createStartScreen() {
+	// TODO паддинги в result виджете
 	QWidget* result = new QWidget{this->centralWidget()};
 	QVBoxLayout* resultLayout = new QVBoxLayout{result};
 	result->setLayout(resultLayout);
@@ -314,6 +316,15 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 	s.setWidth(s.width() - m.left() - m.right());
 	tabWidget->setMinimumSize(s);
 	QMainWindow::resizeEvent(event);
+}
+
+void MainWindow::onServerLookupFailed() {
+	QMessageBox mb{QMessageBox::Critical, tr("Unable to lookup server"),
+				   tr("Unable to find server with provided hostname. Enter another name and try again."), QMessageBox::Ok, this};
+	mb.setWindowIcon(QIcon{":/static/images/error.png"});
+	mAuthLabel->setText(tr("Authorize"));
+
+	mb.exec();
 }
 
 MainWindow::~MainWindow() {

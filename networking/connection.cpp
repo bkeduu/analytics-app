@@ -19,14 +19,22 @@ void Networker::setHostPort(int port) {
 }
 
 void Networker::connectToHost() {
-	QList<QHostAddress> addresses = QHostInfo::fromName(mHost).addresses();
+	QHostInfo lookupResult = QHostInfo::fromName(mHost);
+	QList<QHostAddress> addresses = lookupResult.addresses();
+	if (lookupResult.error() != QHostInfo::NoError) {
+		emit serverLookupFailed();
+		return;
+	}
 
 	for (auto it = addresses.begin(); it != addresses.end(); ++it) {
 		if (!((*it).isNull()) && (*it).protocol() == QAbstractSocket::IPv4Protocol) {
 			socket->connectToHost(*it, mPort);
-			if (!socket->waitForConnected(10000)) {
+			if (!socket->waitForConnected(3000)) {
 				emit unableToConnect();
+				return;
 			}
+
+			emit connected();
 			return;
 		}
 	}

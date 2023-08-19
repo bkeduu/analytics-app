@@ -66,105 +66,105 @@
         <translation>Система предиктивной аналитики</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="96"/>
+        <location filename="mainwindow.cpp" line="116"/>
         <source>Status</source>
         <translation>Показатели</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="99"/>
+        <location filename="mainwindow.cpp" line="119"/>
         <source>Consumers</source>
         <translation>Потребление</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="98"/>
+        <location filename="mainwindow.cpp" line="118"/>
         <source>Generation</source>
         <translation>Генерация</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="97"/>
+        <location filename="mainwindow.cpp" line="117"/>
         <source>Forecast</source>
         <translation>Прогноз</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="100"/>
+        <location filename="mainwindow.cpp" line="120"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="173"/>
+        <location filename="mainwindow.cpp" line="195"/>
         <source>Log in to the system</source>
         <translation>Вход в систему</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="176"/>
+        <location filename="mainwindow.cpp" line="198"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="177"/>
+        <location filename="mainwindow.cpp" line="199"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="178"/>
+        <location filename="mainwindow.cpp" line="200"/>
         <source>Server address</source>
         <translation>Адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="179"/>
+        <location filename="mainwindow.cpp" line="201"/>
         <source>Server port</source>
         <translation>Порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="200"/>
+        <location filename="mainwindow.cpp" line="222"/>
         <source>Authorize</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="218"/>
+        <location filename="mainwindow.cpp" line="240"/>
         <source>Empty login</source>
         <translation>Пустой логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="219"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>You need to fill all fields, but login field is empty.</source>
         <oldsource>You need to fill all fields, but login field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с логином пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="226"/>
+        <location filename="mainwindow.cpp" line="248"/>
         <source>Empty password</source>
         <translation>Пустой пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="227"/>
+        <location filename="mainwindow.cpp" line="249"/>
         <source>You need to fill all fields, but password field is empty.</source>
         <oldsource>You need to fill all fields, but password field is emtpty.</oldsource>
-        <translation>Необходимо заполнить все поля формы, однако поле с логином пустое.</translation>
+        <translation>Необходимо заполнить все поля формы, однако поле с паролем пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="234"/>
+        <location filename="mainwindow.cpp" line="256"/>
         <source>Empty server address</source>
         <translation>Пустой адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="235"/>
+        <location filename="mainwindow.cpp" line="257"/>
         <source>You need to fill all fields, but server address field is empty.</source>
         <oldsource>You need to fill all fields, but server address field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с адресом сервера пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="245"/>
+        <location filename="mainwindow.cpp" line="267"/>
         <source>Incorrect server port</source>
         <translation>Некорректный порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="246"/>
+        <location filename="mainwindow.cpp" line="268"/>
         <source>Server port field is empty or contains incorrect value.</source>
         <translation>Поле с портом сервера пустое, либо содержит некорректное значение.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="252"/>
+        <location filename="mainwindow.cpp" line="274"/>
         <source>Authorization...</source>
         <translation>Авторизация...</translation>
     </message>
@@ -183,6 +183,14 @@
     <message>
         <source>Authorizing...</source>
         <translation type="vanished">Авторизация...</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="main.cpp" line="29"/>
+        <source>Critical error</source>
+        <translation>Ошибка</translation>
     </message>
 </context>
 <context>
@@ -276,24 +284,14 @@
 <context>
     <name>StatusTab</name>
     <message>
-        <location filename="tabs/statustab.cpp" line="110"/>
-        <location filename="tabs/statustab.cpp" line="116"/>
-        <location filename="tabs/statustab.cpp" line="122"/>
-        <location filename="tabs/statustab.cpp" line="146"/>
-        <location filename="tabs/statustab.cpp" line="152"/>
-        <location filename="tabs/statustab.cpp" line="158"/>
-        <source>V: %1</source>
-        <translation>V: %1</translation>
-    </message>
-    <message>
         <location filename="tabs/statustab.cpp" line="111"/>
         <location filename="tabs/statustab.cpp" line="117"/>
         <location filename="tabs/statustab.cpp" line="123"/>
         <location filename="tabs/statustab.cpp" line="147"/>
         <location filename="tabs/statustab.cpp" line="153"/>
         <location filename="tabs/statustab.cpp" line="159"/>
-        <source>A: %1</source>
-        <translation>A: %1</translation>
+        <source>V: %1</source>
+        <translation>V: %1</translation>
     </message>
     <message>
         <location filename="tabs/statustab.cpp" line="112"/>
@@ -302,68 +300,78 @@
         <location filename="tabs/statustab.cpp" line="148"/>
         <location filename="tabs/statustab.cpp" line="154"/>
         <location filename="tabs/statustab.cpp" line="160"/>
+        <source>A: %1</source>
+        <translation>A: %1</translation>
+    </message>
+    <message>
+        <location filename="tabs/statustab.cpp" line="113"/>
+        <location filename="tabs/statustab.cpp" line="119"/>
+        <location filename="tabs/statustab.cpp" line="125"/>
+        <location filename="tabs/statustab.cpp" line="149"/>
+        <location filename="tabs/statustab.cpp" line="155"/>
+        <location filename="tabs/statustab.cpp" line="161"/>
         <source>W: %1</source>
         <translation>W: %1</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="136"/>
+        <location filename="tabs/statustab.cpp" line="137"/>
         <source>Discharging...</source>
         <translation>Разрядка...</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="139"/>
+        <location filename="tabs/statustab.cpp" line="140"/>
         <source>Unknown...</source>
         <translation>Неизвестно...</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="182"/>
+        <location filename="tabs/statustab.cpp" line="180"/>
         <source>Generators</source>
         <translatorcomment>Метка секции генераторов во вкладке с информацией</translatorcomment>
         <translation>Генерация</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="250"/>
+        <location filename="tabs/statustab.cpp" line="251"/>
         <source>Consumers</source>
         <translatorcomment>Метка секции потребителей во вкладке с информацией</translatorcomment>
         <translation>Потребители</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="261"/>
+        <location filename="tabs/statustab.cpp" line="263"/>
         <source>1st group</source>
         <translation>1-я группа</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="280"/>
+        <location filename="tabs/statustab.cpp" line="282"/>
         <source>2nd group</source>
         <translation>2-я группа</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="398"/>
+        <location filename="tabs/statustab.cpp" line="401"/>
         <source>Battery</source>
         <translation>Аккумулятор</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="421"/>
+        <location filename="tabs/statustab.cpp" line="424"/>
         <source>- V</source>
-        <translation type="unfinished"></translation>
+        <translation>- V</translation>
     </message>
     <message>
         <source>%1 V</source>
         <translation type="vanished">%1 V</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="299"/>
+        <location filename="tabs/statustab.cpp" line="301"/>
         <source>3rd group</source>
         <translation>3-я группа</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="317"/>
+        <location filename="tabs/statustab.cpp" line="319"/>
         <source>Work Mode</source>
         <translatorcomment>Метка секции режимов работы во вкладке с информацией</translatorcomment>
         <translation>Режимы работы</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="340"/>
+        <location filename="tabs/statustab.cpp" line="342"/>
         <source>Manual mode</source>
         <translatorcomment>Название ручного режима</translatorcomment>
         <translation>Ручной режим</translation>
@@ -379,19 +387,19 @@
         <translation type="vanished">Система автоматически выбирает оптимальный режим работы.</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="349"/>
+        <location filename="tabs/statustab.cpp" line="351"/>
         <source>Manual mode description</source>
         <translatorcomment>Описание ручного режима</translatorcomment>
         <translation>Описание ручного режима</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="368"/>
+        <location filename="tabs/statustab.cpp" line="370"/>
         <source>Automatic mode</source>
         <translatorcomment>Название автоматического режима</translatorcomment>
         <translation>Автоматический режим</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="376"/>
+        <location filename="tabs/statustab.cpp" line="378"/>
         <source>Automatic mode description</source>
         <translatorcomment>Описание автоматического режима</translatorcomment>
         <translation>Описание автоматического режима</translation>
@@ -402,8 +410,8 @@
         <translation type="vanished">%1 Вт*ч</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="133"/>
-        <location filename="tabs/statustab.cpp" line="430"/>
+        <location filename="tabs/statustab.cpp" line="134"/>
+        <location filename="tabs/statustab.cpp" line="433"/>
         <source>Charging...</source>
         <translatorcomment>Статус зарядки аккумулятора</translatorcomment>
         <translation>Заряжается...</translation>

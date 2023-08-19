@@ -18,7 +18,6 @@ public:
 	void setHostAddress(const QString& addr);
 	void setHostPort(int port);
 	void connectToHost();
-
 	QAbstractSocket::SocketState state() const { return socket->state(); }
 
 	void sendToHost(const QString& data);
@@ -26,9 +25,11 @@ public:
 	virtual ~Networker() final override;
 
 signals:
+	void connected();
 	void dataReceived(const QJsonObject&);
 	void disconnected();
 	void unableToConnect();
+	void serverLookupFailed();
 
 private slots:
 	void readFromSocket();

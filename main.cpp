@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QSettings>
 #include <QTranslator>
+#include <QMessageBox>
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
@@ -19,5 +20,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	Client c;
-	return a.exec();
+	int resultCode;
+
+	try {
+		resultCode = a.exec();
+	}
+	catch (std::exception& e) {
+		QMessageBox::critical(&c.getMainWindow(), QObject::tr("Critical error"), e.what());
+	}
+
+	return resultCode;
 }

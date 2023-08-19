@@ -24,22 +24,32 @@ public:
 	Client(QObject *parent = nullptr);
 	virtual ~Client() final override;
 
+	MainWindow& getMainWindow() { return mWindow; }
+
 signals:
+	void serverLookupFailed();
+
 	void authorized(bool status);
-	void ESPStatusChanged();
+	void ESPConnected();
+	void ESPDisconnected();
 	void relaySwitched();
 	void consumersData();
-	void sensorsData();
+	void sensorsData(QJsonObject);
 	void shutdown();
 
 public slots:
+	void onConnected() { mServerConnected = true; }
+	void onDisconnected() { mServerConnected = false; }
 	void onDataReceived(const QJsonObject& data);
 	void sendAuth(const QString& login, const QString& password, const QString& serverAddress, int serverPort);
-
-	void sendData();
+	void onUnableToConnect();
+	void onServerLookupFailed();
 
 private:
+	void sendData(const QString& request) const;
+
 	bool mAuthorized;
+	bool mServerConnected;
 	bool mESPConnected;
 
 	MainWindow mWindow;
