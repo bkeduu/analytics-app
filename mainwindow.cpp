@@ -104,8 +104,6 @@ QWidget* MainWindow::createMainContents() {
 	tabWidget->setCurrentWidget(mStatusTab.data());
 	tabWidget->setMinimumSize(this->centralWidget()->size());
 
-	// resultLayout->addWidget(tabWidget, 1, Qt::AlignCenter);
-
 	this->tabWidget = tabWidget;
 
 	return tabWidget;
@@ -145,6 +143,7 @@ QWidget* MainWindow::createStartScreen() {
 
 	mPasswordField->setPasswordMode(true);
 
+	formLayout->addSpacing(10);
 	formLayout->addWidget(mAuthLabel, 1, Qt::AlignCenter);
 	formLayout->addSpacing(40);
 	formLayout->addWidget(mLoginField, 1, Qt::AlignCenter);
@@ -167,6 +166,7 @@ QWidget* MainWindow::createStartScreen() {
 	authorizeButton->setAutoDefault(true);
 
 	formLayout->addWidget(authorizeButton, 1, Qt::AlignCenter);
+	formLayout->addSpacing(10);
 
 	formWidget->setMinimumSize(400, 300);
 	formWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
