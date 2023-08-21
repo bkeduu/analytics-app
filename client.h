@@ -7,14 +7,16 @@
 #include <QSharedPointer>
 
 enum MessageType {
-	Error = 0,
-	Authorization,
-	AuthorizationReply,
+	AuthorizationSuccess = 0, //Ответ от сервера на клиента и есп, если авторизация успешна
+	AuthorizationError, //Ответ от сервера на клиента и есп, если авторизация не успешна
+	Authorization, //Запрос на авторизацию от клиента на сервер и есп на сервер
+	SensorsData, //Показатели силы тока и напряжения на esp (сервер отправляет запрос на есп, получает ответ и отправляет клиенту)
+	ConsumersData, //Сервер отправляет информацию с потребителями клиенту
+	RelaySwitch, //Клиент отправляет запрос на переключение реле на сервер, а сервер на есп.
+	ModeSwitch, //Клиент отправляет запрос на сервер по режиму работы есп, а сервер отправляет на есп
+	GraphicsData, //Сервер отправляет клиенту информацию о графиках
 	ESPStatus,
-	RelaySwitch,
-	ConsumersData,
-	SensorsData,
-	Shutdown
+	Shutdown //Желательно чтобы это отправлял клиент и есп, когда они отключаются
 };
 
 class Client final : public QObject {
@@ -28,18 +30,20 @@ public:
 
 signals:
 	void serverLookupFailed();
+	void connected();
+	void unableToConnect();
+	void disconnected();
 
 	void authorized(bool status);
-	void ESPConnected();
-	void ESPDisconnected();
+	void ESPConnectionChange(bool status);
 	void relaySwitched();
-	void consumersData();
-	void sensorsData(QJsonObject);
+	void consumersData(QJsonObject data);
+	void sensorsData(QJsonObject data);
 	void shutdown();
 
 public slots:
-	void onConnected() { mServerConnected = true; }
-	void onDisconnected() { mServerConnected = false; }
+	void onConnected();
+	void onDisconnected();
 	void onDataReceived(const QJsonObject& data);
 	void sendAuth(const QString& login, const QString& password, const QString& serverAddress, int serverPort);
 	void onRelayClicked(int group, bool newState);

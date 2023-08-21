@@ -4,12 +4,13 @@
 <context>
     <name>ConsumersTab</name>
     <message>
-        <location filename="tabs/consumerstab.cpp" line="29"/>
+        <location filename="tabs/consumerstab.cpp" line="6"/>
+        <location filename="tabs/consumerstab.cpp" line="10"/>
         <source>Waiting for consumers data from server</source>
         <translation>Ожидание данных о потребителях с сервера</translation>
     </message>
     <message>
-        <location filename="tabs/consumerstab.cpp" line="59"/>
+        <location filename="tabs/consumerstab.cpp" line="62"/>
         <source>Group %1</source>
         <translatorcomment>Чекбокс, выключающий/включающий всю группу</translatorcomment>
         <translation>Группа %1</translation>
@@ -66,107 +67,137 @@
         <translation>Система предиктивной аналитики</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="116"/>
+        <location filename="mainwindow.cpp" line="59"/>
         <source>Status</source>
         <translation>Показатели</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="119"/>
+        <location filename="mainwindow.cpp" line="62"/>
         <source>Consumers</source>
         <translation>Потребление</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="118"/>
+        <location filename="mainwindow.cpp" line="61"/>
         <source>Generation</source>
         <translation>Генерация</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="117"/>
+        <location filename="mainwindow.cpp" line="60"/>
         <source>Forecast</source>
         <translation>Прогноз</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="120"/>
+        <location filename="mainwindow.cpp" line="63"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="195"/>
+        <location filename="mainwindow.cpp" line="138"/>
         <source>Log in to the system</source>
         <translation>Вход в систему</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="198"/>
+        <location filename="mainwindow.cpp" line="141"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="199"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="200"/>
+        <location filename="mainwindow.cpp" line="143"/>
         <source>Server address</source>
         <translation>Адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="201"/>
+        <location filename="mainwindow.cpp" line="144"/>
         <source>Server port</source>
         <translation>Порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="222"/>
+        <location filename="mainwindow.cpp" line="165"/>
         <source>Authorize</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="240"/>
+        <location filename="mainwindow.cpp" line="183"/>
         <source>Empty login</source>
         <translation>Пустой логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="241"/>
+        <location filename="mainwindow.cpp" line="184"/>
         <source>You need to fill all fields, but login field is empty.</source>
         <oldsource>You need to fill all fields, but login field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с логином пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="248"/>
+        <location filename="mainwindow.cpp" line="191"/>
         <source>Empty password</source>
         <translation>Пустой пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="192"/>
         <source>You need to fill all fields, but password field is empty.</source>
         <oldsource>You need to fill all fields, but password field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с паролем пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="256"/>
+        <location filename="mainwindow.cpp" line="199"/>
         <source>Empty server address</source>
         <translation>Пустой адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="257"/>
+        <location filename="mainwindow.cpp" line="200"/>
         <source>You need to fill all fields, but server address field is empty.</source>
         <oldsource>You need to fill all fields, but server address field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с адресом сервера пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="267"/>
+        <location filename="mainwindow.cpp" line="210"/>
         <source>Incorrect server port</source>
         <translation>Некорректный порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="268"/>
+        <location filename="mainwindow.cpp" line="211"/>
         <source>Server port field is empty or contains incorrect value.</source>
         <translation>Поле с портом сервера пустое, либо содержит некорректное значение.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="274"/>
+        <location filename="mainwindow.cpp" line="217"/>
         <source>Authorization...</source>
         <translation>Авторизация...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="304"/>
+        <source>Authorization unsuccessfull</source>
+        <translation>Ошибка авторизации</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="305"/>
+        <source>Provided login or password is incorrect. Try again.</source>
+        <translation>Введённый логин или пароль неверный. Попробуйте ещё раз.</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="329"/>
+        <source>Unable to lookup server</source>
+        <translation>Невозможно подключиться к серверу</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="330"/>
+        <source>Unable to find server with provided hostname. Enter another name and try again.</source>
+        <translation>Не удалось найти сервер с заданным адресом. Введите другой адрес и попробуйте ещё раз.</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="345"/>
+        <source>Connection with server lost</source>
+        <translation>Потеряно соединение с сервером</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="346"/>
+        <source>The connection to server lost. Control will be blocked. Check the connection and restart the app.</source>
+        <translation>Соединение с сервером потеряно. Управление системой будет заблокировано. Проверьте подключение к серверу и перезапустите приложение.</translation>
     </message>
     <message>
         <source>Wait for ESP connection...</source>
@@ -195,6 +226,11 @@
 </context>
 <context>
     <name>SettingsTab</name>
+    <message>
+        <location filename="tabs/settingstab.cpp" line="8"/>
+        <source>In development</source>
+        <translation>В разработке</translation>
+    </message>
     <message>
         <location filename="tabs/settingstab.cpp" line="20"/>
         <source>You are successfully authorized</source>

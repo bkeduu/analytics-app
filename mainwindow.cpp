@@ -37,86 +37,19 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 
 	mMainContent->hide();
 
-	connect(client, SIGNAL(connected()), this, SLOT(onConnected()));
-	connect(client, SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFailed()));
-	connect(client, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+	connect(client, SIGNAL(connected()), this, SLOT(onConnect()));
+	connect(client, SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFail()));
+	connect(client, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
 	connect(client, SIGNAL(unableToConnect()), this, SLOT(onUnableToConnect()));
 
-	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorized(bool)));
-
+	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorize(bool)));
+	connect(client, SIGNAL(consumersData(QJsonObject)), this, SLOT(onConsumersData(QJsonObject)));
+	connect(client, SIGNAL(sensorsData(QJsonObject)), this, SLOT(onSensorsData(QJsonObject)));
 
 	// TODO на главном экране марджины слева и справа не совпадают
 }
 
-void MainWindow::onAuthorized(bool status) {
-	if (status) {
-		// authorization successfull, starting animation
-
-		QGraphicsOpacityEffect* mainEffect = new QGraphicsOpacityEffect{mMainContent};
-		QPropertyAnimation* mainAnimation = new QPropertyAnimation{mainEffect, "opacity"};
-
-		mMainContent->setGraphicsEffect(mainEffect);
-		mainAnimation->setStartValue(0);
-		mainAnimation->setEndValue(1);
-		mainAnimation->setDuration(500);
-
-		QGraphicsOpacityEffect* authEffect = new QGraphicsOpacityEffect{mStartScreen};
-		QPropertyAnimation* authAnimation = new QPropertyAnimation{authEffect, "opacity"};
-
-		mStartScreen->setGraphicsEffect(authEffect);
-		authAnimation->setStartValue(1);
-		authAnimation->setEndValue(0);
-		authAnimation->setDuration(500);
-
-		QSequentialAnimationGroup* group = new QSequentialAnimationGroup{};
-		group->addAnimation(mainAnimation);
-		group->addAnimation(authAnimation);
-
-		authAnimation->start();
-
-		connect(authAnimation, &QPropertyAnimation::finished, authAnimation, [this]() {
-			mStartScreen->hide();
-		});
-
-		mMainContent->show();
-		mainAnimation->start();
-
-		QFont appFont{this->font()};
-		appFont.setPixelSize(18);
-		appFont.setHintingPreference(QFont::PreferFullHinting);
-		qApp->setFont(appFont);
-
-		QFile globalStylesheet{":/static/stylesheets/global.css"};
-		globalStylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
-		qApp->setStyleSheet(globalStylesheet.readAll());
-		globalStylesheet.close();
-
-		resizeEvent(nullptr);
-	}
-	else {
-		// authorization unsuccessfull, showing dialog with error message
-		QMessageBox mb{QMessageBox::Critical, tr("Authorization unsuccessfull"),
-					   tr("Provided login or password is incorrect. Try again."), QMessageBox::Ok, this};
-		mb.setWindowIcon(QIcon{":/static/images/error.png"});
-		mb.exec();
-	}
-}
-
-void MainWindow::onESPStatusChanged(const QJsonObject& dataObject) {
-
-}
-
-void MainWindow::onRelayClicked(int group, bool newState) {
-	emit relayClicked(group, newState);
-}
-
 QWidget* MainWindow::createMainContents() {
-//	QWidget* result = new QWidget{};
-//	QVBoxLayout* resultLayout = new QVBoxLayout{result};
-//	resultLayout->setContentsMargins(5, 5, 5, 5);
-//	resultLayout->setAlignment(Qt::AlignCenter);
-//	result->setLayout(resultLayout);
-
 	QTabWidget* tabWidget = new QTabWidget{this->centralWidget()};
 	tabWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
 	tabWidget->tabBar()->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
@@ -288,17 +221,6 @@ QWidget* MainWindow::createStartScreen() {
 	return result;
 }
 
-void MainWindow::onDisconnect() {
-	QMessageBox mb{QMessageBox::Critical, tr("Connection with server lost"),
-				   tr("The connection to server lost. Control will be blocked. Check the connection and restart the app."),
-				   QMessageBox::Ok, this};
-	mb.setWindowIcon(QIcon{":/static/images/error.png"});
-
-	// TODO block the control
-
-	mb.exec();
-}
-
 void MainWindow::load(QSettings& settings) {
 	restoreGeometry(settings.value("windowGeometry").toByteArray());
 
@@ -332,10 +254,100 @@ void MainWindow::resizeEvent(QResizeEvent* event) {
 	QMainWindow::resizeEvent(event);
 }
 
-void MainWindow::onServerLookupFailed() {
+void MainWindow::onAuthorize(bool status) {
+	if (status) {
+		// authorization successfull, starting animation
+
+		QGraphicsOpacityEffect* mainEffect = new QGraphicsOpacityEffect{mMainContent};
+		QPropertyAnimation* mainAnimation = new QPropertyAnimation{mainEffect, "opacity"};
+
+		mMainContent->setGraphicsEffect(mainEffect);
+		mainAnimation->setStartValue(0);
+		mainAnimation->setEndValue(1);
+		mainAnimation->setDuration(500);
+
+		QGraphicsOpacityEffect* authEffect = new QGraphicsOpacityEffect{mStartScreen};
+		QPropertyAnimation* authAnimation = new QPropertyAnimation{authEffect, "opacity"};
+
+		mStartScreen->setGraphicsEffect(authEffect);
+		authAnimation->setStartValue(1);
+		authAnimation->setEndValue(0);
+		authAnimation->setDuration(500);
+
+		QSequentialAnimationGroup* group = new QSequentialAnimationGroup{};
+		group->addAnimation(mainAnimation);
+		group->addAnimation(authAnimation);
+
+		authAnimation->start();
+
+		connect(authAnimation, &QPropertyAnimation::finished, authAnimation, [this]() {
+			mStartScreen->hide();
+		});
+
+		mMainContent->show();
+		mainAnimation->start();
+
+		QFont appFont{this->font()};
+		appFont.setPixelSize(18);
+		appFont.setHintingPreference(QFont::PreferFullHinting);
+		qApp->setFont(appFont);
+
+		QFile globalStylesheet{":/static/stylesheets/global.css"};
+		globalStylesheet.open(QIODevice::ReadOnly | QIODevice::Text);
+		qApp->setStyleSheet(globalStylesheet.readAll());
+		globalStylesheet.close();
+
+		resizeEvent(nullptr);
+	}
+	else {
+		// authorization unsuccessfull, showing dialog with error message
+		QMessageBox mb{QMessageBox::Critical, tr("Authorization unsuccessfull"),
+					   tr("Provided login or password is incorrect. Try again."), QMessageBox::Ok, this};
+		mb.setWindowIcon(QIcon{":/static/images/error.png"});
+		mb.exec();
+	}
+}
+
+void MainWindow::onSensorsData(const QJsonObject& data) {
+	mStatusTab->onDataReceived(data);
+	mConsumersTab->onDataReceived(data);
+}
+
+void MainWindow::onConnect() {
+
+}
+
+void MainWindow::onESPStatusChange(const QJsonObject& dataObject) {
+
+}
+
+void MainWindow::onRelayClicked(int group, bool newState) {
+	emit relayClicked(group, newState);
+}
+
+void MainWindow::onServerLookupFail() {
 	QMessageBox mb{QMessageBox::Critical, tr("Unable to lookup server"),
 				   tr("Unable to find server with provided hostname. Enter another name and try again."), QMessageBox::Ok, this};
 	mb.setWindowIcon(QIcon{":/static/images/error.png"});
+
+	mb.exec();
+}
+
+void MainWindow::onUnableToConnect() {
+
+}
+
+void MainWindow::onConsumersData(const QJsonObject& data) {
+	mConsumersTab->onDataReceived(data);
+}
+
+void MainWindow::onDisconnect() {
+	QMessageBox mb{QMessageBox::Critical, tr("Connection with server lost"),
+				   tr("The connection to server lost. Control will be blocked. Check the connection and restart the app."),
+				   QMessageBox::Ok, this};
+	mb.setWindowIcon(QIcon{":/static/images/error.png"});
+
+	// TODO block the control
 
 	mb.exec();
 }

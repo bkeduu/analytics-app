@@ -7,7 +7,9 @@ Networker::Networker(QObject* parent, const QString& address, int port) : QObjec
 	socket = new QTcpSocket{this};
 
 	connect(socket, SIGNAL(readyRead()), this, SLOT(readFromSocket()));
-	connect(socket, SLOT(disconnected()), this, SIGNAL(disconnected()));
+	connect(socket, &QTcpSocket::disconnected, socket, [this]() {
+		emit disconnected();
+	});
 }
 
 void Networker::setHostAddress(const QString& addr) {
@@ -19,29 +21,26 @@ void Networker::setHostPort(int port) {
 }
 
 void Networker::connectToHost() {
-	QHostInfo lookupResult = QHostInfo::fromName(mHost);
-	QList<QHostAddress> addresses = lookupResult.addresses();
-	if (lookupResult.error() != QHostInfo::NoError) {
+	QHostAddress addr{mHost};
+
+	if (addr.isNull()) {
 		emit serverLookupFailed();
 		return;
 	}
 
-	for (auto it = addresses.begin(); it != addresses.end(); ++it) {
-		if (!((*it).isNull()) && (*it).protocol() == QAbstractSocket::IPv4Protocol) {
-			socket->connectToHost(*it, mPort);
-			if (!socket->waitForConnected(3000)) {
-				emit unableToConnect();
-				return;
-			}
-
-			emit connected();
-			return;
-		}
+	socket->connectToHost(addr, mPort);
+	if (!socket->waitForConnected(3000)) {
+		emit unableToConnect();
+		return;
 	}
+
+	emit connected();
+	return;
 }
 
 void Networker::sendToHost(const QString& data) {
-	socket->write(data.toStdString().c_str());
+	socket->write(data.toStdString().c_str(), data.length());
+	socket->flush();
 }
 
 void Networker::readFromSocket() {
@@ -52,8 +51,6 @@ void Networker::readFromSocket() {
 }
 
 Networker::~Networker() {
-	QFile file{":/static/requests/shutdown.json"};
-	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	sendToHost(QString::fromStdString(file.readAll().toStdString()));
+	blockSignals(true);
 	socket->close();
 }

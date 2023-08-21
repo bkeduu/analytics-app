@@ -39,7 +39,6 @@ public slots:
 private:
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
-	void setJSONDocument(const QJsonObject& document);
 
 	QLayout* layout;
 	QVector<QMap<int, Consumer>> consumersGroups;

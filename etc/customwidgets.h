@@ -10,6 +10,7 @@ class CustomCheckbox : public QWidget {
 
 public:
 	CustomCheckbox(QWidget *parent = nullptr, const QString& text = "");
+	void setCheckboxStatus(bool newStatus);
 
 protected:
 	void mousePressEvent(QMouseEvent* event) final override;

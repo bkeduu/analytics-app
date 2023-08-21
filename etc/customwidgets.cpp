@@ -21,6 +21,10 @@ CustomCheckbox::CustomCheckbox(QWidget *parent, const QString& text) : QWidget{p
 	});
 }
 
+void CustomCheckbox::setCheckboxStatus(bool newStatus) {
+	checkbox->setChecked(newStatus);
+}
+
 void CustomCheckbox::mousePressEvent(QMouseEvent* /*event*/) {
 	checkbox->animateClick();
 }

@@ -20,34 +20,14 @@ Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{"ICS
 
 void Client::onDataReceived(const QJsonObject& data) {
 	switch (MessageType(data.value("type").toInt(-1))) {
-	case AuthorizationReply: {  // json with authorization status (failed/success)
-		if (!data.contains("data")) {
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
-		}
-
-		QJsonObject payload = data.value("data").toObject();
-		if (!payload.contains("status")) {
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
-		}
-
-		int status = payload.value("status").toInt(-1);
-
-		switch (status) {
-		case 0: {
-			mAuthorized = true;
-			emit authorized(true);
-			break;
-		}
-		case 1: {
-			mAuthorized = false;
-			emit authorized(false);
-			break;
-		}
-		default: {
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
-			break;
-		}
-		}
+	case AuthorizationSuccess: {  // json with authorization status (failed/success)
+		mAuthorized = true;
+		emit authorized(true);
+		break;
+	}
+	case AuthorizationError: {  // json with authorization status (failed/success)
+		mAuthorized = false;
+		emit authorized(false);
 		break;
 	}
 	case ESPStatus: {  // json with new esp status (connected/disconnected)
@@ -57,12 +37,10 @@ void Client::onDataReceived(const QJsonObject& data) {
 		switch (status) {
 		case 0: {
 			mESPConnected = false;
-			emit ESPDisconnected();
 			break;
 		}
 		case 1: {
 			mESPConnected = true;
-			emit ESPConnected();
 			break;
 		}
 		default: {
@@ -71,6 +49,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 		}
 		}
 
+		emit ESPConnectionChange(mESPConnected);
 		break;
 	}
 	case RelaySwitch: {  // wrong data, this type can be only sent to server from client (if we have only 1 client)
@@ -81,7 +60,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 		if (!data.contains("data"))
 			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit sensorsData(data.value("data").toObject());
+		emit consumersData(data.value("data").toObject());
 		break;
 	}
 	case SensorsData: {  // json with information about sensors, that will be displayed at main tab
@@ -126,6 +105,8 @@ void Client::onServerLookupFailed() {
 
 void Client::onUnableToConnect() {
 	// set timer to retry connection and retry last action
+
+	emit unableToConnect();
 }
 
 void Client::onRelayClicked(int group, bool newState) {
@@ -139,7 +120,17 @@ void Client::onRelayClicked(int group, bool newState) {
 		requestFile.close();
 	}
 
-	sendData(request.arg(group, newState));
+	sendData(request.arg(group).arg(newState));
+}
+
+void Client::onConnected() {
+	mServerConnected = true;
+	emit connected();
+}
+
+void Client::onDisconnected() {
+	mServerConnected = false;
+	emit disconnected();
 }
 
 void Client::sendData(const QString& request) const  {
@@ -148,13 +139,11 @@ void Client::sendData(const QString& request) const  {
 }
 
 Client::~Client() {
-	QString request;
 	QFile requestFile{":/static/requests/shutdown.json"};
 	requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	if (!requestFile.isOpen()) {
-		request = requestFile.readAll();
+	if (requestFile.isOpen()) {
+		sendData(requestFile.readAll());
 		requestFile.close();
-		sendData(request);
 	}
 
 	mWindow.save(mSettings);

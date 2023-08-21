@@ -3,7 +3,7 @@
 #include "mainwindow.h"
 
 GenerationTab::GenerationTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
-	removeTabContents();
+	createTabContents();
 }
 
 void GenerationTab::onAuthorized() {

@@ -44,11 +44,14 @@ signals:
 	void relayClicked(int group, bool newState);
 
 public slots:
-	void onAuthorized(bool status);
-	void onESPStatusChanged(const QJsonObject&);
-	//void onConsumersReceived(const QJsonObject&);
+	void onAuthorize(bool status);
+	void onESPStatusChange(const QJsonObject&);
+	void onConsumersData(const QJsonObject&);
+	void onSensorsData(const QJsonObject&);
 
-	void onServerLookupFailed();
+	void onServerLookupFail();
+	void onUnableToConnect();
+	void onConnect();
 	void onDisconnect();
 
 private:
