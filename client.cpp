@@ -12,6 +12,8 @@ Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{"ICS
 	connect(mNetworker.data(), SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFailed()));
 	connect(mNetworker.data(), SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
+	connect(&mWindow, SIGNAL(relayClicked(int, bool)), this, SLOT(onRelayClicked(int, bool)));
+
 	mWindow.load(mSettings);
 	mWindow.show();
 }
@@ -126,11 +128,34 @@ void Client::onUnableToConnect() {
 	// set timer to retry connection and retry last action
 }
 
+void Client::onRelayClicked(int group, bool newState) {
+	static QString request;
+	if (request.isEmpty()) {
+		QFile requestFile{":/static/requests/relay.json"};
+		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		if (!requestFile.isOpen())
+			throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+		request = requestFile.readAll();
+		requestFile.close();
+	}
+
+	sendData(request.arg(group, newState));
+}
+
 void Client::sendData(const QString& request) const  {
 	if (mServerConnected)
 		mNetworker->sendToHost(request);
 }
 
 Client::~Client() {
+	QString request;
+	QFile requestFile{":/static/requests/shutdown.json"};
+	requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if (!requestFile.isOpen()) {
+		request = requestFile.readAll();
+		requestFile.close();
+		sendData(request);
+	}
+
 	mWindow.save(mSettings);
 }

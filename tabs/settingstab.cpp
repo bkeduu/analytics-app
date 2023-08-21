@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
-	createTabContents();
+	removeTabContents(tr("In development"));
 }
 
 void SettingsTab::onAuthorized() {

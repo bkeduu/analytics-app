@@ -37,8 +37,13 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 
 	mMainContent->hide();
 
-	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorized(bool)));
+	connect(client, SIGNAL(connected()), this, SLOT(onConnected()));
 	connect(client, SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFailed()));
+	connect(client, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+	connect(client, SIGNAL(unableToConnect()), this, SLOT(onUnableToConnect()));
+
+	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorized(bool)));
+
 
 	// TODO на главном экране марджины слева и справа не совпадают
 }
@@ -90,6 +95,10 @@ void MainWindow::onAuthorized(bool status) {
 	}
 	else {
 		// authorization unsuccessfull, showing dialog with error message
+		QMessageBox mb{QMessageBox::Critical, tr("Authorization unsuccessfull"),
+					   tr("Provided login or password is incorrect. Try again."), QMessageBox::Ok, this};
+		mb.setWindowIcon(QIcon{":/static/images/error.png"});
+		mb.exec();
 	}
 }
 
@@ -98,7 +107,7 @@ void MainWindow::onESPStatusChanged(const QJsonObject& dataObject) {
 }
 
 void MainWindow::onRelayClicked(int group, bool newState) {
-
+	emit relayClicked(group, newState);
 }
 
 QWidget* MainWindow::createMainContents() {
@@ -280,9 +289,14 @@ QWidget* MainWindow::createStartScreen() {
 }
 
 void MainWindow::onDisconnect() {
+	QMessageBox mb{QMessageBox::Critical, tr("Connection with server lost"),
+				   tr("The connection to server lost. Control will be blocked. Check the connection and restart the app."),
+				   QMessageBox::Ok, this};
+	mb.setWindowIcon(QIcon{":/static/images/error.png"});
 
+	// TODO block the control
 
-
+	mb.exec();
 }
 
 void MainWindow::load(QSettings& settings) {
@@ -322,7 +336,6 @@ void MainWindow::onServerLookupFailed() {
 	QMessageBox mb{QMessageBox::Critical, tr("Unable to lookup server"),
 				   tr("Unable to find server with provided hostname. Enter another name and try again."), QMessageBox::Ok, this};
 	mb.setWindowIcon(QIcon{":/static/images/error.png"});
-	mAuthLabel->setText(tr("Authorize"));
 
 	mb.exec();
 }

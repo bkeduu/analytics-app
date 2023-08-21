@@ -41,6 +41,7 @@ public:
 
 signals:
 	void authorize(QString login, QString password, QString serverAddress, int serverPort);
+	void relayClicked(int group, bool newState);
 
 public slots:
 	void onAuthorized(bool status);

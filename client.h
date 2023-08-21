@@ -42,6 +42,7 @@ public slots:
 	void onDisconnected() { mServerConnected = false; }
 	void onDataReceived(const QJsonObject& data);
 	void sendAuth(const QString& login, const QString& password, const QString& serverAddress, int serverPort);
+	void onRelayClicked(int group, bool newState);
 	void onUnableToConnect();
 	void onServerLookupFailed();
 
