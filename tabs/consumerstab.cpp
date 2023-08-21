@@ -10,10 +10,6 @@ void ConsumersTab::onAuthorized() {
 	removeTabContents(tr("Waiting for consumers data from server"));
 }
 
-void ConsumersTab::onTabOpened() {
-
-}
-
 void ConsumersTab::onDataReceived(const QJsonObject& data) {
 	if (data.contains("G1")) {
 		for (int i = 0; i < 3; ++i) {
@@ -59,19 +55,19 @@ void ConsumersTab::createTabContents() {
 		verticalLayout->setAlignment(Qt::AlignLeft);
 		groupWidgets[i]->setLayout(verticalLayout);
 
-		CustomCheckbox* groupCheckbox = new CustomCheckbox{groupWidgets[i], tr("Group %1").arg(i + 1)};
+		CustomCheckBox* groupCheckbox = new CustomCheckBox{groupWidgets[i], tr("Group %1").arg(i + 1)};
 		verticalLayout->addWidget(groupCheckbox);
 		groupRelays.push_back(groupCheckbox);
 
 		foreach (int consumerId, consumersGroups[i].keys()) {
-			QWidget* consumerWidget = new CustomCheckbox{groupWidgets[i], consumersGroups[i][consumerId].name};
+			QWidget* consumerWidget = new CustomCheckBox{groupWidgets[i], consumersGroups[i][consumerId].name};
 			verticalLayout->addWidget(consumerWidget);
 			consumersGroups[i][consumerId].widget = consumerWidget;
 		}
 	}
 
 	for (int i = 0; i < groupRelays.size(); ++i)
-		connect(groupRelays[i], &CustomCheckbox::checkboxClicked, groupRelays[i], [=](bool newState) {
+		connect(groupRelays[i], &CustomCheckBox::checkboxClicked, groupRelays[i], [=](bool newState) {
 			mParent->onRelayClicked(i, newState);
 		});
 }

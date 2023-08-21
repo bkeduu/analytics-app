@@ -22,10 +22,13 @@ public:
 	StatusTab(const QString& tabName, QWidget* parent = nullptr);
 	virtual ~StatusTab() final override {};
 
+signals:
+	void modeChanged(int);
+
 public slots:
 	virtual void onAuthorized() final override;
-	virtual void onTabOpened() final override;
 	virtual void onDataReceived(const QJsonObject&) final override;
+	void onButtonModeChange(int);
 
 private:
 	enum class TabWidget { Generation, Consumers, WorkMode, BatteryStatus };

@@ -1,25 +1,46 @@
 #pragma once
 
-#include <QCheckBox>
+#include <QAbstractButton>
 #include <QLabel>
+#include <QCheckBox>
+#include <QRadioButton>
 #include <QHBoxLayout>
 #include <QLineEdit>
 
-class CustomCheckbox : public QWidget {
+class CustomCheckBox : public QWidget {
 	Q_OBJECT
 
 public:
-	CustomCheckbox(QWidget *parent = nullptr, const QString& text = "");
+	CustomCheckBox(QWidget *parent = nullptr, const QString& text = "", const QString& hint = "");
 	void setCheckboxStatus(bool newStatus);
 
 protected:
-	void mousePressEvent(QMouseEvent* event) final override;
+	void mousePressEvent(QMouseEvent* event);
 
 signals:
 	void checkboxClicked(bool);
 
 private:
-	QCheckBox* checkbox;
+	QCheckBox* button;
+};
+
+
+class CustomRadioButton : public QWidget {
+	Q_OBJECT
+
+public:
+	CustomRadioButton(QWidget *parent = nullptr, const QString& text = "", const QString& hint = "");
+	void setButtonStatus(bool newStatus);
+	QRadioButton* getButton() const { return button; }
+
+protected:
+	void mousePressEvent(QMouseEvent* event);
+
+signals:
+	void buttonClicked(bool);
+
+private:
+	QRadioButton* button;
 };
 
 

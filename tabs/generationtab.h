@@ -20,7 +20,6 @@ public:
 
 public slots:
 	virtual void onAuthorized() final override;
-	virtual void onTabOpened() final override;
 	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:

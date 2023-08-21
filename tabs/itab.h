@@ -24,7 +24,6 @@ public:
 
 public slots:
 	virtual void onAuthorized() = 0;
-	virtual void onTabOpened() = 0;
 	virtual void onDataReceived(const QJsonObject&) = 0;
 
 private:

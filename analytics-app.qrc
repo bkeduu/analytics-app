@@ -21,5 +21,6 @@
         <file>static/stylesheets/global.css</file>
         <file>static/stylesheets/qpushbutton.css</file>
         <file>static/images/error.png</file>
+        <file>static/requests/mode_switch.json</file>
     </qresource>
 </RCC>

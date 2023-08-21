@@ -42,6 +42,7 @@ public:
 signals:
 	void authorize(QString login, QString password, QString serverAddress, int serverPort);
 	void relayClicked(int group, bool newState);
+	void modeChanged(int);
 
 public slots:
 	void onAuthorize(bool status);
@@ -53,6 +54,8 @@ public slots:
 	void onUnableToConnect();
 	void onConnect();
 	void onDisconnect();
+
+	void onModeChange(int);
 
 private:
 	QWidget* createMainContents();

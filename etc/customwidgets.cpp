@@ -1,32 +1,66 @@
 #include "customwidgets.h"
 
-CustomCheckbox::CustomCheckbox(QWidget *parent, const QString& text) : QWidget{parent} {
-
+CustomCheckBox::CustomCheckBox(QWidget* parent, const QString& text, const QString& hint) : QWidget{parent} {
 	QHBoxLayout* layout = new QHBoxLayout{this};
 	layout->setAlignment(Qt::AlignLeft);
 
-	checkbox = new QCheckBox{this};
+	button = new QCheckBox{this};
 	QLabel* label = new QLabel{this};
 	label->setText(text);
 
 	this->setLayout(layout);
-	layout->addWidget(checkbox);
+	layout->addWidget(button);
 	layout->addWidget(label);
 
 	layout->setSpacing(5);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	connect(checkbox, &QCheckBox::clicked, checkbox, [&](bool newState) {
+	if (hint.length())
+		setToolTip(hint);
+
+	connect(button, &QCheckBox::clicked, button, [&](bool newState) {
 		emit checkboxClicked(newState);
 	});
 }
 
-void CustomCheckbox::setCheckboxStatus(bool newStatus) {
-	checkbox->setChecked(newStatus);
+void CustomCheckBox::setCheckboxStatus(bool newStatus) {
+	button->setChecked(newStatus);
 }
 
-void CustomCheckbox::mousePressEvent(QMouseEvent* /*event*/) {
-	checkbox->animateClick();
+void CustomCheckBox::mousePressEvent(QMouseEvent* /*event*/) {
+	button->animateClick();
+}
+
+
+CustomRadioButton::CustomRadioButton(QWidget* parent, const QString& text, const QString& hint) : QWidget{parent} {
+	QHBoxLayout* layout = new QHBoxLayout{this};
+	layout->setAlignment(Qt::AlignLeft);
+
+	button = new QRadioButton{this};
+	QLabel* label = new QLabel{this};
+	label->setText(text);
+
+	this->setLayout(layout);
+	layout->addWidget(button);
+	layout->addWidget(label);
+
+	layout->setSpacing(5);
+	layout->setContentsMargins(0, 0, 0, 0);
+
+	if (hint.length())
+		setToolTip(hint);
+
+	connect(button, &QRadioButton::clicked, button, [&](bool newState) {
+		emit buttonClicked(newState);
+	});
+}
+
+void CustomRadioButton::setButtonStatus(bool newStatus) {
+	button->setChecked(newStatus);
+}
+
+void CustomRadioButton::mousePressEvent(QMouseEvent* /*event*/) {
+	button->animateClick();
 }
 
 

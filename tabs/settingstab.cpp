@@ -24,11 +24,6 @@ void SettingsTab::onAuthorized() {
 	layout->addWidget(textLabel);
 }
 
-void SettingsTab::onTabOpened() {
-//	if (!mParent->authorized() && button->isVisible())
-//		button->setFocus(Qt::TabFocusReason);
-}
-
 void SettingsTab::onDataReceived(const QJsonObject&) {
 
 }

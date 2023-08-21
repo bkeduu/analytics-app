@@ -33,7 +33,6 @@ public:
 
 public slots:
 	virtual void onAuthorized() final override;
-	virtual void onTabOpened() final override;
 	virtual void onDataReceived(const QJsonObject&) final override;
 
 private:
@@ -42,6 +41,6 @@ private:
 
 	QLayout* layout;
 	QVector<QMap<int, Consumer>> consumersGroups;
-	QVector<CustomCheckbox*> groupRelays;
+	QVector<CustomCheckBox*> groupRelays;
 	QVector<QFrame*> groupWidgets;
 };

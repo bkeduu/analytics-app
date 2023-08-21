@@ -8,10 +8,6 @@ void ForecastTab::onAuthorized() {
 
 }
 
-void ForecastTab::onTabOpened() {
-
-}
-
 void ForecastTab::onDataReceived(const QJsonObject&) {
 
 }

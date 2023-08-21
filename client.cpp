@@ -13,6 +13,7 @@ Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{"ICS
 	connect(mNetworker.data(), SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
 	connect(&mWindow, SIGNAL(relayClicked(int, bool)), this, SLOT(onRelayClicked(int, bool)));
+	connect(&mWindow, SIGNAL(modeChanged(int)), this, SLOT(onModeChange(int)));
 
 	mWindow.load(mSettings);
 	mWindow.show();
@@ -96,7 +97,7 @@ void Client::sendAuth(const QString& login, const QString& password, const QStri
 		requestFile.close();
 	}
 
-	sendData(request.arg(login, password));  // TODO hashing password
+	sendData(request.arg(int(Authorization)).arg(login).arg(password));  // TODO hashing password
 }
 
 void Client::onServerLookupFailed() {
@@ -120,7 +121,7 @@ void Client::onRelayClicked(int group, bool newState) {
 		requestFile.close();
 	}
 
-	sendData(request.arg(group).arg(newState));
+	sendData(request.arg(int(RelaySwitch)).arg(group).arg(newState));
 }
 
 void Client::onConnected() {
@@ -133,6 +134,20 @@ void Client::onDisconnected() {
 	emit disconnected();
 }
 
+void Client::onModeChange(int mode) {
+	static QString request;
+	if (request.isEmpty()) {
+		QFile requestFile{":/static/requests/mode_switch.json"};
+		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		if (!requestFile.isOpen())
+			throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+		request = requestFile.readAll();
+		requestFile.close();
+	}
+
+	sendData(request.arg(int(ModeSwitch)).arg(mode));
+}
+
 void Client::sendData(const QString& request) const  {
 	if (mServerConnected)
 		mNetworker->sendToHost(request);
@@ -142,7 +157,7 @@ Client::~Client() {
 	QFile requestFile{":/static/requests/shutdown.json"};
 	requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
 	if (requestFile.isOpen()) {
-		sendData(requestFile.readAll());
+		sendData(QString{requestFile.readAll()}.arg(int(Shutdown)));
 		requestFile.close();
 	}
 

@@ -79,33 +79,13 @@ QWidget* MainWindow::createMainContents() {
 	tabWidget->setTabIcon(tabWidget->indexOf(mSettingsTab.data()),
 						  QIcon{QString{":/static/images/page_"} + mSettingsTab->getName() + ".png"});
 
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
-		if (clickedTabIndex != -1 && tabWidget->indexOf(mStatusTab.data()) == clickedTabIndex)
-			mStatusTab->onTabOpened();
-	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
-		if (clickedTabIndex != -1 && tabWidget->indexOf(mForecastTab.data()) == clickedTabIndex)
-			mForecastTab->onTabOpened();
-	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
-		if (clickedTabIndex != -1 && tabWidget->indexOf(mGenerationTab.data()) == clickedTabIndex)
-			mGenerationTab->onTabOpened();
-	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
-		if (clickedTabIndex != -1 && tabWidget->indexOf(mConsumersTab.data()) == clickedTabIndex)
-			mConsumersTab->onTabOpened();
-	});
-	connect(tabWidget, &QTabWidget::currentChanged, tabWidget, [tabWidget, this](int clickedTabIndex) {
-		if (clickedTabIndex != -1 && tabWidget->indexOf(mSettingsTab.data()) == clickedTabIndex)
-			mSettingsTab->onTabOpened();
-	});
-
 	tabWidget->tabBar()->setIconSize(QSize(35, 35));
 	tabWidget->setCurrentWidget(mStatusTab.data());
 	tabWidget->setMinimumSize(this->centralWidget()->size());
 
-	this->tabWidget = tabWidget;
+	connect(mStatusTab.data(), SIGNAL(modeChanged(int)), this, SLOT(onModeChange(int)));
 
+	this->tabWidget = tabWidget;
 	return tabWidget;
 }
 
@@ -350,6 +330,10 @@ void MainWindow::onDisconnect() {
 	// TODO block the control
 
 	mb.exec();
+}
+
+void MainWindow::onModeChange(int mode) {
+	emit modeChanged(mode);
 }
 
 MainWindow::~MainWindow() {

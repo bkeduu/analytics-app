@@ -10,10 +10,6 @@ void GenerationTab::onAuthorized() {
 	createTabContents();
 }
 
-void GenerationTab::onTabOpened() {
-
-}
-
 void GenerationTab::onDataReceived(const QJsonObject&) {
 
 }
@@ -23,10 +19,10 @@ void GenerationTab::createTabContents() {
 	delete this->layout;
 	layout = new QGridLayout{this};
 	this->setLayout(layout);
-	CustomCheckbox* cb = new CustomCheckbox{this, tr("Diesel generator")};
+	CustomCheckBox* cb = new CustomCheckBox{this, tr("Diesel generator")};
 	layout->addWidget(cb);
 
-	connect(cb, &CustomCheckbox::checkboxClicked, cb, [=](bool newState) {
+	connect(cb, &CustomCheckBox::checkboxClicked, cb, [=](bool newState) {
 		mParent->onRelayClicked(3, newState);
 	});
 }

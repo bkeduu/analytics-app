@@ -1,7 +1,10 @@
 #include "statustab.h"
+#include "customwidgets.h"
+#include "client.h"
 
 #include <QJsonArray>
 #include <QGroupBox>
+#include <QButtonGroup>
 #include <QResizeEvent>
 
 StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
@@ -10,10 +13,6 @@ StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tab
 }
 
 void StatusTab::onAuthorized() {
-
-}
-
-void StatusTab::onTabOpened() {
 
 }
 
@@ -322,77 +321,28 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		QVBoxLayout* layout = new QVBoxLayout{widget};
 		widget->setLayout(layout);
 
-		QFrame* manualModeWidget = new QFrame{widget};
-		QHBoxLayout* manualModeWidgetLayout = new QHBoxLayout{manualModeWidget};
-		manualModeWidget->setLayout(manualModeWidgetLayout);
-		manualModeWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-		layout->addWidget(manualModeWidget, 20, Qt::AlignLeft);
+		CustomRadioButton* manualModeButton = new CustomRadioButton{widget, tr("Manual mode"), tr("Description of manual mode")};
+		CustomRadioButton* maximumReliabilityModeButton = new CustomRadioButton{widget, tr("Maximum reliability mode"), tr("Description of maximum reliability mode")};
+		CustomRadioButton* maximumPowerModeButton = new CustomRadioButton{widget, tr("Maximum power mode"), tr("Description of maximum power mode")};
+		CustomRadioButton* maximumEcologyModeButton = new CustomRadioButton{widget, tr("Maximum ecology mode"), tr("Description of maximum ecology mode")};
+		CustomRadioButton* maximumEconomyModeButton = new CustomRadioButton{widget, tr("Maximum economy mode"), tr("Description of maximum economy mode")};
 
-		QRadioButton* manualModeButton = new QRadioButton{manualModeWidget};
-		manualModeButton->setMinimumSize(20, 20);
-		manualModeWidgetLayout->addWidget(manualModeButton, 20, Qt::AlignLeft);
+		layout->addWidget(manualModeButton);
+		layout->addWidget(maximumReliabilityModeButton);
+		layout->addWidget(maximumPowerModeButton);
+		layout->addWidget(maximumEcologyModeButton);
+		layout->addWidget(maximumEconomyModeButton);
 
-		QFrame* manualModeDescriptionWidget = new QFrame{manualModeWidget};
-		QVBoxLayout* manualModeDescriptionLayout = new QVBoxLayout{manualModeDescriptionWidget};
-		manualModeDescriptionWidget->setLayout(manualModeDescriptionLayout);
-		manualModeDescriptionWidget->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-		manualModeWidgetLayout->addWidget(manualModeDescriptionWidget, 20, Qt::AlignLeft);
+		QButtonGroup* buttonGroup = new QButtonGroup{widget};
+		buttonGroup->setExclusive(true);
 
-		QLabel* manualModeWidgetName = new QLabel{manualModeDescriptionWidget};
-		manualModeWidgetName->setText(tr("Manual mode"));
-		manualModeDescriptionLayout->addWidget(manualModeWidgetName, Qt::AlignLeft);
-		manualModeWidgetName->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
+		buttonGroup->addButton(manualModeButton->getButton(), int(Manual));
+		buttonGroup->addButton(maximumReliabilityModeButton->getButton(), int(MaximumReliability));
+		buttonGroup->addButton(maximumPowerModeButton->getButton(), int(MaximumPower));
+		buttonGroup->addButton(maximumEcologyModeButton->getButton(), int(MaximumEcology));
+		buttonGroup->addButton(maximumEconomyModeButton->getButton(), int(MaximumEconomy));
 
-		QFrame* manualModeDescriptionDelimeter = new QFrame{manualModeDescriptionWidget};
-		manualModeDescriptionDelimeter->setFrameShape(QFrame::HLine);
-		manualModeDescriptionLayout->addWidget(manualModeDescriptionDelimeter, Qt::AlignLeft);
-
-		QLabel* manualModeWidgetDescription = new QLabel{manualModeDescriptionWidget};
-		manualModeWidgetDescription->setText(tr("Manual mode description"));
-		manualModeDescriptionLayout->addWidget(manualModeWidgetDescription, Qt::AlignLeft);
-		manualModeWidgetDescription->setSizePolicy(QSizePolicy{QSizePolicy::Maximum, QSizePolicy::Maximum});
-
-		QFrame* autoModeWidget = new QFrame{widget};
-		QHBoxLayout* autoModeWidgetLayout = new QHBoxLayout{autoModeWidget};
-		autoModeWidget->setLayout(autoModeWidgetLayout);
-		layout->addWidget(autoModeWidget, 20, Qt::AlignLeft);
-
-		QRadioButton* autoModeButton = new QRadioButton{autoModeWidget};
-		autoModeButton->setMinimumSize(20, 20);
-		autoModeWidgetLayout->addWidget(autoModeButton, 20);
-
-		QFrame* autoModeDescriptionWidget = new QFrame{autoModeWidget};
-		QVBoxLayout* autoModeDescriptionLayout = new QVBoxLayout{autoModeDescriptionWidget};
-		autoModeDescriptionWidget->setLayout(autoModeDescriptionLayout);
-		autoModeWidgetLayout->addWidget(autoModeDescriptionWidget, 20, Qt::AlignLeft);
-
-		QLabel* autoModeWidgetName = new QLabel{autoModeDescriptionWidget};
-		autoModeWidgetName->setText(tr("Automatic mode"));
-		autoModeDescriptionLayout->addWidget(autoModeWidgetName, Qt::AlignLeft);
-
-		QFrame* autoModeDescriptionDelimeter = new QFrame{autoModeDescriptionWidget};
-		autoModeDescriptionDelimeter->setFrameShape(QFrame::HLine);
-		autoModeDescriptionLayout->addWidget(autoModeDescriptionDelimeter, Qt::AlignLeft);
-
-		QLabel* autoModeWidgetDescription = new QLabel{autoModeDescriptionWidget};
-		autoModeWidgetDescription->setText(tr("Automatic mode description"));
-		autoModeDescriptionLayout->addWidget(autoModeWidgetDescription, Qt::AlignLeft);
-
-		// clicked signal prevents infinite recursion against toggled signal
-		// TODO rewrite to qbuttongroup
-		connect(manualModeButton, &QRadioButton::clicked, manualModeButton, [autoModeButton, manualModeButton](bool state) {
-			if (state)
-				autoModeButton->setChecked(!state);
-			else
-				manualModeButton->setChecked(!state);
-		});
-
-		connect(autoModeButton, &QRadioButton::clicked, autoModeButton, [autoModeButton, manualModeButton](bool state) {
-			if (state)
-				manualModeButton->setChecked(!state);
-			else
-				autoModeButton->setChecked(!state);
-		});
+		connect(buttonGroup, SIGNAL(idClicked(int)), this, SLOT(onButtonModeChange(int)));
 
 		break;
 	}
@@ -442,4 +392,8 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 	}
 
 	return widget;
+}
+
+void StatusTab::onButtonModeChange(int mode) {
+	emit modeChanged(mode);
 }
