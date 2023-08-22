@@ -7,7 +7,7 @@
 #include <QButtonGroup>
 #include <QResizeEvent>
 
-StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName} {
+StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, mLayout{nullptr} {
 	createTabContents();
 }
 
@@ -342,16 +342,16 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(maximumEcologyModeButton);
 		layout->addWidget(maximumEconomyModeButton);
 
-		QButtonGroup* buttonGroup = new QButtonGroup{widget};
-		buttonGroup->setExclusive(true);
+		mButtonGroup = new QButtonGroup{widget};
+		mButtonGroup->setExclusive(true);
 
-		buttonGroup->addButton(manualModeButton->getButton(), int(Manual));
-		buttonGroup->addButton(maximumReliabilityModeButton->getButton(), int(MaximumReliability));
-		buttonGroup->addButton(maximumPowerModeButton->getButton(), int(MaximumPower));
-		buttonGroup->addButton(maximumEcologyModeButton->getButton(), int(MaximumEcology));
-		buttonGroup->addButton(maximumEconomyModeButton->getButton(), int(MaximumEconomy));
+		mButtonGroup->addButton(manualModeButton->getButton(), int(Manual));
+		mButtonGroup->addButton(maximumReliabilityModeButton->getButton(), int(MaximumReliability));
+		mButtonGroup->addButton(maximumPowerModeButton->getButton(), int(MaximumPower));
+		mButtonGroup->addButton(maximumEcologyModeButton->getButton(), int(MaximumEcology));
+		mButtonGroup->addButton(maximumEconomyModeButton->getButton(), int(MaximumEconomy));
 
-		connect(buttonGroup, SIGNAL(idClicked(int)), this, SLOT(onButtonModeChange(int)));
+		connect(mButtonGroup, SIGNAL(idClicked(int)), this, SLOT(onButtonModeChange(int)));
 
 		break;
 	}
