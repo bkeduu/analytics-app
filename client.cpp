@@ -1,6 +1,6 @@
 #include "client.h"
 
-Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{"ICS4", "Analytics app"} {
+Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
 
 	connect(&mWindow, SIGNAL(authorize(QString,QString,QString,int)), this, SLOT(sendAuth(QString,QString,QString,int)));
 
