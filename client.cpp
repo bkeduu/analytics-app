@@ -28,6 +28,12 @@ void Client::onDataReceived(const QJsonObject& data) {
 	}
 	case AuthorizationError: {  // json with authorization status (failed/success)
 		mAuthorized = false;
+
+		if (mServerConnected) {
+			mNetworker.clear();
+			mNetworker = QSharedPointer<Networker>::create(this);
+		}
+
 		emit authorized(false);
 		break;
 	}
@@ -83,9 +89,11 @@ void Client::onDataReceived(const QJsonObject& data) {
 }
 
 void Client::sendAuth(const QString& login, const QString& password, const QString& serverAddress, int serverPort) {
-	mNetworker->setHostAddress(serverAddress);
-	mNetworker->setHostPort(serverPort);
-	mNetworker->connectToHost();
+	if (!mServerConnected) {
+		mNetworker->setHostAddress(serverAddress);
+		mNetworker->setHostPort(serverPort);
+		mNetworker->connectToHost();
+	}
 
 	static QString request;
 	if (request.isEmpty()) {
