@@ -22,6 +22,9 @@ public:
 	StatusTab(const QString& tabName, QWidget* parent = nullptr);
 	virtual ~StatusTab() final override {};
 
+	virtual void lock() final override;
+	virtual void unlock() final override;
+
 signals:
 	void modeChanged(int);
 
@@ -36,15 +39,14 @@ private:
 	QLabel* createLabel(QWidget* parent, const QString& text) const;
 	QLabel* createLabel(QWidget* parent, const QString& imagePath, const QSize& sz) const;
 	QProgressBar* createProgressBar(QWidget* parent, const QSize& minSize) const;
+	QWidget* createWidget(TabWidget widgetType, QWidget* parent);
 
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& = tr("You need to authorize before starting")) final override;
 
-	QWidget* generators,* consumers,* modes,* battery;
+	QWidget* mGenerators,* mConsumers,* mModes,* mBattery;
+	QLayout* mLayout;
+	QButtonGroup* mButtonGroup;
 
-	QLayout* layout;
-
-	QWidget* createWidget(TabWidget widgetType, QWidget* parent);
-
-	QHash<QString, QWidget*> widgetLocator;
+	QHash<QString, QWidget*> mWidgetLocator;
 };

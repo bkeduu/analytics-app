@@ -31,6 +31,9 @@ public:
 	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);
 	virtual ~ConsumersTab() final override { };
 
+	virtual void lock() final override;
+	virtual void unlock() final override;
+
 public slots:
 	virtual void onAuthorized() final override;
 	virtual void onDataReceived(const QJsonObject&) final override;

@@ -61,6 +61,9 @@ private:
 	QWidget* createMainContents();
 	QWidget* createStartScreen();
 
+	void lockTabs();
+	void unlockTabs();
+
     Ui::MainWindow *ui;
 	QWidget* mMainContent;
 	QWidget* mStartScreen;

@@ -16,6 +16,9 @@ public:
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
+	virtual void lock() final override;
+	virtual void unlock() final override;
+
 	void load(QSettings& settings) final override;
 	void save(QSettings& settings) final override;
 

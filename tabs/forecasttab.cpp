@@ -4,6 +4,14 @@ ForecastTab::ForecastTab(const QString& tabName, QWidget* parent) : ITab{parent,
 	removeTabContents(tr("In development"));
 }
 
+void ForecastTab::lock() {
+
+}
+
+void ForecastTab::unlock() {
+
+}
+
 void ForecastTab::onAuthorized() {
 
 }

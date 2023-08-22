@@ -297,8 +297,14 @@ void MainWindow::onConnect() {
 
 }
 
-void MainWindow::onESPStatusChange(const QJsonObject& dataObject) {
+void MainWindow::onESPStatusChange(const QJsonObject& data) {
+	if (!data.contains("status"))
+		throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
 
+	if (data.value("status").toInt())
+		unlockTabs();
+	else
+		lockTabs();
 }
 
 void MainWindow::onRelayClicked(int group, bool newState) {
@@ -322,6 +328,7 @@ void MainWindow::onConsumersData(const QJsonObject& data) {
 }
 
 void MainWindow::onDisconnect() {
+	lockTabs();
 	QMessageBox mb{QMessageBox::Critical, tr("Connection with server lost"),
 				   tr("The connection to server lost. Control will be blocked. Check the connection and restart the app."),
 				   QMessageBox::Ok, this};
@@ -334,6 +341,22 @@ void MainWindow::onDisconnect() {
 
 void MainWindow::onModeChange(int mode) {
 	emit modeChanged(mode);
+}
+
+void MainWindow::lockTabs() {
+	mStatusTab->lock();
+	mForecastTab->lock();
+	mGenerationTab->lock();
+	mConsumersTab->lock();
+	mSettingsTab->lock();
+}
+
+void MainWindow::unlockTabs() {
+	mStatusTab->unlock();
+	mForecastTab->unlock();
+	mGenerationTab->unlock();
+	mConsumersTab->unlock();
+	mSettingsTab->unlock();
 }
 
 MainWindow::~MainWindow() {

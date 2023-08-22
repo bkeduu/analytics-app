@@ -20,6 +20,9 @@ public:
 	virtual void load(QSettings&) { };
 	virtual void save(QSettings&) { };
 
+	virtual void lock() = 0;
+	virtual void unlock() = 0;
+
 	virtual ~ITab() = default;
 
 public slots:

@@ -13,6 +13,8 @@ class CustomCheckBox : public QWidget {
 public:
 	CustomCheckBox(QWidget *parent = nullptr, const QString& text = "", const QString& hint = "");
 	void setCheckboxStatus(bool newStatus);
+	void lock() { button->setEnabled(false); }
+	void unlock() { button->setEnabled(true); }
 
 protected:
 	void mousePressEvent(QMouseEvent* event);
@@ -32,6 +34,8 @@ public:
 	CustomRadioButton(QWidget *parent = nullptr, const QString& text = "", const QString& hint = "");
 	void setButtonStatus(bool newStatus);
 	QRadioButton* getButton() const { return button; }
+	void lock() { button->setEnabled(false); }
+	void unlock() { button->setEnabled(true); }
 
 protected:
 	void mousePressEvent(QMouseEvent* event);

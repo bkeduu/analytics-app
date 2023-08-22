@@ -1,6 +1,7 @@
 #pragma once
 
 #include "itab.h"
+#include "etc/customwidgets.h"
 
 #include <QWidget>
 #include <QGridLayout>
@@ -16,6 +17,9 @@ public:
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
+	virtual void lock() final override;
+	virtual void unlock() final override;
+
 	virtual ~GenerationTab() final override {};
 
 public slots:
@@ -24,5 +28,6 @@ public slots:
 
 private:
 	QLayout* layout;
+	CustomCheckBox* mCheckBox;
 };
 

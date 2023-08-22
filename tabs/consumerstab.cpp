@@ -6,6 +6,16 @@ ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{paren
 	removeTabContents(tr("Waiting for consumers data from server"));
 }
 
+void ConsumersTab::lock() {
+	foreach (CustomCheckBox* cb, groupRelays)
+		cb->lock();
+}
+
+void ConsumersTab::unlock() {
+	foreach (CustomCheckBox* cb, groupRelays)
+		cb->unlock();
+}
+
 void ConsumersTab::onAuthorized() {
 	removeTabContents(tr("Waiting for consumers data from server"));
 }

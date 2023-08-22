@@ -1,9 +1,16 @@
 #include "generationtab.h"
-#include "etc/customwidgets.h"
 #include "mainwindow.h"
 
 GenerationTab::GenerationTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
 	createTabContents();
+}
+
+void GenerationTab::lock() {
+	mCheckBox->lock();
+}
+
+void GenerationTab::unlock() {
+	mCheckBox->unlock();
 }
 
 void GenerationTab::onAuthorized() {
@@ -19,10 +26,10 @@ void GenerationTab::createTabContents() {
 	delete this->layout;
 	layout = new QGridLayout{this};
 	this->setLayout(layout);
-	CustomCheckBox* cb = new CustomCheckBox{this, tr("Diesel generator")};
-	layout->addWidget(cb);
+	mCheckBox = new CustomCheckBox{this, tr("Diesel generator")};
+	layout->addWidget(mCheckBox);
 
-	connect(cb, &CustomCheckBox::checkboxClicked, cb, [=](bool newState) {
+	connect(mCheckBox, &CustomCheckBox::checkboxClicked, mCheckBox, [=](bool newState) {
 		mParent->onRelayClicked(3, newState);
 	});
 }

@@ -8,6 +8,14 @@ SettingsTab::SettingsTab(const QString& tabName, QWidget* parent) : ITab{parent,
 	removeTabContents(tr("In development"));
 }
 
+void SettingsTab::lock() {
+
+}
+
+void SettingsTab::unlock() {
+
+}
+
 void SettingsTab::onAuthorized() {
 	clearTab();
 	delete this->layout;
