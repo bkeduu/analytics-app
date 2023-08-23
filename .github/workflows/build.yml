@@ -29,5 +29,5 @@ jobs:
           DEPLOY_HOST: ${{ secrets.deploy_server_host_name }}
           DEPLOY_PATH: ${{ secrets.deploy_server_path }}
         run: |
-            sudo apt install rsync sshpass
+            sudo apt install sshpass
             sshpass -e scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 49170 build/analytics-app root@$DEPLOY_HOST:$DEPLOY_PATH
