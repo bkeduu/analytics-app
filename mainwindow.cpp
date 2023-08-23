@@ -329,13 +329,11 @@ void MainWindow::onConsumersData(const QJsonObject& data) {
 
 void MainWindow::onDisconnect() {
 	lockTabs();
+
 	QMessageBox mb{QMessageBox::Critical, tr("Connection with server lost"),
 				   tr("The connection to server lost. Control will be blocked. Check the connection and restart the app."),
 				   QMessageBox::Ok, this};
 	mb.setWindowIcon(QIcon{":/static/images/error.png"});
-
-	// TODO block the control
-
 	mb.exec();
 }
 

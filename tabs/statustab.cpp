@@ -7,18 +7,20 @@
 #include <QButtonGroup>
 #include <QResizeEvent>
 
-StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, mLayout{nullptr} {
+StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, mLayout{nullptr}, mButtonGroup{nullptr} {
 	createTabContents();
 }
 
 void StatusTab::lock() {
-	for (int i = int(Manual); i < int(MaximumEconomy); ++i)
-		dynamic_cast<CustomRadioButton*>(mButtonGroup->button(i))->lock();
+	if (mButtonGroup)
+		for (int i = int(Manual); i < int(MaximumEconomy); ++i)
+			dynamic_cast<QRadioButton*>(mButtonGroup->button(i))->setEnabled(false);
 }
 
 void StatusTab::unlock() {
-	for (int i = int(Manual); i < int(MaximumEconomy); ++i)
-		dynamic_cast<CustomRadioButton*>(mButtonGroup->button(i))->unlock();
+	if (mButtonGroup)
+		for (int i = int(Manual); i < int(MaximumEconomy); ++i)
+			dynamic_cast<QRadioButton*>(mButtonGroup->button(i))->setEnabled(true);
 }
 
 void StatusTab::onAuthorized() {
