@@ -16,7 +16,7 @@ jobs:
       - name: Build
         run: |
           mkdir build && cd build
-          qmake .. && make -j 2
+          qmake .. && make -j
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
