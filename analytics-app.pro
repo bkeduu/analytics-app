@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,30 +10,34 @@ CONFIG += c++17
 
 SOURCES += \
     client.cpp \
+    etc/stackedbarwithlineswidget.cpp \
     etc/utils.cpp \
     main.cpp \
-	mainwindow.cpp \
-	tabs/consumerstab.cpp \
-	tabs/forecasttab.cpp \
-	tabs/generationtab.cpp \
-	tabs/itab.cpp \
-	tabs/settingstab.cpp \
-	tabs/statustab.cpp \
-	networking/connection.cpp \
-	etc/customwidgets.cpp
+    mainwindow.cpp \
+    tabs/consumerstab.cpp \
+    tabs/forecasttab.cpp \
+    tabs/generationtab.cpp \
+    tabs/itab.cpp \
+    tabs/settingstab.cpp \
+    tabs/statustab.cpp \
+    networking/connection.cpp \
+    etc/customwidgets.cpp \
+    etc/contentwidget.cpp
 
 HEADERS += \
-	client.h \
-	etc/utils.h \
-	mainwindow.h \
-	etc/customwidgets.h \
-	tabs/consumerstab.h \
-	tabs/forecasttab.h \
-	tabs/generationtab.h \
-	tabs/itab.h \
-	tabs/settingstab.h \
-	tabs/statustab.h \
-	networking/connection.h
+    client.h \
+    etc/stackedbarwithlineswidget.h \
+    etc/utils.h \
+    etc/contentwidget.h \
+    mainwindow.h \
+    etc/customwidgets.h \
+    tabs/consumerstab.h \
+    tabs/forecasttab.h \
+    tabs/generationtab.h \
+    tabs/itab.h \
+    tabs/settingstab.h \
+    tabs/statustab.h \
+    networking/connection.h
 
 
 FORMS += \
@@ -41,6 +45,7 @@ FORMS += \
 
 TRANSLATIONS += \
     analytics-app_ru_RU.ts
+
 CONFIG += lrelease
 CONFIG += embed_translations
 

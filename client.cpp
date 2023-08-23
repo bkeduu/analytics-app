@@ -82,6 +82,13 @@ void Client::onDataReceived(const QJsonObject& data) {
 		emit consumersData(data.value("data").toObject());
 		break;
 	}
+	case GraphicsData: {
+		if (!data.contains("data"))
+			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+
+		emit graphicsData(data.value("data").toObject());
+		break;
+	}
 	case SensorsData: {  // json with information about sensors, that will be displayed at main tab
 		if (!data.contains("data"))
 			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};

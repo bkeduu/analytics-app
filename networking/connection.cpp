@@ -1,4 +1,5 @@
 #include "networking/connection.h"
+#include "etc/utils.h"
 
 #include <QJsonArray>
 #include <QFile>
@@ -44,10 +45,15 @@ void Networker::sendToHost(const QString& data) {
 }
 
 void Networker::readFromSocket() {
-	QString line = socket->readLine();
-	QJsonObject inputObject = QJsonDocument::fromJson(line.toUtf8()).object();
+	if (socket->canReadLine()) {
+		QString line = socket->readLine();
+		QJsonDocument document = QJsonDocument::fromJson(line.toUtf8());
 
-	emit dataReceived(inputObject);
+		if (document.isNull())
+			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+
+		emit dataReceived(document.object());
+	}
 }
 
 Networker::~Networker() {

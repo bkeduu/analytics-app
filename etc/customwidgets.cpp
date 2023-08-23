@@ -114,6 +114,8 @@ void CustomLayout::addWidget(QWidget* widget, int row, int column, Qt::Alignment
 	widgets.push_back(widget);
 	QGridLayout::addWidget(widget, row, column, alignment);
 
+	widget->adjustSize();
+
 	updateWidgetsGeometry();
 }
 
@@ -122,7 +124,7 @@ void CustomLayout::updateWidgetsGeometry() {
 		QRect geometry = widget->geometry();
 		geometry.setX(0);
 		geometry.setY(0);
-		widget->setGeometry(geometry);
-		widget->move(0 - widget->x(), 0 - widget->y());
+
+		widget->move(0, 0);
 	}
 }

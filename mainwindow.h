@@ -50,6 +50,7 @@ public slots:
 	void onConsumersData(const QJsonObject& data);
 	void onSensorsData(const QJsonObject& data);
 	void onModeSwitch(int newMode);
+	void onGraphicsData(const QJsonObject& data);
 
 	void onServerLookupFail();
 	void onUnableToConnect();

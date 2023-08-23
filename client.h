@@ -48,6 +48,7 @@ signals:
 	void relaySwitched();
 	void consumersData(QJsonObject data);
 	void sensorsData(QJsonObject data);
+	void graphicsData(QJsonObject data);
 	void shutdown();
 
 public slots:
