@@ -56,7 +56,19 @@ void Client::onDataReceived(const QJsonObject& data) {
 		}
 		}
 
-		emit ESPConnectionChange(mESPConnected);
+		emit ESPConnectionChanged(mESPConnected);
+		break;
+	}
+	case ModeSwitch: {
+		if (!data.contains("data"))
+			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+
+		QJsonObject payload = data.value("data").toObject();
+
+		if (!payload.contains("mode"))
+			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+
+		emit modeSwitched(payload.value("mode").toInt());
 		break;
 	}
 	case RelaySwitch: {  // wrong data, this type can be only sent to server from client (if we have only 1 client)

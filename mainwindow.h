@@ -46,9 +46,10 @@ signals:
 
 public slots:
 	void onAuthorize(bool status);
-	void onESPStatusChange(const QJsonObject&);
-	void onConsumersData(const QJsonObject&);
-	void onSensorsData(const QJsonObject&);
+	void onESPStatusChange(const QJsonObject& data);
+	void onConsumersData(const QJsonObject& data);
+	void onSensorsData(const QJsonObject& data);
+	void onModeSwitch(int newMode);
 
 	void onServerLookupFail();
 	void onUnableToConnect();

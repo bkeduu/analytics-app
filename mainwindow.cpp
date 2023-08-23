@@ -45,6 +45,7 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 	connect(client, SIGNAL(authorized(bool)), this, SLOT(onAuthorize(bool)));
 	connect(client, SIGNAL(consumersData(QJsonObject)), this, SLOT(onConsumersData(QJsonObject)));
 	connect(client, SIGNAL(sensorsData(QJsonObject)), this, SLOT(onSensorsData(QJsonObject)));
+	connect(client, SIGNAL(modeSwitched(int)), this, SLOT(onModeSwitch(int)));
 
 	// TODO на главном экране марджины слева и справа не совпадают
 }
@@ -337,7 +338,11 @@ void MainWindow::onDisconnect() {
 	mb.exec();
 }
 
-void MainWindow::onModeChange(int mode) {
+void MainWindow::onModeSwitch(int newMode) {  // mode switch from server
+	mStatusTab->switchMode(newMode);
+}
+
+void MainWindow::onModeChange(int mode) {  // mode switch with button
 	emit modeChanged(mode);
 }
 

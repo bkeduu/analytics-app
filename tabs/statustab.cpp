@@ -344,6 +344,8 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		layout->addWidget(maximumEcologyModeButton);
 		layout->addWidget(maximumEconomyModeButton);
 
+		manualModeButton->getButton()->click();
+
 		mButtonGroup = new QButtonGroup{widget};
 		mButtonGroup->setExclusive(true);
 
@@ -403,6 +405,14 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 	}
 
 	return widget;
+}
+
+void StatusTab::switchMode(int newMode) {
+	QAbstractButton* button = mButtonGroup->button(newMode);
+
+	button->blockSignals(true);
+	button->click();
+	button->blockSignals(false);
 }
 
 void StatusTab::onButtonModeChange(int mode) {

@@ -25,6 +25,8 @@ public:
 	virtual void lock() final override;
 	virtual void unlock() final override;
 
+	void switchMode(int newMode);
+
 signals:
 	void modeChanged(int);
 

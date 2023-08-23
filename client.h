@@ -43,7 +43,8 @@ signals:
 	void disconnected();
 
 	void authorized(bool status);
-	void ESPConnectionChange(bool status);
+	void ESPConnectionChanged(bool status);
+	void modeSwitched(int newMode);
 	void relaySwitched();
 	void consumersData(QJsonObject data);
 	void sensorsData(QJsonObject data);
