@@ -16,10 +16,18 @@ jobs:
       - name: Build
         run: |
           mkdir build && cd build
-          qmake .. && make
+          qmake .. && make -j 2
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-artifact
           path: |
             build/analytics-app
+      - name: Publish to server
+        env:
+          SSHPASS: ${{ secrets.deploy_server_password }}
+          DEPLOY_HOST: ${{ secrets.deploy_server_host_name }}
+          DEPLOY_PATH: ${{ secrets.deploy_server_path }}
+        run: |
+            sudo apt install rsync sshpass
+            sshpass -e scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 49170 build/analytics-app root@$DEPLOY_HOST:$DEPLOY_PATH
