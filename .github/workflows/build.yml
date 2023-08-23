@@ -8,7 +8,7 @@ jobs:
       - name: Install Qt Libraries
         run: |
           sudo apt update
-          sudo apt install qtchooser *qt6*
+          sudo apt install libgl1-mesa-dev qtchooser *qt6*
           qtchooser -install qt6 $(which qmake6)
           sudo mv ~/.config/qtchooser/qt6.conf /usr/share/qtchooser/qt6.conf
           sudo mkdir -p /usr/lib/$(uname -p)-linux-gnu/qt-default/qtchooser
