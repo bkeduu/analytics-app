@@ -45,15 +45,13 @@ void Networker::sendToHost(const QString& data) {
 }
 
 void Networker::readFromSocket() {
-	if (socket->canReadLine()) {
-		QString line = socket->readLine();
-		QJsonDocument document = QJsonDocument::fromJson(line.toUtf8());
+	QString line = socket->readLine();
+	QJsonDocument document = QJsonDocument::fromJson(line.toUtf8());
 
-		if (document.isNull())
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+	if (document.isNull())
+		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit dataReceived(document.object());
-	}
+	emit dataReceived(document.object());
 }
 
 Networker::~Networker() {
