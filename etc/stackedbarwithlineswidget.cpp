@@ -11,6 +11,7 @@
 #include <QStackedBarSeries>
 #include <QBarSet>
 #include <QValueAxis>
+#include <QLabel>
 
 StackedBarWithLinesWidget::StackedBarWithLinesWidget(QWidget *parent, const QString& title,
 	const QString& xAxisTitle, const QString& yAxisTitle)
@@ -43,7 +44,7 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 		mChart->removeAxis(mYAxis);
 
 	double minimumValue = DBL_MAX;
-	double maximumValue = DBL_MIN;  // TODO расчёт максимума неправильный
+	double maximumValue = DBL_MIN;
 
 	auto it = plotsLabels.begin();
 
@@ -66,6 +67,7 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 
 	for (int i = 0; i < barsValues.size(); ++i) {
 		QBarSet* barData = new QBarSet{*it++};
+		barData->setBorderColor(QColor{0, 0, 0, 0});
 
 		for (int j = 0; j < barsValues[i].size(); ++j) {
 			if (barsValues[i][j] < minimumValue)
@@ -76,6 +78,36 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 		}
 
 		barSeries->append(barData);
+
+		connect(barSeries, &QStackedBarSeries::hovered, barData, [this] (bool hovered, int index, QBarSet* set) {
+			static QFrame* tooltip = nullptr;
+			static QLabel* textLabel = nullptr;
+
+			if (hovered) {  // cursor entered the bar area
+				if (!tooltip) {
+					tooltip = new QFrame{this};
+					tooltip->setFrameShape(QFrame::Box);
+					tooltip->setBaseSize(QSize{400, 200});
+					tooltip->setStyleSheet("background-color: #dcded3; border-radius: 2px;");
+
+					textLabel = new QLabel{this};
+
+					QHBoxLayout* layout = new QHBoxLayout{tooltip};
+					layout->addWidget(textLabel, 1, Qt::AlignCenter);
+					layout->setContentsMargins(0, 0, 0, 0);
+					tooltip->setLayout(layout);
+				}
+
+				textLabel->setText(QString{"%1 %2"}.arg(set->at(index)).arg(mYAxisTitle));
+				tooltip->move(mapFromGlobal(QCursor::pos()));
+				tooltip->show();
+			}
+			else {
+				if (tooltip) {
+					tooltip->hide();
+				}
+			}
+		});
 	}
 
 	maximumValue = *std::max_element(sums.begin(), sums.end());
