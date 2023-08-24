@@ -35,6 +35,7 @@ public:
 	virtual ~Client() final override;
 
 	MainWindow& getMainWindow() { return mWindow; }
+	bool authorized() const { return mAuthorized; }
 
 signals:
 	void serverLookupFailed();

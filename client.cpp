@@ -1,6 +1,6 @@
 #include "client.h"
 
-Client::Client(QObject *parent) : QObject{parent}, mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
+Client::Client(QObject *parent) : QObject{parent}, mAuthorized{false}, mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
 
 	connect(&mWindow, SIGNAL(authorize(QString,QString,QString,int)), this, SLOT(sendAuth(QString,QString,QString,int)));
 
@@ -38,37 +38,41 @@ void Client::onDataReceived(const QJsonObject& data) {
 		break;
 	}
 	case ESPStatus: {  // json with new esp status (connected/disconnected)
-		QJsonObject payload = data.value("data").toObject();
-		int status = payload.value("status").toInt(-1);
+		if (mAuthorized) {
+			QJsonObject payload = data.value("data").toObject();
+			int status = payload.value("status").toInt(-1);
 
-		switch (status) {
-		case 0: {
-			mESPConnected = false;
-			break;
-		}
-		case 1: {
-			mESPConnected = true;
-			break;
-		}
-		default: {
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
-			break;
-		}
-		}
+			switch (status) {
+			case 0: {
+				mESPConnected = false;
+				break;
+			}
+			case 1: {
+				mESPConnected = true;
+				break;
+			}
+			default: {
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+				break;
+			}
+			}
 
-		emit ESPConnectionChanged(mESPConnected);
+			emit ESPConnectionChanged(mESPConnected);
+		}
 		break;
 	}
 	case ModeSwitch: {
-		if (!data.contains("data"))
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		if (mAuthorized) {
+			if (!data.contains("data"))
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		QJsonObject payload = data.value("data").toObject();
+			QJsonObject payload = data.value("data").toObject();
 
-		if (!payload.contains("mode"))
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			if (!payload.contains("mode"))
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit modeSwitched(payload.value("mode").toInt());
+			emit modeSwitched(payload.value("mode").toInt());
+		}
 		break;
 	}
 	case RelaySwitch: {  // wrong data, this type can be only sent to server from client (if we have only 1 client)
@@ -76,28 +80,36 @@ void Client::onDataReceived(const QJsonObject& data) {
 		break;
 	}
 	case ConsumersData: {  // json with information about consumers
-		if (!data.contains("data"))
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		if (mAuthorized) {
+			if (!data.contains("data"))
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit consumersData(data.value("data").toObject());
+			emit consumersData(data.value("data").toObject());
+		}
 		break;
 	}
 	case GraphicsData: {
-		if (!data.contains("data"))
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		if (mAuthorized) {
+			if (!data.contains("data"))
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit graphicsData(data.value("data").toObject());
+			emit graphicsData(data.value("data").toObject());
+		}
 		break;
 	}
 	case SensorsData: {  // json with information about sensors, that will be displayed at main tab
-		if (!data.contains("data"))
-			throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		if (mAuthorized) {
+			if (!data.contains("data"))
+				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
 
-		emit sensorsData(data.value("data").toObject());
+			emit sensorsData(data.value("data").toObject());
+		}
 		break;
 	}
 	case Shutdown: {  // json when server dies
-		emit shutdown();
+		if (mAuthorized) {
+			emit shutdown();
+		}
 		break;
 	}
 	default: {  // wrong data type code

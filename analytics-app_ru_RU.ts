@@ -22,16 +22,48 @@
     </message>
 </context>
 <context>
+    <name>ContentWidget</name>
+    <message>
+        <location filename="etc/contentwidget.cpp" line="25"/>
+        <source>Error loading the example:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ForecastTab</name>
     <message>
-        <location filename="tabs/forecasttab.cpp" line="4"/>
         <source>In development</source>
-        <translation>В разработке</translation>
+        <translation type="vanished">В разработке</translation>
     </message>
     <message>
-        <location filename="tabs/forecasttab.h" line="14"/>
         <source>You need to authorize before starting</source>
-        <translation>Авторизуйтесь перед началом работы</translation>
+        <translation type="vanished">Авторизуйтесь перед началом работы</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="7"/>
+        <source>Waiting for forecast data from server</source>
+        <translation>Ожидание данных для графика от сервера</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="29"/>
+        <source>Solar</source>
+        <translation>Солнечные батареи</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="29"/>
+        <source>Wind</source>
+        <translation>Ветряки</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="29"/>
+        <source>Diesel</source>
+        <translation>Дизельная генерация</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="29"/>
+        <source>Consumers</source>
+        <translation>Потребление</translation>
     </message>
 </context>
 <context>
@@ -67,135 +99,140 @@
         <translation>Система предиктивной аналитики</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="59"/>
+        <location filename="mainwindow.cpp" line="61"/>
         <source>Status</source>
         <translation>Показатели</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="62"/>
+        <location filename="mainwindow.cpp" line="64"/>
         <source>Consumers</source>
         <translation>Потребление</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="61"/>
+        <location filename="mainwindow.cpp" line="63"/>
         <source>Generation</source>
         <translation>Генерация</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="60"/>
+        <location filename="mainwindow.cpp" line="62"/>
         <source>Forecast</source>
         <translation>Прогноз</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="65"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="116"/>
+        <location filename="mainwindow.cpp" line="118"/>
         <source>Log in to the system</source>
         <translation>Вход в систему</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="119"/>
+        <location filename="mainwindow.cpp" line="121"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="120"/>
+        <location filename="mainwindow.cpp" line="122"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="121"/>
+        <location filename="mainwindow.cpp" line="123"/>
         <source>Server address</source>
         <translation>Адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="122"/>
+        <location filename="mainwindow.cpp" line="124"/>
         <source>Server port</source>
         <translation>Порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="144"/>
+        <location filename="mainwindow.cpp" line="146"/>
         <source>Authorize</source>
         <translation>Вход</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="163"/>
+        <location filename="mainwindow.cpp" line="165"/>
         <source>Empty login</source>
         <translation>Пустой логин</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="164"/>
+        <location filename="mainwindow.cpp" line="166"/>
         <source>You need to fill all fields, but login field is empty.</source>
         <oldsource>You need to fill all fields, but login field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с логином пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="171"/>
+        <location filename="mainwindow.cpp" line="173"/>
         <source>Empty password</source>
         <translation>Пустой пароль</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="172"/>
+        <location filename="mainwindow.cpp" line="174"/>
         <source>You need to fill all fields, but password field is empty.</source>
         <oldsource>You need to fill all fields, but password field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с паролем пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="179"/>
+        <location filename="mainwindow.cpp" line="181"/>
         <source>Empty server address</source>
         <translation>Пустой адрес сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="180"/>
+        <location filename="mainwindow.cpp" line="182"/>
         <source>You need to fill all fields, but server address field is empty.</source>
         <oldsource>You need to fill all fields, but server address field is emtpty.</oldsource>
         <translation>Необходимо заполнить все поля формы, однако поле с адресом сервера пустое.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="190"/>
+        <location filename="mainwindow.cpp" line="192"/>
         <source>Incorrect server port</source>
         <translation>Некорректный порт сервера</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="191"/>
+        <location filename="mainwindow.cpp" line="193"/>
         <source>Server port field is empty or contains incorrect value.</source>
         <translation>Поле с портом сервера пустое, либо содержит некорректное значение.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="197"/>
+        <location filename="mainwindow.cpp" line="199"/>
         <source>Authorization...</source>
         <translation>Авторизация...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="284"/>
+        <location filename="mainwindow.cpp" line="288"/>
         <source>Authorization unsuccessfull</source>
         <translation>Ошибка авторизации</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="285"/>
+        <location filename="mainwindow.cpp" line="289"/>
         <source>Provided login or password is incorrect. Try again.</source>
         <translation>Введённый логин или пароль неверный. Попробуйте ещё раз.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="315"/>
+        <location filename="mainwindow.cpp" line="319"/>
         <source>Unable to lookup server</source>
         <translation>Невозможно подключиться к серверу</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="316"/>
+        <location filename="mainwindow.cpp" line="320"/>
         <source>Unable to find server with provided hostname. Enter another name and try again.</source>
         <translation>Не удалось найти сервер с заданным адресом. Введите другой адрес и попробуйте ещё раз.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="333"/>
+        <location filename="mainwindow.cpp" line="339"/>
+        <source>The connection to server lost. Try again.</source>
+        <translation>Соединение с сервером потеряно. Попробуйте ещё раз.</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="341"/>
         <source>Connection with server lost</source>
         <translation>Потеряно соединение с сервером</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="334"/>
+        <location filename="mainwindow.cpp" line="335"/>
         <source>The connection to server lost. Control will be blocked. Check the connection and restart the app.</source>
         <translation>Соединение с сервером потеряно. Управление системой будет заблокировано. Проверьте подключение к серверу и перезапустите приложение.</translation>
     </message>
@@ -427,12 +464,12 @@
         <translation>Описание режима максимальной экономичности</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="362"/>
+        <location filename="tabs/statustab.cpp" line="364"/>
         <source>Battery</source>
         <translation>Аккумулятор</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.cpp" line="385"/>
+        <location filename="tabs/statustab.cpp" line="387"/>
         <source>- V</source>
         <translation>- V</translation>
     </message>
@@ -489,13 +526,13 @@
     </message>
     <message>
         <location filename="tabs/statustab.cpp" line="144"/>
-        <location filename="tabs/statustab.cpp" line="394"/>
+        <location filename="tabs/statustab.cpp" line="396"/>
         <source>Charging...</source>
         <translatorcomment>Статус зарядки аккумулятора</translatorcomment>
         <translation>Заряжается...</translation>
     </message>
     <message>
-        <location filename="tabs/statustab.h" line="45"/>
+        <location filename="tabs/statustab.h" line="47"/>
         <source>You need to authorize before starting</source>
         <translation>Авторизуйтесь перед началом работы</translation>
     </message>
