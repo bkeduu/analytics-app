@@ -279,6 +279,8 @@ void MainWindow::onAuthorize(bool status) {
 		qApp->setStyleSheet(globalStylesheet.readAll());
 		globalStylesheet.close();
 
+		unlockTabs();
+
 		resizeEvent(nullptr);
 	}
 	else {
