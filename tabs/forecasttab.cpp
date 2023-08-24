@@ -98,3 +98,13 @@ void ForecastTab::removeTabContents(const QString& text) {
 		mLayout->addWidget(textLabel);
 	}
 }
+
+void ForecastTab::showEvent(QShowEvent*) {
+	if (mPlot)
+		mPlot->show();
+}
+
+void ForecastTab::hideEvent(QHideEvent*) {
+	if (mPlot)
+		mPlot->hide();
+}

@@ -17,6 +17,9 @@ public:
 	virtual void lock() final override;
 	virtual void unlock() final override;
 
+	virtual void showEvent(QShowEvent*) final override;
+	virtual void hideEvent(QHideEvent*) final override;
+
 	virtual ~ForecastTab() final override {};
 
 public slots:
