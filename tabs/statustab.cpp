@@ -112,24 +112,43 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 }
 
 void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
+	if (!dataObject.contains("solar") || !dataObject.contains("wind") || !dataObject.contains("gen"))
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	QJsonArray solarArray = dataObject.value("solar").toArray();
+	if (solarArray.isEmpty() || solarArray.size() < 4)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
 	dynamic_cast<QLabel*>(mWidgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
 	dynamic_cast<QLabel*>(mWidgetLocator["solar-current-label"])->setText(tr("A: %1").arg(solarArray[1].toDouble()));
 	dynamic_cast<QLabel*>(mWidgetLocator["solar-power-label"])->setText(tr("W: %1").arg(solarArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(mWidgetLocator["solar-progressbar"])->setValue(solarArray[3].toInt());
 
 	QJsonArray windArray = dataObject.value("wind").toArray();
+	if (windArray.isEmpty() || windArray.size() < 4)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
 	dynamic_cast<QLabel*>(mWidgetLocator["wind-voltage-label"])->setText(tr("V: %1").arg(windArray[0].toDouble()));
 	dynamic_cast<QLabel*>(mWidgetLocator["wind-current-label"])->setText(tr("A: %1").arg(windArray[1].toDouble()));
 	dynamic_cast<QLabel*>(mWidgetLocator["wind-power-label"])->setText(tr("W: %1").arg(windArray[2].toDouble()));
 	dynamic_cast<QProgressBar*>(mWidgetLocator["wind-progressbar"])->setValue(windArray[3].toInt());
 
 	QJsonArray dieselArray = dataObject.value("gen").toArray();
-	dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(mWidgetLocator["diesel-progressbar"])->setValue(dieselArray[3].toInt());
+	if (dieselArray.isEmpty() || dieselArray.size() < 4)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	if (dieselArray[4].toBool()) {
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["diesel-progressbar"])->setValue(dieselArray[3].toInt());
+	}
+	else {
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: -"));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["diesel-progressbar"])->setValue(0);
+	}
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
 	dynamic_cast<QLabel*>(mWidgetLocator["battery-voltage-label"])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
@@ -150,22 +169,55 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	dynamic_cast<QProgressBar*>(mWidgetLocator["battery-progressbar"])->setValue(batteryArray[1].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
-	dynamic_cast<QLabel*>(mWidgetLocator["first-voltage-label"])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["first-current-label"])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["first-power-label"])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(mWidgetLocator["first-progressbar"])->setValue(firstArray[3].toInt());
+	if (firstArray.isEmpty() || firstArray.size() < 5)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	if (firstArray[4].toBool()) {
+		dynamic_cast<QLabel*>(mWidgetLocator["first-voltage-label"])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["first-current-label"])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["first-power-label"])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["first-progressbar"])->setValue(firstArray[3].toInt());
+	}
+	else {
+		dynamic_cast<QLabel*>(mWidgetLocator["first-voltage-label"])->setText(tr("V: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["first-current-label"])->setText(tr("A: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["first-power-label"])->setText(tr("W: -"));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["first-progressbar"])->setValue(0);
+	}
 
 	QJsonArray secondArray = dataObject.value("2").toArray();
-	dynamic_cast<QLabel*>(mWidgetLocator["second-voltage-label"])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["second-current-label"])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["second-power-label"])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(mWidgetLocator["second-progressbar"])->setValue(secondArray[3].toInt());
+	if (secondArray.isEmpty() || secondArray.size() < 5)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	if (secondArray[4].toBool()) {
+		dynamic_cast<QLabel*>(mWidgetLocator["second-voltage-label"])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["second-current-label"])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["second-power-label"])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["second-progressbar"])->setValue(secondArray[3].toInt());
+	}
+	else {
+		dynamic_cast<QLabel*>(mWidgetLocator["second-voltage-label"])->setText(tr("V: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["second-current-label"])->setText(tr("A: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["second-power-label"])->setText(tr("W: -"));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["second-progressbar"])->setValue(0);
+	}
 
 	QJsonArray thirdArray = dataObject.value("3").toArray();
-	dynamic_cast<QLabel*>(mWidgetLocator["third-voltage-label"])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["third-current-label"])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["third-power-label"])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
-	dynamic_cast<QProgressBar*>(mWidgetLocator["third-progressbar"])->setValue(thirdArray[3].toInt());
+	if (thirdArray.isEmpty() || thirdArray.size() < 5)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	if (secondArray[4].toBool()) {
+		dynamic_cast<QLabel*>(mWidgetLocator["third-voltage-label"])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["third-current-label"])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["third-power-label"])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["third-progressbar"])->setValue(thirdArray[3].toInt());
+	}
+	else {
+		dynamic_cast<QLabel*>(mWidgetLocator["third-voltage-label"])->setText(tr("V: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["third-current-label"])->setText(tr("A: -"));
+		dynamic_cast<QLabel*>(mWidgetLocator["third-power-label"])->setText(tr("W: -"));
+		dynamic_cast<QProgressBar*>(mWidgetLocator["third-progressbar"])->setValue(0);
+	}
 }
 
 QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
