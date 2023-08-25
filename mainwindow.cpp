@@ -352,15 +352,19 @@ void MainWindow::onModeSwitch(int newMode) {  // mode switch from server
 
 	if (ModeType(newMode) == ModeType::Manual)
 		unlockTabs();
-	else
+	else {
 		lockTabs();
+		mStatusTab->unlock();
+	}
 }
 
 void MainWindow::onModeChange(int mode) {  // mode switch with button
 	if (ModeType(mode) == ModeType::Manual)
 		unlockTabs();
-	else
+	else {
 		lockTabs();
+		mStatusTab->unlock();
+	}
 
 	emit modeChanged(mode);
 }
