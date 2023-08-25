@@ -49,7 +49,7 @@ void Networker::readFromSocket() {
 	QJsonDocument document = QJsonDocument::fromJson(line.toUtf8());
 
 	if (document.isNull())
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	emit dataReceived(document.object());
 }

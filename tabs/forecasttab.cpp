@@ -20,7 +20,7 @@ void ForecastTab::onForecastDataReceived(const QJsonObject& data) {
 		createTabContents();
 
 	if (!data.contains("forecast_dates") || !data.contains("forecast") || !data.contains("forecast_dates"))
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	static const QStringList plotLabels{tr("Solar"), tr("Wind"), tr("Diesel"), tr("Consumers")};
 
@@ -33,7 +33,7 @@ void ForecastTab::onForecastDataReceived(const QJsonObject& data) {
 	QJsonObject forecastData = data.value("forecast").toObject();
 
 	if (!forecastData.contains("solar") || !forecastData.contains("wind") || !forecastData.contains("diesel"))
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	QVector<QVector<double>> generatorValues(3, {});
 
@@ -42,7 +42,7 @@ void ForecastTab::onForecastDataReceived(const QJsonObject& data) {
 	QJsonArray dieselData = forecastData.value("diesel").toArray();
 
 	if (solarData.size() != labels.size() || windData.size() != labels.size() || dieselData.size() != labels.size())
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	for (int i = 0; i < solarData.size(); ++i)
 		generatorValues[0].push_back(solarData[i].toDouble());
@@ -56,7 +56,7 @@ void ForecastTab::onForecastDataReceived(const QJsonObject& data) {
 	QJsonArray consumersData = forecastData.value("consumers").toArray();
 
 	if (consumersData.size() != labels.size())
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	QVector<QVector<double>> consumersValues(1, {});
 

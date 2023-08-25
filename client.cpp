@@ -52,7 +52,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 				break;
 			}
 			default: {
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 				break;
 			}
 			}
@@ -64,25 +64,25 @@ void Client::onDataReceived(const QJsonObject& data) {
 	case ModeSwitch: {
 		if (mAuthorized) {
 			if (!data.contains("data"))
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 			QJsonObject payload = data.value("data").toObject();
 
 			if (!payload.contains("mode"))
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 			emit modeSwitched(payload.value("mode").toInt());
 		}
 		break;
 	}
 	case RelaySwitch: {  // wrong data, this type can be only sent to server from client (if we have only 1 client)
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 		break;
 	}
 	case ConsumersData: {  // json with information about consumers
 		if (mAuthorized) {
 			if (!data.contains("data"))
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 			emit consumersData(data.value("data").toObject());
 		}
@@ -91,7 +91,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 	case GraphicsData: {
 		if (mAuthorized) {
 			if (!data.contains("data"))
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 			emit graphicsData(data.value("data").toObject());
 		}
@@ -100,7 +100,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 	case SensorsData: {  // json with information about sensors, that will be displayed at main tab
 		if (mAuthorized) {
 			if (!data.contains("data"))
-				throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 			emit sensorsData(data.value("data").toObject());
 		}
@@ -113,7 +113,7 @@ void Client::onDataReceived(const QJsonObject& data) {
 		break;
 	}
 	default: {  // wrong data type code
-		throw InternalErrorException{QString{"Data structure with wrong value received at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 		break;
 	}
 	}
@@ -133,7 +133,7 @@ void Client::sendAuth(const QString& login, const QString& password, const QStri
 		QFile requestFile{":/static/requests/authorization.json"};
 		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
 		if (!requestFile.isOpen())
-			throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
 	}
@@ -157,7 +157,7 @@ void Client::onRelayClicked(int group, bool newState) {
 		QFile requestFile{":/static/requests/relay.json"};
 		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
 		if (!requestFile.isOpen())
-			throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
 	}
@@ -181,7 +181,7 @@ void Client::onModeChange(int mode) {
 		QFile requestFile{":/static/requests/mode_switch.json"};
 		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
 		if (!requestFile.isOpen())
-			throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+			throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
 	}

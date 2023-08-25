@@ -2,6 +2,28 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
+    <name>Client</name>
+    <message>
+        <location filename="client.cpp" line="55"/>
+        <location filename="client.cpp" line="67"/>
+        <location filename="client.cpp" line="72"/>
+        <location filename="client.cpp" line="79"/>
+        <location filename="client.cpp" line="85"/>
+        <location filename="client.cpp" line="94"/>
+        <location filename="client.cpp" line="103"/>
+        <location filename="client.cpp" line="116"/>
+        <source>Data structure with wrong value received at %1. The app will be closed.</source>
+        <translation>Неверная структура данных получена от сервера. Приложение будет закрыто. %1.</translation>
+    </message>
+    <message>
+        <location filename="client.cpp" line="136"/>
+        <location filename="client.cpp" line="160"/>
+        <location filename="client.cpp" line="184"/>
+        <source>Internal error at %1. The app will be closed.</source>
+        <translation>Внутренняя ошибка в %1. Приложение будет закрыто.</translation>
+    </message>
+</context>
+<context>
     <name>ConsumersTab</name>
     <message>
         <location filename="tabs/consumerstab.cpp" line="6"/>
@@ -52,6 +74,14 @@
         <location filename="tabs/forecasttab.cpp" line="7"/>
         <source>Waiting for forecast data from server</source>
         <translation>Ожидание данных для графика от сервера</translation>
+    </message>
+    <message>
+        <location filename="tabs/forecasttab.cpp" line="23"/>
+        <location filename="tabs/forecasttab.cpp" line="36"/>
+        <location filename="tabs/forecasttab.cpp" line="45"/>
+        <location filename="tabs/forecasttab.cpp" line="59"/>
+        <source>Data structure with wrong value received at %1. The app will be closed.</source>
+        <translation>Неверная структура данных получена от сервера в %1. Приложение будет закрыто.</translation>
     </message>
     <message>
         <location filename="tabs/forecasttab.cpp" line="25"/>
@@ -225,6 +255,11 @@
         <translation>Введённый логин или пароль неверный. Попробуйте ещё раз.</translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="310"/>
+        <source>Internal error at %1. The app will be closed.</source>
+        <translation>Внутренняя ошибка в %1. Приложение будет закрыто.</translation>
+    </message>
+    <message>
         <location filename="mainwindow.cpp" line="323"/>
         <source>Unable to lookup server</source>
         <translation>Невозможно подключиться к серверу</translation>
@@ -264,6 +299,14 @@
     <message>
         <source>Authorizing...</source>
         <translation type="vanished">Авторизация...</translation>
+    </message>
+</context>
+<context>
+    <name>Networker</name>
+    <message>
+        <location filename="networking/connection.cpp" line="52"/>
+        <source>Data structure with wrong value received at %1. The app will be closed.</source>
+        <translation>Неверная структура данных получена от сервера. Приложение будет закрыто. %1.</translation>
     </message>
 </context>
 <context>
@@ -484,6 +527,11 @@
         <location filename="tabs/statustab.cpp" line="383"/>
         <source>- V</source>
         <translation>- V</translation>
+    </message>
+    <message>
+        <location filename="tabs/statustab.cpp" line="399"/>
+        <source>Data structure with wrong value received at %1. The app will be closed.</source>
+        <translation>Неверная структура данных получена от сервера. Приложение будет закрыто. %1.</translation>
     </message>
     <message>
         <source>%1 V</source>

@@ -396,7 +396,7 @@ QWidget* StatusTab::createWidget(TabWidget widgetType, QWidget* parent) {
 		break;
 	}
 	default:
-		throw InternalErrorException{QString{"Bad internal argument received. The app will be closed."} + FLF};
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 		break;
 	}
 

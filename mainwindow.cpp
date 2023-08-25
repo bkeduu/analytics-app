@@ -307,7 +307,7 @@ void MainWindow::onConnect() {
 
 void MainWindow::onESPStatusChange(const QJsonObject& data) {
 	if (!data.contains("status"))
-		throw InternalErrorException{QString{"Internal error at %1. The app will be closed."}.arg(FLF)};
+		throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 
 	if (data.value("status").toInt())
 		unlockTabs();
