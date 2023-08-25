@@ -33,10 +33,6 @@ signals:
 	void authorizationClicked(const QString& serverAddress, int serverPort,
 								const QString& login, const QString& password);
 
-public slots:
-	virtual void onAuthorized() final override;
-	virtual void onDataReceived(const QJsonObject&) final override;
-
 private:
 	QLayout* layout;
 

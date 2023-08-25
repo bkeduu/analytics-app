@@ -29,10 +29,10 @@ class MainWindow final : public QMainWindow {
     Q_OBJECT
 
 public:
-	MainWindow(Client* client, QWidget *parent = nullptr);  // legacy
+	MainWindow(Client* client, QWidget *parent = nullptr);
 	virtual ~MainWindow() final override;
 
-	void onRelayClicked(int group, bool newState);  // legacy
+	void onRelayClicked(int group, bool newState);
 
 	virtual void resizeEvent(QResizeEvent* event) final override;
 

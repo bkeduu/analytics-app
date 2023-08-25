@@ -16,26 +16,6 @@ void SettingsTab::unlock() {
 
 }
 
-void SettingsTab::onAuthorized() {
-	clearTab();
-	delete this->layout;
-	layout = new QGridLayout{this};
-	this->setLayout(layout);
-	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-	QLabel* textLabel = new QLabel{this};
-	textLabel->setProperty("class", "tab-standalone-text");
-	textLabel->setText(tr("You are successfully authorized"));
-	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	textLabel->setAlignment(Qt::AlignCenter);
-
-	layout->addWidget(textLabel);
-}
-
-void SettingsTab::onDataReceived(const QJsonObject&) {
-
-}
-
 void SettingsTab::createTabContents() {
 	clearTab();
 	QGridLayout* gridLayout = new QGridLayout{this};

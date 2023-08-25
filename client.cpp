@@ -123,6 +123,8 @@ void Client::sendAuth(const QString& login, const QString& password, const QStri
 	if (!mServerConnected) {
 		mNetworker->setHostAddress(serverAddress);
 		mNetworker->setHostPort(serverPort);
+
+		emit connecting();
 		mNetworker->connectToHost();
 	}
 

@@ -38,6 +38,7 @@ public:
 	bool authorized() const { return mAuthorized; }
 
 signals:
+	void connecting();
 	void serverLookupFailed();
 	void connected();
 	void unableToConnect();

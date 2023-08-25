@@ -1,7 +1,7 @@
 #include "generationtab.h"
 #include "mainwindow.h"
 
-GenerationTab::GenerationTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, layout{nullptr} {
+GenerationTab::GenerationTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, mLayout{nullptr} {
 	createTabContents();
 }
 
@@ -13,21 +13,18 @@ void GenerationTab::unlock() {
 	mCheckBox->unlock();
 }
 
-void GenerationTab::onAuthorized() {
-	createTabContents();
-}
-
-void GenerationTab::onDataReceived(const QJsonObject&) {
-
+void GenerationTab::onSensorsDataReceived(const QJsonObject& data) {
+	for (int i = 0; i < 4; ++i)
+		mCheckBox->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
 }
 
 void GenerationTab::createTabContents() {
 	clearTab();
-	delete this->layout;
-	layout = new QGridLayout{this};
-	this->setLayout(layout);
+	delete mLayout;
+	mLayout = new QGridLayout{this};
+	setLayout(mLayout);
 	mCheckBox = new CustomCheckBox{this, tr("Diesel generator")};
-	layout->addWidget(mCheckBox);
+	mLayout->addWidget(mCheckBox);
 
 	connect(mCheckBox, &CustomCheckBox::checkboxClicked, mCheckBox, [=](bool newState) {
 		mParent->onRelayClicked(3, newState);
@@ -36,10 +33,10 @@ void GenerationTab::createTabContents() {
 
 void GenerationTab::removeTabContents(const QString& text) {
 	clearTab();
-	delete this->layout;
-	layout = new QGridLayout{this};
-	this->setLayout(layout);
-	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	delete mLayout;
+	mLayout = new QGridLayout{this};
+	setLayout(mLayout);
+	mLayout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
 	textLabel->setProperty("class", "tab-standalone-text");
@@ -47,5 +44,5 @@ void GenerationTab::removeTabContents(const QString& text) {
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);
 
-	layout->addWidget(textLabel);
+	mLayout->addWidget(textLabel);
 }

@@ -20,14 +20,13 @@ public:
 	virtual void lock() final override;
 	virtual void unlock() final override;
 
+	void onSensorsDataReceived(const QJsonObject&);
+
 	virtual ~GenerationTab() final override {};
 
-public slots:
-	virtual void onAuthorized() final override;
-	virtual void onDataReceived(const QJsonObject&) final override;
-
 private:
-	QLayout* layout;
+	QLayout* mLayout;
 	CustomCheckBox* mCheckBox;
+	bool mTabCreated;
 };
 

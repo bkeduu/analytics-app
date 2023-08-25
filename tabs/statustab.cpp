@@ -23,10 +23,6 @@ void StatusTab::unlock() {
 			dynamic_cast<QRadioButton*>(mButtonGroup->button(i))->setEnabled(true);
 }
 
-void StatusTab::onAuthorized() {
-
-}
-
 void StatusTab::createTabContents() {
 	clearTab();
 	delete mLayout;
@@ -115,7 +111,7 @@ QProgressBar* StatusTab::createProgressBar(QWidget* parent, const QSize& minSize
 	return result;
 }
 
-void StatusTab::onDataReceived(const QJsonObject& dataObject) {
+void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray solarArray = dataObject.value("solar").toArray();
 	dynamic_cast<QLabel*>(mWidgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(solarArray[0].toDouble()));

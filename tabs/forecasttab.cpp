@@ -15,11 +15,7 @@ void ForecastTab::unlock() {
 
 }
 
-void ForecastTab::onAuthorized() {
-
-}
-
-void ForecastTab::onDataReceived(const QJsonObject& data) {
+void ForecastTab::onForecastDataReceived(const QJsonObject& data) {
 	if (!mPlot)
 		createTabContents();
 

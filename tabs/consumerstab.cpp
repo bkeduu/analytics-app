@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 
 ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
-	layout{nullptr}, consumersGroups{3} {
+	layout{nullptr}, consumersGroups{3, {}}, mConsumersReceived{false} {
 	removeTabContents(tr("Waiting for consumers data from server"));
 }
 
@@ -16,33 +16,44 @@ void ConsumersTab::unlock() {
 		cb->unlock();
 }
 
-void ConsumersTab::onAuthorized() {
-	removeTabContents(tr("Waiting for consumers data from server"));
+void ConsumersTab::onConsumersReceived(const QJsonObject& data) {
+	if (!data.contains("G1") || !data.contains("G2") || !data.contains("G3"))
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	for (int i = 0; i < 3; ++i) {
+		if (!data.contains(QString{"G%1"}.arg(i + 1)))
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+		QJsonArray group = data.value(QString{"G%1"}.arg(i + 1)).toArray();
+		for (auto it = group.begin(); it != group.end(); ++it) {
+			QJsonObject consumer = (*it).toObject();
+
+			if (!consumer.contains("id") || !consumer.contains("name") || !consumer.contains("status"))
+				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+			consumersGroups[i][consumer.value("id").toInt()] = {
+				consumer.value("id").toInt(),
+				consumer.value("name").toString(),
+				bool(consumer.value("status").toInt()),
+				nullptr
+			};
+		}
+	}
+
+	createTabContents();
+	mConsumersReceived = true;
 }
 
-void ConsumersTab::onDataReceived(const QJsonObject& data) {
-	if (data.contains("G1")) {
+void ConsumersTab::onSensorsDataReceived(const QJsonObject& data) {
+	if (!data.contains("1") || !data.contains("2") || !data.contains("3"))
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	if (mConsumersReceived) {
 		for (int i = 0; i < 3; ++i) {
-			QJsonArray group = data.value(QString{"G%1"}.arg(i)).toArray();
-			for (auto it = group.begin(); it != group.end(); ++it) {
-
-				QJsonObject consumer = (*it).toObject();
-
-				consumersGroups[i][consumer.value("id").toInt()] = {
-					consumer.value("id").toInt(),
-					consumer.value("name").toString(),
-					bool(consumer.value("status").toInt()),
-					nullptr
-				};
-			}
+			if (!data.contains(QString{"%1"}.arg(i + 1)))
+				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+			groupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
 		}
-
-		createTabContents();
-	}
-	else if (data.contains("solar")) {
-		groupRelays[0]->setCheckboxStatus(data.value("1").toArray().at(4).toInt());
-		groupRelays[1]->setCheckboxStatus(data.value("2").toArray().at(4).toInt());
-		groupRelays[2]->setCheckboxStatus(data.value("3").toArray().at(4).toInt());
 	}
 }
 

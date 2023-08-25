@@ -20,11 +20,9 @@ public:
 	virtual void showEvent(QShowEvent*) final override;
 	virtual void hideEvent(QHideEvent*) final override;
 
-	virtual ~ForecastTab() final override {};
+	void onForecastDataReceived(const QJsonObject&);
 
-public slots:
-	virtual void onAuthorized() final override;
-	virtual void onDataReceived(const QJsonObject&) final override;
+	virtual ~ForecastTab() final override {};
 
 private:
 	StackedBarWithLinesWidget* mPlot;

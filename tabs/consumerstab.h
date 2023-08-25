@@ -21,7 +21,6 @@ struct Consumer {
 	int id;
 	QString name;
 	bool is_on;
-
 	QWidget* widget;
 };
 
@@ -29,14 +28,14 @@ class ConsumersTab final : public ITab {
 	Q_OBJECT
 public:
 	ConsumersTab(const QString& tabName, QWidget* parent = nullptr);
-	virtual ~ConsumersTab() final override { };
 
 	virtual void lock() final override;
 	virtual void unlock() final override;
 
-public slots:
-	virtual void onAuthorized() final override;
-	virtual void onDataReceived(const QJsonObject&) final override;
+	void onConsumersReceived(const QJsonObject&);
+	void onSensorsDataReceived(const QJsonObject&);
+
+	virtual ~ConsumersTab() final override { };
 
 private:
 	virtual void createTabContents() final override;
@@ -46,4 +45,6 @@ private:
 	QVector<QMap<int, Consumer>> consumersGroups;
 	QVector<CustomCheckBox*> groupRelays;
 	QVector<QFrame*> groupWidgets;
+
+	bool mConsumersReceived;
 };

@@ -37,6 +37,10 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 
 	mMainContent->hide();
 
+	connect(client, &Client::connecting, this, [this]() {
+		mAuthLabel->setText(tr("Connecting to server..."));
+	});
+
 	connect(client, SIGNAL(connected()), this, SLOT(onConnect()));
 	connect(client, SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFail()));
 	connect(client, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
@@ -150,7 +154,7 @@ QWidget* MainWindow::createStartScreen() {
 	formLayout->addWidget(authorizeButton, 1, Qt::AlignCenter);
 	formLayout->addSpacing(10);
 
-	formWidget->setMinimumSize(400, 300);
+	formWidget->setMinimumSize(500, 300);
 	formWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	resultLayout->addWidget(formWidget, 1, Qt::AlignCenter);
@@ -293,8 +297,8 @@ void MainWindow::onAuthorize(bool status) {
 }
 
 void MainWindow::onSensorsData(const QJsonObject& data) {
-	mStatusTab->onDataReceived(data);
-	mConsumersTab->onDataReceived(data);
+	mStatusTab->onSensorsDataReceived(data);
+	mConsumersTab->onSensorsDataReceived(data);
 }
 
 void MainWindow::onConnect() {
@@ -328,7 +332,8 @@ void MainWindow::onUnableToConnect() {
 }
 
 void MainWindow::onConsumersData(const QJsonObject& data) {
-	mConsumersTab->onDataReceived(data);
+	mConsumersTab->onSensorsDataReceived(data);
+	mGenerationTab->onSensorsDataReceived(data);
 }
 
 void MainWindow::onDisconnect() {
@@ -345,14 +350,24 @@ void MainWindow::onDisconnect() {
 
 void MainWindow::onModeSwitch(int newMode) {  // mode switch from server
 	mStatusTab->switchMode(newMode);
+
+	if (ModeType(newMode) == ModeType::Manual)
+		unlockTabs();
+	else
+		lockTabs();
 }
 
 void MainWindow::onModeChange(int mode) {  // mode switch with button
+	if (ModeType(mode) == ModeType::Manual)
+		unlockTabs();
+	else
+		lockTabs();
+
 	emit modeChanged(mode);
 }
 
 void MainWindow::onGraphicsData(const QJsonObject& data) {
-	mForecastTab->onDataReceived(data);
+	mForecastTab->onForecastDataReceived(data);
 }
 
 void MainWindow::lockTabs() {

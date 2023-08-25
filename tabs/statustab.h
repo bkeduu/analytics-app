@@ -31,8 +31,7 @@ signals:
 	void modeChanged(int);
 
 public slots:
-	virtual void onAuthorized() final override;
-	virtual void onDataReceived(const QJsonObject&) final override;
+	void onSensorsDataReceived(const QJsonObject&);
 	void onButtonModeChange(int);
 
 private:
@@ -44,7 +43,7 @@ private:
 	QWidget* createWidget(TabWidget widgetType, QWidget* parent);
 
 	virtual void createTabContents() final override;
-	virtual void removeTabContents(const QString& = tr("You need to authorize before starting")) final override;
+	virtual void removeTabContents(const QString& = tr("")) final override;
 
 	QWidget* mGenerators,* mConsumers,* mModes,* mBattery;
 	QLayout* mLayout;

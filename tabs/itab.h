@@ -25,10 +25,6 @@ public:
 
 	virtual ~ITab() = default;
 
-public slots:
-	virtual void onAuthorized() = 0;
-	virtual void onDataReceived(const QJsonObject&) = 0;
-
 private:
 	const QString tabName;
 
