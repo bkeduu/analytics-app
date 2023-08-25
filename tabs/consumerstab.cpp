@@ -92,7 +92,7 @@ void ConsumersTab::createTabContents() {
 
 	for (int i = 0; i < groupRelays.size(); ++i)
 		connect(groupRelays[i], &CustomCheckBox::checkboxClicked, groupRelays[i], [=](bool newState) {
-			mParent->onRelayClicked(i, newState);
+			mParent->onRelayClicked(i + 1, newState);
 		});
 }
 
