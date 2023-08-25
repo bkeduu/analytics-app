@@ -332,8 +332,7 @@ void MainWindow::onUnableToConnect() {
 }
 
 void MainWindow::onConsumersData(const QJsonObject& data) {
-	mConsumersTab->onSensorsDataReceived(data);
-	mGenerationTab->onSensorsDataReceived(data);
+	mConsumersTab->onConsumersReceived(data);
 }
 
 void MainWindow::onDisconnect() {
