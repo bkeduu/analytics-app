@@ -52,7 +52,10 @@ void ConsumersTab::onSensorsDataReceived(const QJsonObject& data) {
 		for (int i = 0; i < 3; ++i) {
 			if (!data.contains(QString{"%1"}.arg(i + 1)))
 				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+			groupRelays[i]->blockSignals(true);
 			groupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
+			groupRelays[i]->blockSignals(false);
 		}
 	}
 }
@@ -77,6 +80,9 @@ void ConsumersTab::createTabContents() {
 		groupWidgets[i]->setLayout(verticalLayout);
 
 		CustomCheckBox* groupCheckbox = new CustomCheckBox{groupWidgets[i], tr("Group %1").arg(i + 1)};
+		groupCheckbox->blockSignals(true);
+		groupCheckbox->setCheckboxStatus(consumersGroups[i][0].is_on);
+		groupCheckbox->blockSignals(false);
 		verticalLayout->addWidget(groupCheckbox);
 		groupRelays.push_back(groupCheckbox);
 

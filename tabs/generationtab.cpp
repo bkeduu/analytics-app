@@ -14,8 +14,11 @@ void GenerationTab::unlock() {
 }
 
 void GenerationTab::onSensorsDataReceived(const QJsonObject& data) {
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) {
+		mCheckBox->blockSignals(true);
 		mCheckBox->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
+		mCheckBox->blockSignals(false);
+	}
 }
 
 void GenerationTab::createTabContents() {
