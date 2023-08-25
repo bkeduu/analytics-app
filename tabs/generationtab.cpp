@@ -14,7 +14,14 @@ void GenerationTab::unlock() {
 }
 
 void GenerationTab::onSensorsDataReceived(const QJsonObject& data) {
-	mCheckBox->setCheckboxStatus(data.value("gen").toArray().at(4).toInt());
+	if (!data.contains("gen"))
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	QJsonArray generatorArray = data.value("gen").toArray();
+	if (generatorArray.isEmpty() || generatorArray.size() < 5)
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	mCheckBox->setCheckboxStatus(generatorArray[4].toInt());
 }
 
 void GenerationTab::createTabContents() {

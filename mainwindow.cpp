@@ -299,6 +299,7 @@ void MainWindow::onAuthorize(bool status) {
 void MainWindow::onSensorsData(const QJsonObject& data) {
 	mStatusTab->onSensorsDataReceived(data);
 	mConsumersTab->onSensorsDataReceived(data);
+	mGenerationTab->onSensorsDataReceived(data);
 }
 
 void MainWindow::onConnect() {

@@ -137,7 +137,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	if (dieselArray.isEmpty() || dieselArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	if (dieselArray[4].toBool()) {
+	if (dieselArray[4].toInt()) {
 		dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
@@ -172,7 +172,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	if (firstArray.isEmpty() || firstArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	if (firstArray[4].toBool()) {
+	if (firstArray[4].toInt()) {
 		dynamic_cast<QLabel*>(mWidgetLocator["first-voltage-label"])->setText(tr("V: %1").arg(firstArray[0].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["first-current-label"])->setText(tr("A: %1").arg(firstArray[1].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["first-power-label"])->setText(tr("W: %1").arg(firstArray[2].toDouble()));
@@ -189,7 +189,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	if (secondArray.isEmpty() || secondArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	if (secondArray[4].toBool()) {
+	if (secondArray[4].toInt()) {
 		dynamic_cast<QLabel*>(mWidgetLocator["second-voltage-label"])->setText(tr("V: %1").arg(secondArray[0].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["second-current-label"])->setText(tr("A: %1").arg(secondArray[1].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["second-power-label"])->setText(tr("W: %1").arg(secondArray[2].toDouble()));
@@ -206,7 +206,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	if (thirdArray.isEmpty() || thirdArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	if (thirdArray[4].toBool()) {
+	if (thirdArray[4].toInt()) {
 		dynamic_cast<QLabel*>(mWidgetLocator["third-voltage-label"])->setText(tr("V: %1").arg(thirdArray[0].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["third-current-label"])->setText(tr("A: %1").arg(thirdArray[1].toDouble()));
 		dynamic_cast<QLabel*>(mWidgetLocator["third-power-label"])->setText(tr("W: %1").arg(thirdArray[2].toDouble()));
