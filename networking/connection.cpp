@@ -40,7 +40,7 @@ void Networker::connectToHost() {
 }
 
 void Networker::sendToHost(const QString& data) {
-	socket->write(data.toStdString().c_str(), data.length());
+	socket->write(data.toUtf8());
 	socket->flush();
 }
 
