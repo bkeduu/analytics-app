@@ -80,9 +80,6 @@ void ConsumersTab::createTabContents() {
 		groupWidgets[i]->setLayout(verticalLayout);
 
 		CustomCheckBox* groupCheckbox = new CustomCheckBox{groupWidgets[i], tr("Group %1").arg(i + 1)};
-		groupCheckbox->blockSignals(true);
-		groupCheckbox->setCheckboxStatus(consumersGroups[i][0].is_on);
-		groupCheckbox->blockSignals(false);
 		verticalLayout->addWidget(groupCheckbox);
 		groupRelays.push_back(groupCheckbox);
 
