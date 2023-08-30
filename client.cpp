@@ -1,6 +1,7 @@
 #include "client.h"
 
-Client::Client(QObject *parent) : QObject{parent}, mAuthorized{false}, mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
+Client::Client(QObject *parent) : QObject{parent}, mAuthorized{false}, mServerConnected{false},
+	mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
 
 	connect(&mWindow, SIGNAL(authorize(QString,QString,QString,int)), this, SLOT(sendAuth(QString,QString,QString,int)));
 
@@ -12,7 +13,7 @@ Client::Client(QObject *parent) : QObject{parent}, mAuthorized{false}, mWindow{t
 	connect(mNetworker.data(), SIGNAL(serverLookupFailed()), this, SLOT(onServerLookupFailed()));
 	connect(mNetworker.data(), SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
-	connect(&mWindow, SIGNAL(relayClicked(int, bool)), this, SLOT(onRelayClicked(int, bool)));
+	connect(&mWindow, SIGNAL(relayClicked(int,bool)), this, SLOT(onRelayClicked(int,bool)));
 	connect(&mWindow, SIGNAL(modeChanged(int)), this, SLOT(onModeChange(int)));
 
 	mWindow.load(mSettings);
@@ -146,8 +147,6 @@ void Client::onServerLookupFailed() {
 }
 
 void Client::onUnableToConnect() {
-	// set timer to retry connection and retry last action
-
 	emit unableToConnect();
 }
 
