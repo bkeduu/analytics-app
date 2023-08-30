@@ -200,7 +200,7 @@ QWidget* MainWindow::createStartScreen() {
 			return;
 		}
 
-		mAuthLabel->setText(tr("Authorization..."));
+		mAuthLabel->setText(tr("Connecting..."));
 		emit authorize(login, password, serverAddress, serverPort);
 	});
 
@@ -303,7 +303,7 @@ void MainWindow::onSensorsData(const QJsonObject& data) {
 }
 
 void MainWindow::onConnect() {
-
+	mAuthLabel->setText(tr("Authorization..."));
 }
 
 void MainWindow::onESPStatusChange(const QJsonObject& data) {
@@ -329,7 +329,12 @@ void MainWindow::onServerLookupFail() {
 }
 
 void MainWindow::onUnableToConnect() {
+	mAuthLabel->setText(tr("Log in to the system"));
+	QMessageBox mb{QMessageBox::Critical, tr("Unable to connect to the server"),
+				   tr("Unable to connect to server with provided hostname. Try again."), QMessageBox::Ok, this};
+	mb.setWindowIcon(QIcon{":/static/images/error.png"});
 
+	mb.exec();
 }
 
 void MainWindow::onConsumersData(const QJsonObject& data) {
