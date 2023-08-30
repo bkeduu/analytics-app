@@ -46,5 +46,8 @@ private:
 	QVector<CustomCheckBox*> groupRelays;
 	QVector<QFrame*> groupWidgets;
 
+	bool mIsGroupSwitched[3];  // при ручном переключении реле единоразово приходит sensorsData со старым состоянием реле
+								// поэтому необходимо запоминать переключение и игнорировать его 1 раз
+
 	bool mConsumersReceived;
 };

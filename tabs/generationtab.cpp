@@ -1,7 +1,8 @@
 #include "generationtab.h"
 #include "mainwindow.h"
 
-GenerationTab::GenerationTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName}, mLayout{nullptr} {
+GenerationTab::GenerationTab(const QString& tabName, QWidget* parent)
+	: ITab{parent, tabName}, mLayout{nullptr}, mIsRelaySwitched{false} {
 	createTabContents();
 }
 
@@ -21,7 +22,11 @@ void GenerationTab::onSensorsDataReceived(const QJsonObject& data) {
 	if (generatorArray.isEmpty() || generatorArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	mCheckBox->setCheckboxStatus(generatorArray[4].toInt());
+	if (mIsRelaySwitched)
+		mIsRelaySwitched = false;
+	else
+		mCheckBox->setCheckboxStatus(generatorArray[4].toInt());
+
 }
 
 void GenerationTab::createTabContents() {
@@ -33,6 +38,7 @@ void GenerationTab::createTabContents() {
 	mLayout->addWidget(mCheckBox);
 
 	connect(mCheckBox, &CustomCheckBox::checkboxClicked, mCheckBox, [=](bool newState) {
+		mIsRelaySwitched = true;
 		mParent->onRelayClicked(4, newState);
 	});
 }

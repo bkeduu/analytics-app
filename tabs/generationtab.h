@@ -27,6 +27,7 @@ public:
 private:
 	QLayout* mLayout;
 	CustomCheckBox* mCheckBox;
+	bool mIsRelaySwitched;
 	bool mTabCreated;
 };
 

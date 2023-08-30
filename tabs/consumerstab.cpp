@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 
 ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
-	layout{nullptr}, consumersGroups{3, {}}, mConsumersReceived{false} {
+	layout{nullptr}, consumersGroups{3, {}}, mIsGroupSwitched{false, false, false}, mConsumersReceived{false} {
 	removeTabContents(tr("Waiting for consumers data from server"));
 }
 
@@ -53,9 +53,12 @@ void ConsumersTab::onSensorsDataReceived(const QJsonObject& data) {
 			if (!data.contains(QString{"%1"}.arg(i + 1)))
 				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-			groupRelays[i]->blockSignals(true);
-			groupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
-			groupRelays[i]->blockSignals(false);
+			if (mIsGroupSwitched[i]) {
+				mIsGroupSwitched[i] = false;
+			}
+			else {
+				groupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
+			}
 		}
 	}
 }
@@ -93,6 +96,7 @@ void ConsumersTab::createTabContents() {
 
 	for (int i = 0; i < groupRelays.size(); ++i)
 		connect(groupRelays[i], &CustomCheckBox::checkboxClicked, groupRelays[i], [=](bool newState) {
+			mIsGroupSwitched[i] = true;
 			mParent->onRelayClicked(i + 1, newState);
 		});
 }
