@@ -5,14 +5,12 @@
 #include <QPropertyAnimation>
 #include <QMouseEvent>
 
-BCSwitch::BCSwitch(QWidget *parent)
-	:QAbstractButton(parent), mOn(tr("On")), mOff(tr("Off"))
-{
+BCSwitch::BCSwitch(QWidget *parent) : QAbstractButton(parent), mOn(tr("On")), mOff(tr("Off")) {
 	setCheckable(true);
 	mOrientation = Qt::Horizontal;
-	mHeight = 18;
+	mHeight = 22;
 	mMargin = 3;
-	mOffset = mHeight / 2;
+	mOffset = 0;
 	bool vertical = mOrientation == Qt::Vertical;
 
 	QStateMachine *machine = new QStateMachine;
@@ -41,9 +39,8 @@ BCSwitch::BCSwitch(QWidget *parent)
 
 BCSwitch::BCSwitch(Qt::Orientation orientation /* = Qt::Horizontal */,
 				   const QString &on /* = "On" */, const QString &off /* = "Off" */,
-				   bool checked /* = false */, QWidget *parent /* = NULL */):
-	QAbstractButton(parent), mOn(on), mOff(off)
-{
+				   bool checked /* = false */, QWidget *parent /* = NULL */) :
+	QAbstractButton(parent), mOn(on), mOff(off) {
 	setCheckable(true);
 	mOrientation = orientation;
 	mHeight = 16;
@@ -71,22 +68,21 @@ BCSwitch::BCSwitch(Qt::Orientation orientation /* = Qt::Horizontal */,
 	 * toggled() signal received but widget not visible */
 	if (checked) {
 		machine->setInitialState(mRight);
-	} else {
+	}
+	else {
 		machine->setInitialState(left);
 	}
 	machine->start();
 	setChecked(checked);
 }
 
-void BCSwitch::setChecked(bool checked)
-{
+void BCSwitch::setChecked(bool checked) {
 	if (checked != isChecked()) {
 		this->click();
 	}
 }
 
-void BCSwitch::paintEvent(QPaintEvent */*e*/)
-{
+void BCSwitch::paintEvent(QPaintEvent*) {
 	bool vertical = mOrientation == Qt::Vertical;
 	QPainter p(this);
 	p.setPen(hasFocus() ? Qt::SolidLine : Qt::NoPen);
@@ -101,29 +97,31 @@ void BCSwitch::paintEvent(QPaintEvent */*e*/)
 	if (isEnabled()) {
 		p.setBrush(isChecked() ? QColor("#009688") : Qt::black);
 		p.setOpacity(isChecked() ? 0.5 : 0.38);
-		p.drawRoundedRect(QRect(mMargin, mMargin, w, h), 8.0, 8.0);
+		p.drawRoundedRect(QRect(mMargin, mMargin, w, h), mHeight / 2, mHeight / 2);
 		p.setBrush(isChecked() ? QColor("#009688") : QColor("#d5d5d5"));
 	} else {
 		p.setBrush(isChecked() ? QColor("#77BCA6") : Qt::black);
 		p.setOpacity(isChecked() ? 0.5 : 0.12);
-		p.drawRoundedRect(QRect(mMargin, mMargin, w, h), 8.0, 8.0);
+		p.drawRoundedRect(QRect(mMargin, mMargin, w, h), mHeight / 2, mHeight / 2);
 		p.setBrush(isChecked() ? QColor("#77BCA6") : QColor("#BDBDBD"));
 	}
 	p.setOpacity(1.0);
 	if (vertical)
 		p.drawEllipse(QRectF(offset() - (mHeight / 2), 0.0, width(), width()));
-	else
-		p.drawEllipse(QRectF(offset() - (mHeight / 2), 0.0, height(), height()));
+	else {
+		if (isChecked())
+			p.drawEllipse(QRectF(offset() - (mHeight / 3), 0.0, height(), height()));
+		else
+			p.drawEllipse(QRectF(offset() - (mHeight / 2), 0.0, height(), height()));
+	}
 }
 
-void BCSwitch::enterEvent(QEnterEvent *e)
-{
+void BCSwitch::enterEvent(QEnterEvent* e) {
 	setCursor(Qt::PointingHandCursor);
 	QAbstractButton::enterEvent(e);
 }
 
-void BCSwitch::resizeEvent(QResizeEvent *e)
-{
+void BCSwitch::resizeEvent(QResizeEvent* e) {
 	int end = mOrientation == Qt::Vertical ? e->size().height() : e->size().width();
 	mRight->assignProperty(this, "offset", end - mHeight);
 	if(isChecked()){
