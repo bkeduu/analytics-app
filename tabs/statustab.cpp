@@ -13,13 +13,13 @@ StatusTab::StatusTab(const QString& tabName, QWidget* parent) : ITab{parent, tab
 
 void StatusTab::lock() {
 	if (mButtonGroup)
-		for (int i = int(Manual); i < int(MaximumEconomy); ++i)
+		for (int i = int(Manual); i <= int(MaximumEconomy); ++i)
 			dynamic_cast<QRadioButton*>(mButtonGroup->button(i))->setEnabled(false);
 }
 
 void StatusTab::unlock() {
 	if (mButtonGroup)
-		for (int i = int(Manual); i < int(MaximumEconomy); ++i)
+		for (int i = int(Manual); i <= int(MaximumEconomy); ++i)
 			dynamic_cast<QRadioButton*>(mButtonGroup->button(i))->setEnabled(true);
 }
 
