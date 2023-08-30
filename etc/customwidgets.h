@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bcswitch.h"
+
 #include <QAbstractButton>
 #include <QLabel>
 #include <QCheckBox>
@@ -23,7 +25,7 @@ signals:
 	void checkboxClicked(bool);
 
 private:
-	QCheckBox* button;
+	QAbstractButton* button;
 };
 
 

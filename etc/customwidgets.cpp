@@ -4,7 +4,7 @@ CustomCheckBox::CustomCheckBox(QWidget* parent, const QString& text, const QStri
 	QHBoxLayout* layout = new QHBoxLayout{this};
 	layout->setAlignment(Qt::AlignLeft);
 
-	button = new QCheckBox{this};
+	button = new BCSwitch{this};
 	QLabel* label = new QLabel{this};
 	label->setText(text);
 

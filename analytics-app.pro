@@ -1,4 +1,4 @@
-QT       += core gui network charts
+QT       += core gui network charts statemachine
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,12 +22,14 @@ SOURCES += \
     tabs/statustab.cpp \
     networking/connection.cpp \
     etc/customwidgets.cpp \
-    etc/contentwidget.cpp
+    etc/contentwidget.cpp \
+    etc/bcswitch.cpp
 
 HEADERS += \
     client.h \
     etc/stackedbarwithlineswidget.h \
     etc/utils.h \
+    etc/bcswitch.h \
     etc/contentwidget.h \
     mainwindow.h \
     etc/customwidgets.h \

@@ -84,9 +84,10 @@ void ConsumersTab::createTabContents() {
 		groupRelays.push_back(groupCheckbox);
 
 		foreach (int consumerId, consumersGroups[i].keys()) {
-			QWidget* consumerWidget = new CustomCheckBox{groupWidgets[i], consumersGroups[i][consumerId].name};
-			verticalLayout->addWidget(consumerWidget);
+			QLabel* consumerWidget = new QLabel{groupWidgets[i]};
+			consumerWidget->setText(consumersGroups[i][consumerId].name);
 			consumersGroups[i][consumerId].widget = consumerWidget;
+			verticalLayout->addWidget(consumerWidget);
 		}
 	}
 
