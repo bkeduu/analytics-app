@@ -116,7 +116,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	QJsonArray solarArray = dataObject.value("solar").toArray();
-	if (solarArray.isEmpty() || solarArray.size() < 4)
+	if (solarArray.isEmpty() || solarArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	dynamic_cast<QLabel*>(mWidgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
@@ -125,7 +125,7 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	dynamic_cast<QProgressBar*>(mWidgetLocator["solar-progressbar"])->setValue(solarArray[3].toInt());
 
 	QJsonArray windArray = dataObject.value("wind").toArray();
-	if (windArray.isEmpty() || windArray.size() < 4)
+	if (windArray.isEmpty() || windArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	dynamic_cast<QLabel*>(mWidgetLocator["wind-voltage-label"])->setText(tr("V: %1").arg(windArray[0].toDouble()));
@@ -152,9 +152,9 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
 	dynamic_cast<QLabel*>(mWidgetLocator["battery-voltage-label"])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
-	int status = batteryArray[4].toInt();
+	// int status = batteryArray[4].toInt();
 
-	switch (BatteryInformation(status)) {
+	switch (BatteryInformation(0)) {
 	case Charging:
 		dynamic_cast<QLabel*>(mWidgetLocator["battery-status-label"])->setText(tr("Charging..."));
 		break;

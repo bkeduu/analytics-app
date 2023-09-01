@@ -23,7 +23,10 @@ SOURCES += \
     networking/connection.cpp \
     etc/customwidgets.cpp \
     etc/contentwidget.cpp \
-    etc/bcswitch.cpp
+    etc/bcswitch.cpp \
+    etc/callout.cpp \
+    etc/calloutwidget.cpp \
+    etc/calloutview.cpp
 
 HEADERS += \
     client.h \
@@ -31,6 +34,9 @@ HEADERS += \
     etc/utils.h \
     etc/bcswitch.h \
     etc/contentwidget.h \
+    etc/callout.h \
+    etc/calloutwidget.h \
+    etc/calloutview.h \
     mainwindow.h \
     etc/customwidgets.h \
     tabs/consumerstab.h \

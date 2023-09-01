@@ -21,6 +21,7 @@ public:
 	QAbstractSocket::SocketState state() const { return socket->state(); }
 
 	void sendToHost(const QString& data);
+	void close();
 
 	virtual ~Networker() final override;
 

@@ -1,18 +1,19 @@
 #include "consumerstab.h"
 #include "mainwindow.h"
+#include "calloutwidget.h"
 
 ConsumersTab::ConsumersTab(const QString& tabName, QWidget* parent) : ITab{parent, tabName},
-	layout{nullptr}, consumersGroups{3, {}}, mIsGroupSwitched{false, false, false}, mConsumersReceived{false} {
-	removeTabContents(tr("Waiting for consumers data from server"));
+	mLayout{nullptr}, mConsumersGroups{3, {}}, mIsGroupSwitched{false, false, false}, mConsumersReceived{false} {
+	createTabContents();
 }
 
 void ConsumersTab::lock() {
-	foreach (CustomCheckBox* cb, groupRelays)
+	foreach (CustomCheckBox* cb, mGroupRelays)
 		cb->lock();
 }
 
 void ConsumersTab::unlock() {
-	foreach (CustomCheckBox* cb, groupRelays)
+	foreach (CustomCheckBox* cb, mGroupRelays)
 		cb->unlock();
 }
 
@@ -31,7 +32,7 @@ void ConsumersTab::onConsumersReceived(const QJsonObject& data) {
 			if (!consumer.contains("id") || !consumer.contains("name") || !consumer.contains("status"))
 				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-			consumersGroups[i][consumer.value("id").toInt()] = {
+			mConsumersGroups[i][consumer.value("id").toInt()] = {
 				consumer.value("id").toInt(),
 				consumer.value("name").toString(),
 				bool(consumer.value("status").toInt()),
@@ -40,7 +41,6 @@ void ConsumersTab::onConsumersReceived(const QJsonObject& data) {
 		}
 	}
 
-	createTabContents();
 	mConsumersReceived = true;
 }
 
@@ -48,65 +48,55 @@ void ConsumersTab::onSensorsDataReceived(const QJsonObject& data) {
 	if (!data.contains("1") || !data.contains("2") || !data.contains("3"))
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	if (mConsumersReceived) {
-		for (int i = 0; i < 3; ++i) {
-			if (!data.contains(QString{"%1"}.arg(i + 1)))
-				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+	for (int i = 0; i < 3; ++i) {
+		if (!data.contains(QString{"%1"}.arg(i + 1)))
+			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-			if (mIsGroupSwitched[i]) {
-				mIsGroupSwitched[i] = false;
-			}
-			else {
-				groupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
-			}
+		if (mIsGroupSwitched[i]) {
+			mIsGroupSwitched[i] = false;
+		}
+		else {
+			mGroupRelays[i]->setCheckboxStatus(data.value(QString{"%1"}.arg(i + 1)).toArray().at(4).toInt());
 		}
 	}
 }
 
 void ConsumersTab::createTabContents() {
 	clearTab();
-	delete this->layout;
-	layout = new QHBoxLayout{this};
-	this->setLayout(layout);
+	delete mLayout;
+	QVBoxLayout* layout = new QVBoxLayout{this};
+	mLayout = layout;
 	layout->setSpacing(30);
 
-	groupWidgets.push_back(new QFrame{this});
-	groupWidgets.push_back(new QFrame{this});
-	groupWidgets.push_back(new QFrame{this});
+	CalloutWidget* plot = new CalloutWidget{this};
+	layout->addWidget(plot, 15);
 
-	for (int i = 0; i < groupWidgets.size(); ++i) {
-		layout->addWidget(groupWidgets[i]);
-		groupWidgets[i]->setFrameShape(QFrame::Box);
+	QWidget* groupsWidget = new QWidget{this};
+	QHBoxLayout* groupsWidgetLayout = new QHBoxLayout{groupsWidget};
+	groupsWidget->setLayout(groupsWidgetLayout);
+	layout->addWidget(groupsWidget, 1);
 
-		QVBoxLayout* verticalLayout = new QVBoxLayout{groupWidgets[i]};
-		verticalLayout->setAlignment(Qt::AlignLeft);
-		groupWidgets[i]->setLayout(verticalLayout);
-
-		CustomCheckBox* groupCheckbox = new CustomCheckBox{groupWidgets[i], tr("Group %1").arg(i + 1)};
-		verticalLayout->addWidget(groupCheckbox);
-		groupRelays.push_back(groupCheckbox);
-
-		foreach (int consumerId, consumersGroups[i].keys()) {
-			QLabel* consumerWidget = new QLabel{groupWidgets[i]};
-			consumerWidget->setText(consumersGroups[i][consumerId].name);
-			consumersGroups[i][consumerId].widget = consumerWidget;
-			verticalLayout->addWidget(consumerWidget);
-		}
+	for (int i = 0; i < 3; ++i) {
+		CustomCheckBox* groupCheckbox = new CustomCheckBox{groupsWidget, tr("Group %1").arg(i + 1)};
+		mGroupRelays.push_back(groupCheckbox);
+		groupsWidgetLayout->addWidget(groupCheckbox, 1, Qt::AlignCenter);
 	}
 
-	for (int i = 0; i < groupRelays.size(); ++i)
-		connect(groupRelays[i], &CustomCheckBox::checkboxClicked, groupRelays[i], [=](bool newState) {
+	for (int i = 0; i < mGroupRelays.size(); ++i)
+		connect(mGroupRelays[i], &CustomCheckBox::checkboxClicked, mGroupRelays[i], [this, i](bool newState) {
 			mIsGroupSwitched[i] = true;
 			mParent->onRelayClicked(i + 1, newState);
 		});
+
+	setLayout(mLayout);
 }
 
 void ConsumersTab::removeTabContents(const QString& text) {
 	clearTab();
-	delete this->layout;
-	layout = new QGridLayout{this};
-	this->setLayout(layout);
-	layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	delete mLayout;
+	mLayout = new QGridLayout{this};
+	this->setLayout(mLayout);
+	mLayout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
 	QLabel* textLabel = new QLabel{this};
 	textLabel->setProperty("class", "tab-standalone-text");
@@ -114,5 +104,5 @@ void ConsumersTab::removeTabContents(const QString& text) {
 	textLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	textLabel->setAlignment(Qt::AlignCenter);
 
-	layout->addWidget(textLabel);
+	mLayout->addWidget(textLabel);
 }

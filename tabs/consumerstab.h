@@ -41,10 +41,10 @@ private:
 	virtual void createTabContents() final override;
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
-	QLayout* layout;
-	QVector<QMap<int, Consumer>> consumersGroups;
-	QVector<CustomCheckBox*> groupRelays;
-	QVector<QFrame*> groupWidgets;
+	QLayout* mLayout;
+	QVector<QMap<int, Consumer>> mConsumersGroups;
+	QVector<CustomCheckBox*> mGroupRelays;
+	QVector<QFrame*> mGroupWidgets;
 
 	bool mIsGroupSwitched[3];  // при ручном переключении реле единоразово приходит sensorsData со старым состоянием реле
 								// поэтому необходимо запоминать переключение и игнорировать его 1 раз

@@ -44,6 +44,10 @@ void Networker::sendToHost(const QString& data) {
 	socket->flush();
 }
 
+void Networker::close() {
+	socket->close();
+}
+
 void Networker::readFromSocket() {
 	QString line = socket->readLine();
 	QJsonDocument document = QJsonDocument::fromJson(line.toUtf8());

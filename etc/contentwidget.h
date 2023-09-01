@@ -1,16 +1,11 @@
-// Copyright (C) 2023 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
-
-#ifndef CONTENTWIDGET_H
-#define CONTENTWIDGET_H
+#pragma once
 
 #include <QWidget>
 
 QT_FORWARD_DECLARE_CLASS(QChart)
 QT_FORWARD_DECLARE_CLASS(QChartView)
 
-class ContentWidget : public QWidget
-{
+class ContentWidget : public QWidget {
     Q_OBJECT
 public:
     explicit ContentWidget(QWidget *parent = nullptr);
@@ -27,8 +22,6 @@ protected:
     QString m_loadError;
 
 private:
-    QChartView *m_defaultChartView = nullptr;
+	QChartView* m_defaultChartView = nullptr;
     bool m_loaded = false;
 };
-
-#endif
