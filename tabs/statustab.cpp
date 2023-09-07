@@ -152,21 +152,21 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 
 	QJsonArray batteryArray = dataObject.value("bat").toArray();
 	dynamic_cast<QLabel*>(mWidgetLocator["battery-voltage-label"])->setText(QString{"%1 V"}.arg(batteryArray[0].toDouble()));
-	// int status = batteryArray[4].toInt();
+	dynamic_cast<QProgressBar*>(mWidgetLocator["battery-progressbar"])->setValue(batteryArray[1].toInt());
 
-	switch (BatteryInformation(0)) {
-	case Charging:
+	int status = batteryArray[2].toInt();
+
+	switch (status) {
+	case 1:
 		dynamic_cast<QLabel*>(mWidgetLocator["battery-status-label"])->setText(tr("Charging..."));
 		break;
-	case Discharging:
+	case 0:
 		dynamic_cast<QLabel*>(mWidgetLocator["battery-status-label"])->setText(tr("Discharging..."));
 		break;
 	default:
 		dynamic_cast<QLabel*>(mWidgetLocator["battery-status-label"])->setText(tr("Unknown..."));
 		break;
 	}
-
-	dynamic_cast<QProgressBar*>(mWidgetLocator["battery-progressbar"])->setValue(batteryArray[1].toInt());
 
 	QJsonArray firstArray = dataObject.value("1").toArray();
 	if (firstArray.isEmpty() || firstArray.size() < 5)
