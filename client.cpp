@@ -3,6 +3,14 @@
 Client::Client(QObject *parent) : QObject{parent}, mAuthorized{false}, mServerConnected{false},
 	mWindow{this}, mSettings{QSettings::UserScope, "ICS4", "Analytics app"} {
 
+	mPingTimer = new QTimer{this};
+	mPingTimer->setInterval(2000);
+	connect(mPingTimer, SIGNAL(timeout()), this, SLOT(onPingTimeout()));
+
+	mPingResponseTimer = new QTimer{this};
+	mPingResponseTimer->setInterval(5000);
+	connect(mPingResponseTimer, SIGNAL(timeout()), this, SLOT(onPingResponseTimeout()));
+
 	connect(&mWindow, SIGNAL(authorize(QString,QString,QString,int)), this, SLOT(sendAuth(QString,QString,QString,int)));
 
 	mNetworker = QSharedPointer<Networker>::create(this);
@@ -113,6 +121,10 @@ void Client::onDataReceived(const QJsonObject& data) {
 		}
 		break;
 	}
+	case Ping: {
+		mPingResponseTimer->start();
+		break;
+	}
 	default: {  // wrong data type code
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 		break;
@@ -137,9 +149,10 @@ void Client::sendAuth(const QString& login, const QString& password, const QStri
 		throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
+		request = request.arg(int(Authorization));
 	}
 
-	sendData(request.arg(int(Authorization)).arg(login).arg(password));  // TODO hashing password
+	sendData(request.arg(login).arg(password));  // TODO hashing password
 }
 
 void Client::onServerLookupFailed() {
@@ -159,18 +172,23 @@ void Client::onRelayClicked(int group, bool newState) {
 			throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
+		request = request.arg(int(RelaySwitch));
 	}
 
-	sendData(request.arg(int(RelaySwitch)).arg(group).arg(newState));
+	sendData(request.arg(group).arg(newState));
 }
 
 void Client::onConnected() {
 	mServerConnected = true;
+	mPingTimer->start();
+	mPingResponseTimer->start();
 	emit connected();
 }
 
 void Client::onDisconnected() {
 	mServerConnected = false;
+	mPingTimer->stop();
+	mPingResponseTimer->stop();
 	emit disconnected();
 }
 
@@ -183,9 +201,33 @@ void Client::onModeChange(int mode) {
 			throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
 		request = requestFile.readAll();
 		requestFile.close();
+		request = request.arg(int(ModeSwitch));
 	}
 
-	sendData(request.arg(int(ModeSwitch)).arg(mode));
+	sendData(request.arg(mode));
+}
+
+void Client::onPingTimeout() {
+	static QString request;
+	if (request.isEmpty()) {
+		QFile requestFile{":/static/requests/ping.json"};
+		requestFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		if (!requestFile.isOpen())
+			throw InternalErrorException{tr("Internal error at %1. The app will be closed.").arg(FLF)};
+		request = requestFile.readAll();
+		requestFile.close();
+		request = request.arg(int(Ping));
+	}
+
+	sendData(request);
+	mPingTimer->start();
+}
+
+void Client::onPingResponseTimeout() {
+	onDisconnected();
+	blockSignals(true);
+	mNetworker->close();
+	blockSignals(false);
 }
 
 void Client::sendData(const QString& request) const  {

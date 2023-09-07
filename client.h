@@ -16,6 +16,7 @@ enum MessageType {
 	ModeSwitch,
 	GraphicsData,
 	ESPStatus,
+	Ping,
 	Shutdown
 };
 
@@ -62,6 +63,8 @@ public slots:
 	void onRelayClicked(int group, bool newState);
 	void onUnableToConnect();
 	void onServerLookupFailed();
+	void onPingTimeout();
+	void onPingResponseTimeout();
 
 private:
 	void sendData(const QString& request) const;
@@ -72,6 +75,8 @@ private:
 
 	MainWindow mWindow;
 	QSharedPointer<Networker> mNetworker;
+	QTimer* mPingTimer;
+	QTimer* mPingResponseTimer;
 
 	QSettings mSettings;
 };
