@@ -18,28 +18,28 @@ void ConsumersTab::unlock() {
 }
 
 void ConsumersTab::onConsumersReceived(const QJsonObject& data) {
-	if (!data.contains("G1") || !data.contains("G2") || !data.contains("G3"))
-		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+//	if (!data.contains("G1") || !data.contains("G2") || !data.contains("G3"))
+//		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	for (int i = 0; i < 3; ++i) {
-		if (!data.contains(QString{"G%1"}.arg(i + 1)))
-			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+//	for (int i = 0; i < 3; ++i) {
+//		if (!data.contains(QString{"G%1"}.arg(i + 1)))
+//			throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-		QJsonArray group = data.value(QString{"G%1"}.arg(i + 1)).toArray();
-		for (auto it = group.begin(); it != group.end(); ++it) {
-			QJsonObject consumer = (*it).toObject();
+//		QJsonArray group = data.value(QString{"G%1"}.arg(i + 1)).toArray();
+//		for (auto it = group.begin(); it != group.end(); ++it) {
+//			QJsonObject consumer = (*it).toObject();
 
-			if (!consumer.contains("id") || !consumer.contains("name") || !consumer.contains("status"))
-				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+//			if (!consumer.contains("id") || !consumer.contains("name") || !consumer.contains("status"))
+//				throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-			mConsumersGroups[i][consumer.value("id").toInt()] = {
-				consumer.value("id").toInt(),
-				consumer.value("name").toString(),
-				bool(consumer.value("status").toInt()),
-				nullptr
-			};
-		}
-	}
+//			mConsumersGroups[i][consumer.value("id").toInt()] = {
+//				consumer.value("id").toInt(),
+//				consumer.value("name").toString(),
+//				bool(consumer.value("status").toInt()),
+//				nullptr
+//			};
+//		}
+//	}
 
 	mConsumersReceived = true;
 }
