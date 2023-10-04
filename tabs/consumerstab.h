@@ -2,6 +2,7 @@
 
 #include "itab.h"
 #include "etc/customwidgets.h"
+#include "etc/stackedbarwithlineswidget.h"
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -34,6 +35,7 @@ public:
 
 	void onConsumersReceived(const QJsonObject&);
 	void onSensorsDataReceived(const QJsonObject&);
+	void onGraphicsDataReceived(const QJsonObject&);
 
 	virtual ~ConsumersTab() final override { };
 
@@ -42,6 +44,8 @@ private:
 	virtual void removeTabContents(const QString& text = tr("You need to authorize before starting")) final override;
 
 	QLayout* mLayout;
+	StackedBarWithLinesWidget* mPlot;
+
 	QVector<QMap<int, Consumer>> mConsumersGroups;
 	QVector<CustomCheckBox*> mGroupRelays;
 	QVector<QFrame*> mGroupWidgets;

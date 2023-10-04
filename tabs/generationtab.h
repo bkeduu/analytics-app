@@ -2,6 +2,7 @@
 
 #include "itab.h"
 #include "etc/customwidgets.h"
+#include "etc/stackedbarwithlineswidget.h"
 
 #include <QWidget>
 #include <QGridLayout>
@@ -20,13 +21,16 @@ public:
 	virtual void lock() final override;
 	virtual void unlock() final override;
 
-	void onSensorsDataReceived(const QJsonObject&);
+	void onSensorsDataReceived(const QJsonObject& data);
+	void onGraphicsDataReceived(const QJsonObject& data);
 
 	virtual ~GenerationTab() final override {};
 
 private:
 	QLayout* mLayout;
 	CustomCheckBox* mCheckBox;
+	StackedBarWithLinesWidget* mPlot;
+
 	bool mIsRelaySwitched;
 	bool mTabCreated;
 };

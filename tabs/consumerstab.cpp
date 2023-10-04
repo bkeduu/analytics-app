@@ -61,6 +61,33 @@ void ConsumersTab::onSensorsDataReceived(const QJsonObject& data) {
 	}
 }
 
+void ConsumersTab::onGraphicsDataReceived(const QJsonObject& data) {
+	if (!mPlot)
+		createTabContents();
+
+	if (!data.contains("prediction") || !data.contains("reality"))
+		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
+
+	QJsonArray realityData = data.value("reality").toArray();
+
+	static const QStringList plotLabels{tr("Generation"), tr("Consumers")};
+	QStringList labels;
+
+	QVector<QVector<double>> consumersValues{3, {}};
+
+	for (auto it = realityData.begin(); it != realityData.end(); ++it) {
+		QJsonArray value = (*it).toArray();
+
+		labels << value.at(0).toString("");
+		consumersValues[0] << value.at(4).toDouble(.0);
+		consumersValues[1] << value.at(5).toDouble(.0);
+		consumersValues[2] << value.at(6).toDouble(.0);
+	}
+
+	mPlot->onGraphicsData(labels, plotLabels, {}, consumersValues);
+	mPlot->resize(size());
+}
+
 void ConsumersTab::createTabContents() {
 	clearTab();
 	delete mLayout;
@@ -68,8 +95,8 @@ void ConsumersTab::createTabContents() {
 	mLayout = layout;
 	layout->setSpacing(30);
 
-	CalloutWidget* plot = new CalloutWidget{this};
-	layout->addWidget(plot, 15);
+	mPlot = new StackedBarWithLinesWidget{this};
+	layout->addWidget(mPlot, 15);
 
 	QWidget* groupsWidget = new QWidget{this};
 	QHBoxLayout* groupsWidgetLayout = new QHBoxLayout{groupsWidget};

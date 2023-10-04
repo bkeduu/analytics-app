@@ -46,7 +46,7 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 	double minimumValue = DBL_MAX;
 	double maximumValue = DBL_MIN;
 
-	auto it = plotsLabels.begin();
+	auto it = axisLabels.begin();
 
 	mXAxis = new QBarCategoryAxis;
 	mXAxis->append(axisLabels);
@@ -63,54 +63,60 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 	barSeries->attachAxis(mYAxis);
 	barSeries->attachAxis(mXAxis);
 
-	QVector<double> sums(barsValues[0].size(), .0);
+	if (barsValues.size()) {
+		// auto it = plotsLabels.begin();
 
-	for (int i = 0; i < barsValues.size(); ++i) {
-		QBarSet* barData = new QBarSet{*it++};
-		barData->setBorderColor(QColor{0, 0, 0, 0});
+		QVector<double> sums(barsValues[0].size(), .0);
 
-		for (int j = 0; j < barsValues[i].size(); ++j) {
-			if (barsValues[i][j] < minimumValue)
-				minimumValue = barsValues[i][j];
+		for (int i = 0; i < barsValues.size(); ++i) {
+			QBarSet* barData = new QBarSet{*it++};
+			barData->setBorderColor(QColor{0, 0, 0, 0});
 
-			(*barData) << barsValues[i][j];
-			sums[j] += barsValues[i][j];
+			for (int j = 0; j < barsValues[i].size(); ++j) {
+				if (barsValues[i][j] < minimumValue)
+					minimumValue = barsValues[i][j];
+
+				(*barData) << barsValues[i][j];
+				sums[j] += barsValues[i][j];
+			}
+
+			barSeries->append(barData);
+
+			connect(barSeries, &QStackedBarSeries::hovered, barData, [this] (bool hovered, int index, QBarSet* set) {
+				static QFrame* tooltip = nullptr;
+				static QLabel* textLabel = nullptr;
+
+				if (hovered) {  // cursor entered the bar area
+					if (!tooltip) {
+						tooltip = new QFrame{this};
+						tooltip->setFrameShape(QFrame::Box);
+						tooltip->setBaseSize(QSize{400, 200});
+						tooltip->setStyleSheet("background-color: #dcded3; border-radius: 2px;");
+
+						textLabel = new QLabel{this};
+
+						QHBoxLayout* layout = new QHBoxLayout{tooltip};
+						layout->addWidget(textLabel, 1, Qt::AlignCenter);
+						layout->setContentsMargins(0, 0, 0, 0);
+						tooltip->setLayout(layout);
+					}
+
+					textLabel->setText(QString{"%1 %2"}.arg(set->at(index)).arg(mYAxisTitle));
+					tooltip->move(mapFromGlobal(QCursor::pos()));
+					tooltip->show();
+				}
+				else {
+					if (tooltip) {
+						tooltip->hide();
+					}
+				}
+			});
 		}
 
-		barSeries->append(barData);
-
-		connect(barSeries, &QStackedBarSeries::hovered, barData, [this] (bool hovered, int index, QBarSet* set) {
-			static QFrame* tooltip = nullptr;
-			static QLabel* textLabel = nullptr;
-
-			if (hovered) {  // cursor entered the bar area
-				if (!tooltip) {
-					tooltip = new QFrame{this};
-					tooltip->setFrameShape(QFrame::Box);
-					tooltip->setBaseSize(QSize{400, 200});
-					tooltip->setStyleSheet("background-color: #dcded3; border-radius: 2px;");
-
-					textLabel = new QLabel{this};
-
-					QHBoxLayout* layout = new QHBoxLayout{tooltip};
-					layout->addWidget(textLabel, 1, Qt::AlignCenter);
-					layout->setContentsMargins(0, 0, 0, 0);
-					tooltip->setLayout(layout);
-				}
-
-				textLabel->setText(QString{"%1 %2"}.arg(set->at(index)).arg(mYAxisTitle));
-				tooltip->move(mapFromGlobal(QCursor::pos()));
-				tooltip->show();
-			}
-			else {
-				if (tooltip) {
-					tooltip->hide();
-				}
-			}
-		});
+		maximumValue = *std::max_element(sums.begin(), sums.end());
 	}
 
-	maximumValue = *std::max_element(sums.begin(), sums.end());
+	it = axisLabels.begin();
 
 	for (int i = 0; i < lineValues.size(); ++i) {
 		QLineSeries* lineSeries = new QLineSeries;

@@ -20,7 +20,7 @@ public:
 	virtual void showEvent(QShowEvent*) final override;
 	virtual void hideEvent(QHideEvent*) final override;
 
-	void onForecastDataReceived(const QJsonObject&);
+	void onGraphicsDataReceived(const QJsonObject&);
 
 	virtual ~ForecastTab() final override {};
 

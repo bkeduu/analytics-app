@@ -26,14 +26,27 @@ void GenerationTab::onSensorsDataReceived(const QJsonObject& data) {
 		mIsRelaySwitched = false;
 	else
 		mCheckBox->setCheckboxStatus(generatorArray[4].toInt());
+}
+
+void GenerationTab::onGraphicsDataReceived(const QJsonObject& data) {
 
 }
 
 void GenerationTab::createTabContents() {
 	clearTab();
 	delete mLayout;
-	mLayout = new QGridLayout{this};
-	setLayout(mLayout);
+	QVBoxLayout* layout = new QVBoxLayout{this};
+	mLayout = layout;
+	layout->setSpacing(30);
+
+	mPlot = new StackedBarWithLinesWidget{this};
+	layout->addWidget(mPlot, 15);
+
+	QWidget* relayWidget = new QWidget{this};
+	QHBoxLayout* relayWidgetLayout = new QHBoxLayout{relayWidget};
+	relayWidget->setLayout(relayWidgetLayout);
+	layout->addWidget(relayWidget, 1);
+
 	mCheckBox = new CustomCheckBox{this, tr("Diesel generator")};
 	mLayout->addWidget(mCheckBox);
 
@@ -41,6 +54,8 @@ void GenerationTab::createTabContents() {
 		mIsRelaySwitched = true;
 		mParent->onRelayClicked(4, newState);
 	});
+
+	setLayout(mLayout);
 }
 
 void GenerationTab::removeTabContents(const QString& text) {
