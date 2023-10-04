@@ -18,7 +18,6 @@ SOURCES += \
     tabs/forecasttab.cpp \
     tabs/generationtab.cpp \
     tabs/itab.cpp \
-    tabs/settingstab.cpp \
     tabs/statustab.cpp \
     networking/connection.cpp \
     etc/customwidgets.cpp \
@@ -43,7 +42,6 @@ HEADERS += \
     tabs/forecasttab.h \
     tabs/generationtab.h \
     tabs/itab.h \
-    tabs/settingstab.h \
     tabs/statustab.h \
     networking/connection.h
 

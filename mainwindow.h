@@ -6,7 +6,6 @@
 #include "consumerstab.h"
 #include "generationtab.h"
 #include "forecasttab.h"
-#include "settingstab.h"
 
 #include <QMainWindow>
 #include <QTabWidget>
@@ -85,5 +84,4 @@ private:
 	QSharedPointer<ForecastTab> mForecastTab;
 	QSharedPointer<GenerationTab> mGenerationTab;
 	QSharedPointer<ConsumersTab> mConsumersTab;
-	QSharedPointer<SettingsTab> mSettingsTab;
 };

@@ -66,13 +66,11 @@ QWidget* MainWindow::createMainContents() {
 	mForecastTab = QSharedPointer<ForecastTab>::create(QT_TR_NOOP("Forecast"), this);
 	mGenerationTab = QSharedPointer<GenerationTab>::create(QT_TR_NOOP("Generation"), this);
 	mConsumersTab = QSharedPointer<ConsumersTab>::create(QT_TR_NOOP("Consumers"), this);
-	mSettingsTab = QSharedPointer<SettingsTab>::create(QT_TR_NOOP("Settings"), this);
 
 	tabWidget->addTab(mStatusTab.data(), tr(mStatusTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mForecastTab.data(), tr(mForecastTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mGenerationTab.data(), tr(mGenerationTab->getName().toStdString().c_str()));
 	tabWidget->addTab(mConsumersTab.data(), tr(mConsumersTab->getName().toStdString().c_str()));
-	tabWidget->addTab(mSettingsTab.data(), tr(mSettingsTab->getName().toStdString().c_str()));
 
 	tabWidget->setTabIcon(tabWidget->indexOf(mStatusTab.data()),
 						  QIcon{QString{":/static/images/page_"} + mStatusTab->getName() + ".png"});
@@ -82,8 +80,6 @@ QWidget* MainWindow::createMainContents() {
 						  QIcon{QString{":/static/images/page_"} + mGenerationTab->getName() + ".png"});
 	tabWidget->setTabIcon(tabWidget->indexOf(mConsumersTab.data()),
 						  QIcon{QString{":/static/images/page_"} + mConsumersTab->getName() + ".png"});
-	tabWidget->setTabIcon(tabWidget->indexOf(mSettingsTab.data()),
-						  QIcon{QString{":/static/images/page_"} + mSettingsTab->getName() + ".png"});
 
 	tabWidget->tabBar()->setIconSize(QSize(35, 35));
 	tabWidget->setCurrentWidget(mStatusTab.data());
@@ -384,7 +380,6 @@ void MainWindow::lockTabs() {
 	mForecastTab->lock();
 	mGenerationTab->lock();
 	mConsumersTab->lock();
-	mSettingsTab->lock();
 }
 
 void MainWindow::unlockTabs() {
@@ -392,7 +387,6 @@ void MainWindow::unlockTabs() {
 	mForecastTab->unlock();
 	mGenerationTab->unlock();
 	mConsumersTab->unlock();
-	mSettingsTab->unlock();
 }
 
 MainWindow::~MainWindow() {
