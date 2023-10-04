@@ -374,6 +374,7 @@ void MainWindow::onModeChange(int mode) {  // mode switch with button
 void MainWindow::onGraphicsData(const QJsonObject& data) {
 	mForecastTab->onGraphicsDataReceived(data);
 	mConsumersTab->onGraphicsDataReceived(data);
+	mGenerationTab->onGraphicsDataReceived(data);
 }
 
 void MainWindow::lockTabs() {

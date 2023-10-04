@@ -27,7 +27,7 @@ void ForecastTab::onGraphicsDataReceived(const QJsonObject& data) {
 	static const QStringList plotLabels{tr("Generation"), tr("Consumers")};
 	QStringList labels;
 
-	QVector<QVector<double>> generatorValues{3, {}};
+	QVector<QVector<double>> generatorValues{{}};
 	QVector<QVector<double>> consumersValues{{}};
 
 	for (auto it = predictionData.begin(); it != predictionData.end(); ++it) {

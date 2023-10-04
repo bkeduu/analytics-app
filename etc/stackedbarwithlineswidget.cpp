@@ -43,7 +43,7 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 	if (mYAxis)
 		mChart->removeAxis(mYAxis);
 
-	double minimumValue = DBL_MAX;
+	double minimumValue = 0;
 	double maximumValue = DBL_MIN;
 
 	auto it = axisLabels.begin();
@@ -64,16 +64,19 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 	barSeries->attachAxis(mXAxis);
 
 	if (barsValues.size()) {
-		// auto it = plotsLabels.begin();
-
 		QVector<double> sums(barsValues[0].size(), .0);
 
 		for (int i = 0; i < barsValues.size(); ++i) {
-			QBarSet* barData = new QBarSet{*it++};
+			QBarSet* barData;
+			if (plotsLabels.size() < 3)
+				barData = new QBarSet{plotsLabels.front()};
+			else
+				barData = new QBarSet{plotsLabels[i]};
+
 			barData->setBorderColor(QColor{0, 0, 0, 0});
 
 			for (int j = 0; j < barsValues[i].size(); ++j) {
-				if (barsValues[i][j] < minimumValue)
+				if (barsValues[i][j] < 0 && barsValues[i][j] < minimumValue)
 					minimumValue = barsValues[i][j];
 
 				(*barData) << barsValues[i][j];
@@ -116,17 +119,20 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 		maximumValue = *std::max_element(sums.begin(), sums.end());
 	}
 
-	it = axisLabels.begin();
-
 	for (int i = 0; i < lineValues.size(); ++i) {
 		QLineSeries* lineSeries = new QLineSeries;
-		lineSeries->setName(*it++);
+
+		if (plotsLabels.size() < 3)
+			lineSeries->setName(plotsLabels.back());
+		else
+			lineSeries->setName(plotsLabels[i + (barsValues.size() ? 1 : 0)]);
+
 		mChart->addSeries(lineSeries);
 
 		for (int j = 0; j < lineValues[i].size(); ++j) {
 			if (lineValues[i][j] > maximumValue)
 				maximumValue = lineValues[i][j];
-			else if (lineValues[i][j] < minimumValue)
+			else if (lineValues[i][j] < 0 && lineValues[i][j] < minimumValue)
 				minimumValue = lineValues[i][j];
 
 			lineSeries->append(QPoint{j, static_cast<int>(lineValues[i][j])});

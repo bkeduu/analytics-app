@@ -70,7 +70,7 @@ void ConsumersTab::onGraphicsDataReceived(const QJsonObject& data) {
 
 	QJsonArray realityData = data.value("reality").toArray();
 
-	static const QStringList plotLabels{tr("Generation"), tr("Consumers")};
+	static const QStringList plotLabels{tr("1\'st group"), tr("2\'nd group"), tr("3\'rd group")};
 	QStringList labels;
 
 	QVector<QVector<double>> consumersValues{3, {}};
