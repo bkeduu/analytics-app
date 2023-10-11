@@ -95,7 +95,7 @@ void ConsumersTab::createTabContents() {
 	mLayout = layout;
 	layout->setSpacing(30);
 
-	mPlot = new StackedBarWithLinesWidget{this};
+	mPlot = new StackedBarWithLinesWidget{this, "", "", "kW"};
 	layout->addWidget(mPlot, 15);
 
 	QWidget* groupsWidget = new QWidget{this};

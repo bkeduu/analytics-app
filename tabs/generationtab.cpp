@@ -63,7 +63,7 @@ void GenerationTab::createTabContents() {
 	mLayout = layout;
 	layout->setSpacing(30);
 
-	mPlot = new StackedBarWithLinesWidget{this};
+	mPlot = new StackedBarWithLinesWidget{this, "", "", "kW"};
 	layout->addWidget(mPlot, 15);
 
 	QWidget* relayWidget = new QWidget{this};

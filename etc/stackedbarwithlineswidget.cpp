@@ -46,8 +46,6 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 	double minimumValue = 0;
 	double maximumValue = DBL_MIN;
 
-	auto it = axisLabels.begin();
-
 	mXAxis = new QBarCategoryAxis;
 	mXAxis->append(axisLabels);
 	mXAxis->setRange(axisLabels.first(), axisLabels.last());
@@ -121,6 +119,8 @@ void StackedBarWithLinesWidget::onGraphicsData(const QStringList& axisLabels, co
 
 	for (int i = 0; i < lineValues.size(); ++i) {
 		QLineSeries* lineSeries = new QLineSeries;
+		lineSeries->setMarkerSize(50);
+		lineSeries->setPointLabelsClipping(true);
 
 		if (plotsLabels.size() < 3)
 			lineSeries->setName(plotsLabels.back());

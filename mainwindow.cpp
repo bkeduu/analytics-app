@@ -52,7 +52,11 @@ MainWindow::MainWindow(Client* client, QWidget *parent) : QMainWindow{parent}, u
 	connect(client, SIGNAL(modeSwitched(int)), this, SLOT(onModeSwitch(int)));
 	connect(client, SIGNAL(graphicsData(QJsonObject)), this, SLOT(onGraphicsData(QJsonObject)));
 
-	// TODO на главном экране марджины слева и справа не совпадают
+	mSwitchTimer = new QTimer{};
+	mSwitchTimer->setInterval(2000);
+	mSwitchTimer->setSingleShot(true);
+	mSwitchTimer->start();
+	connect(mSwitchTimer, SIGNAL(timeout()), this, SLOT(onRelayClicked()));
 }
 
 QWidget* MainWindow::createMainContents() {
@@ -313,7 +317,22 @@ void MainWindow::onESPStatusChange(const QJsonObject& data) {
 }
 
 void MainWindow::onRelayClicked(int group, bool newState) {
-	emit relayClicked(group, newState);
+	if (mSwitchTimer->isActive()) {
+		mRelaySwitches.push({group, newState});
+	}
+	else {
+		mSwitchTimer->start();
+		onRelayClicked();
+	}
+}
+
+void MainWindow::onRelayClicked() {
+	if (!mRelaySwitches.empty()) {
+		auto [group, status] = mRelaySwitches.front();
+		mRelaySwitches.pop();
+		emit relayClicked(group, status);
+	}
+	mSwitchTimer->start();
 }
 
 void MainWindow::onServerLookupFail() {

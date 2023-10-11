@@ -17,6 +17,7 @@
 #include <QResizeEvent>
 #include <QVBoxLayout>
 #include <QSharedPointer>
+#include <queue>
 
 class Client;
 
@@ -58,6 +59,9 @@ public slots:
 
 	void onModeChange(int);
 
+private slots:
+	void onRelayClicked();
+
 private:
 	QWidget* createMainContents();
 	QWidget* createStartScreen();
@@ -79,6 +83,9 @@ private:
 	CustomLineEdit* mPasswordField;
 	CustomLineEdit* mServerAddressField;
 	CustomLineEdit* mServerPortField;
+
+	QTimer* mSwitchTimer;
+	std::queue<QPair<int, bool>> mRelaySwitches;
 
 	QSharedPointer<StatusTab> mStatusTab;
 	QSharedPointer<ForecastTab> mForecastTab;
