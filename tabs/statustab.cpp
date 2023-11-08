@@ -119,18 +119,18 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 	if (solarArray.isEmpty() || solarArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	dynamic_cast<QLabel*>(mWidgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(solarArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["solar-current-label"])->setText(tr("A: %1").arg(solarArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["solar-power-label"])->setText(tr("W: %1").arg(solarArray[2].toDouble()));
+	dynamic_cast<QLabel*>(mWidgetLocator["solar-voltage-label"])->setText(tr("V: %1").arg(QString::number(solarArray[0].toDouble(), 'f')));
+	dynamic_cast<QLabel*>(mWidgetLocator["solar-current-label"])->setText(tr("A: %1").arg(QString::number(solarArray[1].toDouble(), 'f')));
+	dynamic_cast<QLabel*>(mWidgetLocator["solar-power-label"])->setText(tr("W: %1").arg(QString::number(solarArray[2].toDouble(), 'f')));
 	dynamic_cast<QProgressBar*>(mWidgetLocator["solar-progressbar"])->setValue(solarArray[3].toInt());
 
 	QJsonArray windArray = dataObject.value("wind").toArray();
 	if (windArray.isEmpty() || windArray.size() < 5)
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
-	dynamic_cast<QLabel*>(mWidgetLocator["wind-voltage-label"])->setText(tr("V: %1").arg(windArray[0].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["wind-current-label"])->setText(tr("A: %1").arg(windArray[1].toDouble()));
-	dynamic_cast<QLabel*>(mWidgetLocator["wind-power-label"])->setText(tr("W: %1").arg(windArray[2].toDouble()));
+	dynamic_cast<QLabel*>(mWidgetLocator["wind-voltage-label"])->setText(tr("V: %1").arg(QString::number(windArray[0].toDouble(), 'f')));
+	dynamic_cast<QLabel*>(mWidgetLocator["wind-current-label"])->setText(tr("A: %1").arg(QString::number(windArray[1].toDouble(), 'f')));
+	dynamic_cast<QLabel*>(mWidgetLocator["wind-power-label"])->setText(tr("W: %1").arg(QString::number(windArray[2].toDouble(), 'f')));
 	dynamic_cast<QProgressBar*>(mWidgetLocator["wind-progressbar"])->setValue(windArray[3].toInt());
 
 	QJsonArray dieselArray = dataObject.value("gen").toArray();
@@ -138,9 +138,9 @@ void StatusTab::onSensorsDataReceived(const QJsonObject& dataObject) {
 		throw InternalErrorException{tr("Data structure with wrong value received at %1. The app will be closed.").arg(FLF)};
 
 	if (dieselArray[4].toInt()) {
-		dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(dieselArray[0].toDouble()));
-		dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(dieselArray[1].toDouble()));
-		dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(dieselArray[2].toDouble()));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-voltage-label"])->setText(tr("V: %1").arg(QString::number(dieselArray[0].toDouble(), 'f')));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-current-label"])->setText(tr("A: %1").arg(QString::number(dieselArray[1].toDouble(), 'f')));
+		dynamic_cast<QLabel*>(mWidgetLocator["diesel-power-label"])->setText(tr("W: %1").arg(QString::number(dieselArray[2].toDouble(), 'f')));
 		dynamic_cast<QProgressBar*>(mWidgetLocator["diesel-progressbar"])->setValue(dieselArray[3].toInt());
 	}
 	else {
